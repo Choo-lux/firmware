@@ -1,0 +1,6 @@
+# Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
+# All rights reserved.
+
+#1-59/1 * * * * /sbin/wifimesh/check.sh
+1-59/1 * * * * /sbin/wifimesh/update.sh
+1-59/1 * * * * /sbin/wifimesh/upgrade.sh

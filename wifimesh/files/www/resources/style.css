@@ -1,0 +1,21 @@
+table{background:#ffffff;color:#000000;border-width:0 0 0 0;vertical-align:middle}
+body,td,input,p,select{font-family:bitstream,sans-serif,arial,verdana;font-size:10pt}
+h2{color:#3cb83f}
+a{text-decoration:underline;font-size:10pt;font-weight:normal;}
+a:link, a:visited {color: 1C36A8;}
+a:hover, a:active {color: 5B914D;}
+legend{font-size:100%;border:1px solid#000000;background-color:#efefef;color:#cc0000;padding:3px}
+body {background-color: FFFFFF;text-align:left;}
+H2 {color: 1C36A8;}
+
+#tabsF a{background-color: FFFFFF;color: 616161;}
+#tabsF a:hover span,#tabsF a:active span{color: FFFFFF;}
+#tabsF{float:left;width:610px;background:#fff;font-size:93%;line-height:normal;border-bottom-style:solid;border-width:1px;border-color:#060606}
+#tabsF ul{margin:0;padding:10px 10px 0 50px;list-style:none}
+#tabsF li{display:inline;margin:0;padding:0}
+#tabsF a{float:left;background:url("tableftF.png")no-repeat left top;margin:0;padding:0 0 0 4px;text-decoration:none}
+#tabsF a span{float:left;display:block;background:url("tabrightF.png")no-repeat right top;padding:5px 15px 4px 6px;color:#060606}
+#tabsF a span{float:none}
+#tabsF a:hover span,#tabsF a:active span{color:#0f0f0f}
+#tabsF a:hover,#tabsF a:active{background-position:0%-42px}
+#tabsF a:hover span,#tabsF a:active span{background-position:100%-42px}
