@@ -57,7 +57,7 @@ fi
 
 
 # Saving Request Data
-request_data="ip=${ip}&mac=${mac}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi="
+request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi="
 
 dashboard_protocol="http"
 dashboard_server="www.wifi-mesh.com/dashboard/"
@@ -141,8 +141,8 @@ cat $response_file | while read line ; do
 		uci set wireless.@wifi-iface[1].isolate="$two"
 	elif [ "$one" = "network.public.captive_portal" ]; then
 		if [ "$two" = "1" ]; then
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac=${mac}&action=coova-html"
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip}&mac=${mac}&action=coova-logo"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-html"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-logo"
 			
 			/etc/init.d/chilli enable
 		else

@@ -4,7 +4,7 @@
 
 # IP Hexor
 hex_ip() {
-	let ip=0x$(echo $mac | cut $1)
+	let ip=0x$(echo $mac_wan | cut $1)
 	echo $ip
 }
 
@@ -55,7 +55,8 @@ fi
 
 
 # Define some networking-related variables
-mac=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+mac_lan=$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }')
+mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 ip="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
