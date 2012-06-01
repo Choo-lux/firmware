@@ -27,6 +27,9 @@ cat > /etc/banner << banner_end
   ------------------------------------------------------
 banner_end
 
+# set the default type
+type=0
+
 # If the first_file exists, configure the node
 if [ -e "/sbin/wifimesh/first_boot" ]; then
 logger "first_boot: Starting..."
@@ -97,6 +100,9 @@ logger "first_boot: setting the ssh password"
 
 logger "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
+
+# mark it as a new boot
+type=1
 fi
 
 logger "boot: initialising mesh networking..."
@@ -136,7 +142,7 @@ logger "boot: configuring cronjobs"
 crontab /sbin/wifimesh/cron.txt
 
 logger "boot: initial report to the dashboard"
-/sbin/wifimesh/update.sh
+/sbin/wifimesh/update.sh ${type}
 
 logger "boot: initial upgrade check"
 /sbin/wifimesh/upgrade.sh

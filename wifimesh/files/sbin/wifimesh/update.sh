@@ -20,6 +20,13 @@ echo "WiFi Mesh Dashboard Checker"
 echo "----------------------------------------------------------------"
 
 
+# fix up the passed in variable if there is none
+if [ "$1" = "" ]; then
+	RR=0
+else
+	RR="$1"
+fi
+
 echo "Calculating memory and load averages"
 memfree=$(free | grep 'Mem:' | awk '{print $4}')
 memtotal=$(free | grep 'Mem:' | awk '{print $2}')
@@ -57,7 +64,7 @@ fi
 
 
 # Saving Request Data
-request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi="
+request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_server="www.wifi-mesh.com/dashboard/"
