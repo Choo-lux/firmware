@@ -105,6 +105,9 @@ rm /sbin/wifimesh/first_boot
 type=1
 fi
 
+logger "boot: initialising LAN IP"
+ifconfig br-lan ${ip_lan}
+
 logger "boot: initialising mesh networking..."
 sleep 10
 

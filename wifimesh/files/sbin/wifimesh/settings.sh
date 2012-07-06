@@ -58,6 +58,7 @@ fi
 mac_lan=$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 ip="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
+ip_lan="240.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
 ssid="wifimesh_$(hex_ip -c16-17)"
