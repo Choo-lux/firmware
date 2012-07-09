@@ -42,6 +42,10 @@ uci set firewall.@zone[1].input="ACCEPT"
 uci commit firewall
 /etc/init.d/firewall restart
 
+logger "first_boot: configuring the bridges"
+brctl addbr br-wan
+brctl addbr br-lan
+
 logger "first_boot: configuring the network"
 uci set network.wan="interface"
 uci set network.wan.type="bridge"
@@ -67,7 +71,7 @@ uci set wireless.@wifi-iface[0].mesh_id="wifimesh"
 uci set wireless.@wifi-iface[0].encryption="none"
 
 uci set wireless.@wifi-iface[1].device="radio0"
-uci set wireless.@wifi-iface[1].network="wan"
+uci set wireless.@wifi-iface[1].network="lan"
 uci set wireless.@wifi-iface[1].mode="ap"
 uci set wireless.@wifi-iface[1].ssid="${ssid}_public"
 uci set wireless.@wifi-iface[1].encryption="none"
@@ -91,12 +95,6 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Y
 
 logger "first_boot: setting the ssh password"
 (echo -n "w1f1m35h" && sleep 1 && echo -n "w1f1m35h") | passwd root
-
-#logger "first_boot: configuring dnsmasq"
-#uci set dhcp.lan.interface="lan"
-#uci commit dhcp
-#/etc/init.d/dnsmasq enable
-#/etc/init.d/dnsmasq restart
 
 logger "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
