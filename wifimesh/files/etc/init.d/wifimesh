@@ -52,6 +52,7 @@ uci set network.wan.type="bridge"
 uci set network.wan.ifname="eth0"
 uci set network.wan.proto="dhcp"
 uci set network.lan.ifname=""
+uci set network.lan.ipaddr="${ip_lan}"
 uci commit network
 
 # Enable the wifi radios
@@ -102,9 +103,6 @@ rm /sbin/wifimesh/first_boot
 # mark it as a new boot
 type=1
 fi
-
-logger "boot: initialising LAN IP"
-ifconfig br-lan ${ip_lan}
 
 logger "boot: initialising mesh networking..."
 sleep 10
