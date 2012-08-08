@@ -36,9 +36,6 @@ logger "first_boot: Starting..."
 
 logger "first_boot: configuring the firewall"
 uci set firewall.@zone[1].input="ACCEPT"
-#uci delete firewall.@rule[2]
-#uci delete firewall.@rule[2]
-#uci delete firewall.@rule[2]
 uci commit firewall
 /etc/init.d/firewall restart
 
@@ -111,9 +108,6 @@ sleep 10
 ping -c 1 -W 3 -I br-wan www.google.com
 if [ $? -eq 0 ]; then
 logger "boot: This node has an Ethernet connection."
-
-#iw wlan0-2 set mesh_param mesh_hwmp_rootmode=1
-#iw wlan0-2 set mesh_param mesh_gate_announcements=1
 else
 logger "boot: This node has no Ethernet connection, falling back to the mesh."
 fi

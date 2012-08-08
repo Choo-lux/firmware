@@ -27,6 +27,9 @@ else
 	echo "No Client radio detected."
 fi
 
+# note:
+# we only support single radio devices for the moment so the next part is commented out
+
 # Mesh
 #if [ "$(uci get wireless.radio0.hwmode)" = "11na" ]; then
 #	# 5.X GHz Mesh on radio0
