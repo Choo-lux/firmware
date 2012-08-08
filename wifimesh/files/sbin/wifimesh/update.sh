@@ -128,15 +128,15 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "servers.dns.domain" ]; then
 		uci set dhcp.@dnsmasq[0].domain="$two"
 	
-	# Public SSID
-	elif [ "$one" = "network.public.enabled" ]; then
+	# SSID #1 (formerly Public SSID)
+	elif [ "$one" = "network.ssid1.enabled" ]; then
 		uci set wireless.@wifi-iface[1].enabled="$two"
-	elif [ "$one" = "network.public.hide" ]; then
+	elif [ "$one" = "network.ssid1.hide" ]; then
 		uci set wireless.@wifi-iface[1].hidden="$two"
-	elif [ "$one" = "network.public.ssid" ]; then
+	elif [ "$one" = "network.ssid1.ssid" ]; then
 		two=$(echo $two | sed 's/*/ /g')
 		uci set wireless.@wifi-iface[1].ssid="$two"
-	elif [ "$one" = "network.public.key" ]; then
+	elif [ "$one" = "network.ssid1.key" ]; then
 		if [ "$two" = "" ]; then
 			uci set wireless.@wifi-iface[1].encryption="none"
 			uci set wireless.@wifi-iface[1].key=""
@@ -144,9 +144,9 @@ cat $response_file | while read line ; do
 			uci set wireless.@wifi-iface[1].encryption="mixed-psk"
 			uci set wireless.@wifi-iface[1].key="$two"
 		fi
-	elif [ "$one" = "network.public.isolate" ]; then
+	elif [ "$one" = "network.ssid1.isolate" ]; then
 		uci set wireless.@wifi-iface[1].isolate="$two"
-	elif [ "$one" = "network.public.captive_portal" ]; then
+	elif [ "$one" = "network.ssid1.captive_portal" ]; then
 		if [ "$two" = "1" ]; then
 			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-html"
 			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-logo"
@@ -156,15 +156,15 @@ cat $response_file | while read line ; do
 			/etc/init.d/chilli disable
 		fi
 	
-	# Private SSID
-	elif [ "$one" = "network.private.enabled" ]; then
+	# SSID #2 (formerly Private SSID)
+	elif [ "$one" = "network.ssid2.enabled" ]; then
 		uci set wireless.@wifi-iface[2].enabled="$two"
-	elif [ "$one" = "network.private.hide" ]; then
+	elif [ "$one" = "network.ssid2.hide" ]; then
 		uci set wireless.@wifi-iface[2].hidden="$two"
-	elif [ "$one" = "network.private.ssid" ]; then
+	elif [ "$one" = "network.ssid2.ssid" ]; then
 		two=$(echo $two | sed 's/*/ /g')
 		uci set wireless.@wifi-iface[2].ssid="$two"
-	elif [ "$one" = "network.private.key" ]; then
+	elif [ "$one" = "network.ssid2.key" ]; then
 		if [ "$two" = "" ]; then
 			uci set wireless.@wifi-iface[2].encryption="none"
 			uci set wireless.@wifi-iface[2].key=""
@@ -172,8 +172,46 @@ cat $response_file | while read line ; do
 			uci set wireless.@wifi-iface[2].encryption="mixed-psk"
 			uci set wireless.@wifi-iface[2].key="$two"
 		fi
-	elif [ "$one" = "network.private.isolate" ]; then
+	elif [ "$one" = "network.ssid2.isolate" ]; then
 		uci set wireless.@wifi-iface[2].isolate="$two"
+	
+	# SSID #3
+	elif [ "$one" = "network.ssid3.enabled" ]; then
+		uci set wireless.@wifi-iface[3].enabled="$two"
+	elif [ "$one" = "network.ssid3.hide" ]; then
+		uci set wireless.@wifi-iface[3].hidden="$two"
+	elif [ "$one" = "network.ssid3.ssid" ]; then
+		two=$(echo $two | sed 's/*/ /g')
+		uci set wireless.@wifi-iface[3].ssid="$two"
+	elif [ "$one" = "network.ssid3.key" ]; then
+		if [ "$two" = "" ]; then
+			uci set wireless.@wifi-iface[3].encryption="none"
+			uci set wireless.@wifi-iface[3].key=""
+		else
+			uci set wireless.@wifi-iface[3].encryption="mixed-psk"
+			uci set wireless.@wifi-iface[3].key="$two"
+		fi
+	elif [ "$one" = "network.ssid3.isolate" ]; then
+		uci set wireless.@wifi-iface[3].isolate="$two"
+	
+	# SSID #4
+	elif [ "$one" = "network.ssid4.enabled" ]; then
+		uci set wireless.@wifi-iface[4].enabled="$two"
+	elif [ "$one" = "network.ssid4.hide" ]; then
+		uci set wireless.@wifi-iface[4].hidden="$two"
+	elif [ "$one" = "network.ssid4.ssid" ]; then
+		two=$(echo $two | sed 's/*/ /g')
+		uci set wireless.@wifi-iface[4].ssid="$two"
+	elif [ "$one" = "network.ssid4.key" ]; then
+		if [ "$two" = "" ]; then
+			uci set wireless.@wifi-iface[4].encryption="none"
+			uci set wireless.@wifi-iface[4].key=""
+		else
+			uci set wireless.@wifi-iface[4].encryption="mixed-psk"
+			uci set wireless.@wifi-iface[4].key="$two"
+		fi
+	elif [ "$one" = "network.ssid4.isolate" ]; then
+		uci set wireless.@wifi-iface[4].isolate="$two"
 	
 	# Radios
 	elif [ "$one" = "network.client.channel" ]; then
