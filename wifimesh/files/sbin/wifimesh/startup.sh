@@ -60,6 +60,8 @@ uci set wireless.${radio_client}.disabled="0"
 # Create the wifi interfaces (if they don't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
 if [ -z "$(uci get wireless.@wifi-iface[2])" ]; then uci add wireless wifi-iface; fi
+if [ -z "$(uci get wireless.@wifi-iface[3])" ]; then uci add wireless wifi-iface; fi
+if [ -z "$(uci get wireless.@wifi-iface[4])" ]; then uci add wireless wifi-iface; fi
 
 # Set the defaults on those interfaces
 uci set wireless.@wifi-iface[0].device="radio0"
@@ -71,7 +73,7 @@ uci set wireless.@wifi-iface[0].encryption="none"
 uci set wireless.@wifi-iface[1].device="radio0"
 uci set wireless.@wifi-iface[1].network="lan"
 uci set wireless.@wifi-iface[1].mode="ap"
-uci set wireless.@wifi-iface[1].ssid="${ssid}_public"
+uci set wireless.@wifi-iface[1].ssid="${ssid}"
 uci set wireless.@wifi-iface[1].encryption="none"
 uci set wireless.@wifi-iface[1].key=""
 uci set wireless.@wifi-iface[1].hidden="0"
@@ -79,10 +81,26 @@ uci set wireless.@wifi-iface[1].hidden="0"
 uci set wireless.@wifi-iface[2].device="radio0"
 uci set wireless.@wifi-iface[2].network="wan"
 uci set wireless.@wifi-iface[2].mode="ap"
-uci set wireless.@wifi-iface[2].ssid="${ssid}_private"
+uci set wireless.@wifi-iface[2].ssid="${ssid}_2"
 uci set wireless.@wifi-iface[2].encryption="psk2"
 uci set wireless.@wifi-iface[2].key="w1f1m35h"
 uci set wireless.@wifi-iface[2].hidden="0"
+
+uci set wireless.@wifi-iface[3].device="radio0"
+uci set wireless.@wifi-iface[3].network="wan"
+uci set wireless.@wifi-iface[3].mode="ap"
+uci set wireless.@wifi-iface[3].ssid="${ssid}_3"
+uci set wireless.@wifi-iface[3].encryption="psk2"
+uci set wireless.@wifi-iface[3].key="w1f1m35h"
+uci set wireless.@wifi-iface[3].hidden="0"
+
+uci set wireless.@wifi-iface[4].device="radio0"
+uci set wireless.@wifi-iface[4].network="wan"
+uci set wireless.@wifi-iface[4].mode="ap"
+uci set wireless.@wifi-iface[4].ssid="${ssid}_4"
+uci set wireless.@wifi-iface[4].encryption="psk2"
+uci set wireless.@wifi-iface[4].key="w1f1m35h"
+uci set wireless.@wifi-iface[4].hidden="0"
 uci commit wireless
 
 logger "first_boot: restarting the networking"
