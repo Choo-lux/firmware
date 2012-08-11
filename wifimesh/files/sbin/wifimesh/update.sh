@@ -19,10 +19,15 @@ if [ ! -d "$temp_dir" ]; then mkdir $temp_dir; fi
 echo "WiFi Mesh Dashboard Checker"
 echo "----------------------------------------------------------------"
 
+# If the node has no configuration, say that we need it
+if [ "$(uci get wireless.@wifi-iface[1].ssid)" = "${ssid}" ]; then
+	RR=1
 
-# fix up the passed in variable if there is none
-if [ "$1" = "" ]; then
+# If we have not passed in a variable then it is 0
+elif [ "$1" = "" ]; then
 	RR=0
+
+# Otherwise, work with what we have on hand
 else
 	RR="$1"
 fi
