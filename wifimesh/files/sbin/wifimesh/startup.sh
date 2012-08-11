@@ -71,7 +71,7 @@ uci set wireless.@wifi-iface[0].mesh_id="wifimesh"
 uci set wireless.@wifi-iface[0].encryption="none"
 
 uci set wireless.@wifi-iface[1].device="radio0"
-uci set wireless.@wifi-iface[1].network="lan"
+uci set wireless.@wifi-iface[1].network="wan"
 uci set wireless.@wifi-iface[1].mode="ap"
 uci set wireless.@wifi-iface[1].ssid="${ssid}"
 uci set wireless.@wifi-iface[1].encryption="none"

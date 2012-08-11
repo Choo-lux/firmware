@@ -36,9 +36,6 @@ logger "first_boot: Starting..."
 
 logger "first_boot: configuring the firewall"
 uci set firewall.@zone[1].input="ACCEPT"
-#uci delete firewall.@rule[2]
-#uci delete firewall.@rule[2]
-#uci delete firewall.@rule[2]
 uci commit firewall
 /etc/init.d/firewall restart
 
@@ -63,6 +60,8 @@ uci set wireless.${radio_client}.disabled="0"
 # Create the wifi interfaces (if they don't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
 if [ -z "$(uci get wireless.@wifi-iface[2])" ]; then uci add wireless wifi-iface; fi
+if [ -z "$(uci get wireless.@wifi-iface[3])" ]; then uci add wireless wifi-iface; fi
+if [ -z "$(uci get wireless.@wifi-iface[4])" ]; then uci add wireless wifi-iface; fi
 
 # Set the defaults on those interfaces
 uci set wireless.@wifi-iface[0].device="radio0"
@@ -72,9 +71,9 @@ uci set wireless.@wifi-iface[0].mesh_id="wifimesh"
 uci set wireless.@wifi-iface[0].encryption="none"
 
 uci set wireless.@wifi-iface[1].device="radio0"
-uci set wireless.@wifi-iface[1].network="lan"
+uci set wireless.@wifi-iface[1].network="wan"
 uci set wireless.@wifi-iface[1].mode="ap"
-uci set wireless.@wifi-iface[1].ssid="${ssid}_public"
+uci set wireless.@wifi-iface[1].ssid="${ssid}"
 uci set wireless.@wifi-iface[1].encryption="none"
 uci set wireless.@wifi-iface[1].key=""
 uci set wireless.@wifi-iface[1].hidden="0"
@@ -82,10 +81,26 @@ uci set wireless.@wifi-iface[1].hidden="0"
 uci set wireless.@wifi-iface[2].device="radio0"
 uci set wireless.@wifi-iface[2].network="wan"
 uci set wireless.@wifi-iface[2].mode="ap"
-uci set wireless.@wifi-iface[2].ssid="${ssid}_private"
+uci set wireless.@wifi-iface[2].ssid="${ssid}_2"
 uci set wireless.@wifi-iface[2].encryption="psk2"
 uci set wireless.@wifi-iface[2].key="w1f1m35h"
 uci set wireless.@wifi-iface[2].hidden="0"
+
+uci set wireless.@wifi-iface[3].device="radio0"
+uci set wireless.@wifi-iface[3].network="wan"
+uci set wireless.@wifi-iface[3].mode="ap"
+uci set wireless.@wifi-iface[3].ssid="${ssid}_3"
+uci set wireless.@wifi-iface[3].encryption="psk2"
+uci set wireless.@wifi-iface[3].key="w1f1m35h"
+uci set wireless.@wifi-iface[3].hidden="0"
+
+uci set wireless.@wifi-iface[4].device="radio0"
+uci set wireless.@wifi-iface[4].network="wan"
+uci set wireless.@wifi-iface[4].mode="ap"
+uci set wireless.@wifi-iface[4].ssid="${ssid}_4"
+uci set wireless.@wifi-iface[4].encryption="psk2"
+uci set wireless.@wifi-iface[4].key="w1f1m35h"
+uci set wireless.@wifi-iface[4].hidden="0"
 uci commit wireless
 
 logger "first_boot: restarting the networking"
@@ -111,9 +126,6 @@ sleep 10
 ping -c 1 -W 3 -I br-wan www.google.com
 if [ $? -eq 0 ]; then
 logger "boot: This node has an Ethernet connection."
-
-#iw wlan0-2 set mesh_param mesh_hwmp_rootmode=1
-#iw wlan0-2 set mesh_param mesh_gate_announcements=1
 else
 logger "boot: This node has no Ethernet connection, falling back to the mesh."
 fi
@@ -132,10 +144,11 @@ elif [ -z $dns2 ]; then
 fi
 done
 
+logger "boot: getting the coova configuration"
 curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/defaults "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-config&$(cat /tmp/dns.tmp)"
 
-logger "boot: starting coovachilli"
-/etc/init.d/chilli start
+logger "boot: getting the coova logo"
+curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/www/coova.jpg "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-logo"
 
 logger "boot: configuring cronjobs"
 crontab /sbin/wifimesh/cron.txt

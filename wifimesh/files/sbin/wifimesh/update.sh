@@ -148,6 +148,9 @@ cat $response_file | while read line ; do
 		uci set wireless.@wifi-iface[1].isolate="$two"
 	elif [ "$one" = "network.ssid1.captive_portal" ]; then
 		if [ "$two" = "1" ]; then
+			# configure the wifi interface to use the wan
+			uci set wireless.@wifi-iface[1].network="lan"
+			
 			# get the page to use as the splash page
 			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-html"
 			
@@ -157,6 +160,9 @@ cat $response_file | while read line ; do
 			# do start coova on boot
 			/etc/init.d/chilli enable
 		else
+			# configure the wifi interface to use the wan
+			uci set wireless.@wifi-iface[1].network="wan"
+			
 			# don't start coova on boot
 			/etc/init.d/chilli disable
 		fi
