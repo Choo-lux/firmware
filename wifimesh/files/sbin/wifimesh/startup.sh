@@ -121,14 +121,6 @@ fi
 
 logger "boot: initialising mesh networking..."
 sleep 10
-
-# check that we have an internet connection on the Ethernet interface
-ping -c 1 -W 3 -I br-wan www.google.com
-if [ $? -eq 0 ]; then
-logger "boot: This node has an Ethernet connection."
-else
-logger "boot: This node has no Ethernet connection, falling back to the mesh."
-fi
 	
 logger "boot: obtaining coovachilli configuration"
 echo "" > /tmp/dns.tmp
