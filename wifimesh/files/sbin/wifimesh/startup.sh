@@ -142,9 +142,6 @@ curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/defaults 
 logger "boot: getting the coova logo"
 curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/www/coova.jpg "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-logo"
 
-logger "boot: configuring cronjobs"
-crontab /sbin/wifimesh/cron.txt
-
 logger "boot: initial report to the dashboard"
 /sbin/wifimesh/update.sh ${type}
 
@@ -153,6 +150,9 @@ logger "boot: initial upgrade check"
 
 logger "boot: initial check for internet connectivity"
 /sbin/wifimesh/check.sh
+
+logger "boot: configuring cronjobs"
+crontab /sbin/wifimesh/cron.txt
 }
 
 start() {
