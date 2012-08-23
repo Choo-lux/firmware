@@ -11,7 +11,9 @@ echo "----------------------------------------------------------------"
 old_version=$(cat /sbin/wifimesh/version.txt)
 new_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s "http://s3.amazonaws.com/cdn.wifi-mesh.com/firmware/development/version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
-if [ "$old_version" != "$new_version" ]; then
+if [ "${new_version+x}" = x ] && [ -z "$new_version" ]; then
+	log_message "upgrade: Could not connect to the upgrade server, aborting..."
+elif [ "$old_version" != "$new_version" ]; then
 	# Make sure the directory exists
 	if [ ! -d "/sbin/wifimesh" ]; then mkdir /sbin/wifimesh > /dev/null; fi
 	
