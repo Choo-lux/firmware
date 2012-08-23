@@ -8,6 +8,11 @@ hex_ip() {
 	echo $ip
 }
 
+log_message() {
+	echo "$(date) $1" >> /etc/perma.log
+	echo $1
+}
+
 # Radio Detection
 # Client
 if [ "$(uci get wireless.radio0.hwmode)" = "11ng" ]; then
@@ -23,8 +28,7 @@ elif [ "$(uci get wireless.radio2.hwmode)" = "11ng" ]; then
 	radio_client="radio2"
 	radio_client_freq="24"
 else
-	logger "No Client radio detected."
-	echo "No Client radio detected."
+	log_message "No Client radio detected."
 fi
 
 # note:
@@ -51,7 +55,7 @@ fi
 		radio_mesh_freq="${radio_client_freq}"
 #	else
 #		# No radios at all
-#		logger "No Mesh radio detected."
+#		log_message "No Mesh radio detected."
 #		echo "No Mesh radio detected."
 #	fi
 #fi

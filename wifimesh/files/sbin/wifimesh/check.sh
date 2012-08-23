@@ -41,9 +41,7 @@ fi
 
 # If we are connected
 if [ "$connected" = "1" ]; then
-	logger "check: We are connected to the Internet"
-	echo "We are connected to the Internet"
+	log_message "check: We are connected to the Internet"
 else
-	logger "check: We are NOT connected to the Internet"
-	echo "We are NOT connected to the Internet"
+	log_message "check: We are NOT connected to the Internet"
 fi

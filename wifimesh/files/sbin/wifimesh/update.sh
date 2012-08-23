@@ -263,6 +263,7 @@ if [ -e $temp_file ]; then rm $temp_file; fi
 
 echo "----------------------------------------------------------------"
 echo "Successfully applied new settings, rebooting..."
-logger "update: Successfully applied new settings, rebooting..."
+
+log_message "update: Successfully applied new settings, rebooting..."
 
 reboot

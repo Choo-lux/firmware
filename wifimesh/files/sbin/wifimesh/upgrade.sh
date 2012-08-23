@@ -27,8 +27,7 @@ if [ "$old_version" != "$new_version" ]; then
 	
 	echo "Installing unzip"
 	if [ ! -e "/tmp/scripts.zip" ]; then
-		logger "upgrade: The upgrade download was not successful, upgrade cancelled."
-		echo "The upgrade download was not successful, upgrade cancelled."
+		log_message "upgrade: The upgrade download was not successful, upgrade cancelled."
 	elif [ "${actual_hash}" = "${local_hash}" ]; then
 		echo "Installing upgrade"
 		unzip -o /tmp/scripts.zip -d /sbin/wifimesh > /dev/null
@@ -45,15 +44,12 @@ if [ "$old_version" != "$new_version" ]; then
 		/etc/init.d/wifimesh enable > /dev/null
 		
 		# Say about it
-		logger "upgrade: Upgraded from ${old_version} to ${new_version} successfully, rebooting..."
-		echo "Upgraded from ${old_version} to ${new_version} successfully, rebooting..."
+		log_message "upgrade: Upgraded from ${old_version} to ${new_version} successfully, rebooting..."
 		
 		reboot
 	else
-		logger "upgrade: The downloaded upgrade was not valid, upgrade cancelled."
-		echo "The downloaded upgrade was not valid, upgrade cancelled."
+		log_message "upgrade: The downloaded upgrade was not valid, upgrade cancelled."
 	fi
 else
-	logger "upgrade: v${old_version} is the latest version available."
-	echo "v${old_version} is the latest version available."
+	log_message "upgrade: v${old_version} is the latest version available."
 fi
