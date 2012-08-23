@@ -13,19 +13,8 @@ chmod -R +x /sbin/wifimesh
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
-log_message "boot: saving the WiFi Mesh banner"
-cat > /etc/banner << banner_end
-  ________ __ _______ __   _______               __     
-  |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
-  |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
-  |________|__|___|   |__| |__|_|__||_____|_____||__|__|
-
-  v${fw_ver}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
-  ------------------------------------------------------
-  Powered by:	
-  http://www.wifi-mesh.com/       http://www.openwrt.org
-  ------------------------------------------------------
-banner_end
+# Add a new line to the log file signalling a reboot
+log_message
 
 # set the default type
 type=0
@@ -118,6 +107,20 @@ rm /sbin/wifimesh/first_boot
 # mark it as a new boot
 type=1
 fi
+
+log_message "boot: saving the WiFi Mesh banner"
+cat > /etc/banner << banner_end
+  ________ __ _______ __   _______               __     
+  |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
+  |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
+  |________|__|___|   |__| |__|_|__||_____|_____||__|__|
+
+  v${fw_ver}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
+  ------------------------------------------------------
+  Powered by:	
+  http://www.wifi-mesh.com/       http://www.openwrt.org
+  ------------------------------------------------------
+banner_end
 
 log_message "boot: initialising mesh networking..."
 sleep 10
