@@ -104,6 +104,10 @@ log_message "first_boot: setting the ssh password"
 log_message "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
 
+log_message "first_boot: rebooting..."
+sleep 10
+reboot
+
 # mark it as a new boot
 type=1
 fi
@@ -122,9 +126,9 @@ cat > /etc/banner << banner_end
   ------------------------------------------------------
 banner_end
 
-log_message "boot: initialising mesh networking..."
+log_message "boot: waiting for system to initialize..."
 sleep 10
-	
+
 log_message "boot: getting coova configuration"
 echo "" > /tmp/dns.tmp
 cat /tmp/resolv.conf | grep 'nameserver' | while read line; do
@@ -148,9 +152,6 @@ log_message "boot: initial report to the dashboard"
 
 log_message "boot: initial upgrade check"
 /sbin/wifimesh/upgrade.sh
-
-log_message "boot: initial connectivity check"
-/sbin/wifimesh/check.sh
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt
