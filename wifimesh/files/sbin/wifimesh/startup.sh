@@ -142,10 +142,10 @@ elif [ -z $dns2 ]; then
 	dns2=1
 fi
 done
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/defaults "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-config&$(cat /tmp/dns.tmp)"
+curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/defaults "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(cat /tmp/dns.tmp)"
 
 log_message "boot: getting coova logo"
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/www/coova.jpg "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-logo"
+curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/www/coova.jpg "https://www.wifi-mesh.com/dashboard/checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 
 log_message "boot: initial report to the dashboard"
 /sbin/wifimesh/update.sh ${type}

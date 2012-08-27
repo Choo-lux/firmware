@@ -69,7 +69,7 @@ fi
 
 
 # Saving Request Data
-request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
+request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_server="www.wifi-mesh.com/dashboard/"
@@ -157,10 +157,10 @@ cat $response_file | while read line ; do
 			uci set wireless.@wifi-iface[1].network="lan"
 			
 			# get the page to use as the splash page
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-html"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
 			
 			# get the logo to use on the splash page
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&action=coova-logo"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
 			# do start coova on boot
 			/etc/init.d/chilli enable
