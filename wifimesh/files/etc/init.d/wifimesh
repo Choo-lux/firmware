@@ -131,7 +131,7 @@ sleep 10
 
 log_message "boot: getting coova configuration"
 echo "" > /tmp/dns.tmp
-cat /tmp/resolv.conf | grep 'nameserver' | while read line; do
+cat /tmp/resolv.conf.auto | grep 'nameserver' | while read line; do
 line=$(echo $line | awk '{ print $2 }')
 
 if [ -z $dns1 ] ; then
