@@ -4,7 +4,7 @@
 
 # IP Hexor
 hex_ip() {
-	let ip=0x$(echo $mac_wan | cut $1)
+	let ip=0x$(echo $mac_wlan | cut $1)
 	echo $ip
 }
 

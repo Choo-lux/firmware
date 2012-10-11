@@ -20,7 +20,12 @@ make menuconfig
 
 4) Then select the following options:
 > Architecture: ar71xx
-> Packages: coovachilli, unzip & wifimesh
+> Packages:
+	Network ->		Captive Portals ->	coova-chilli
+					File Transfer ->	curl
+					wifimesh
+	Utilities ->	compression ->	unzip
+	Base system ->	om-watchdog
 
 5) Build the firmware:
 make
