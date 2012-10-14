@@ -28,6 +28,9 @@ uci set firewall.@zone[1].input="ACCEPT"
 uci commit firewall
 /etc/init.d/firewall restart
 
+log_message "first_boot: disable dnsmasq"
+/etc/init.d/dnsmasq disable
+
 log_message "first_boot: configuring the bridges"
 brctl addbr br-wan
 brctl addbr br-lan
@@ -111,6 +114,9 @@ reboot
 # mark it as a new boot
 type=1
 fi
+
+log_message "boot: stopping dnsmasq"
+/etc/init.d/dnsmasq stop
 
 log_message "boot: saving the WiFi Mesh banner"
 cat > /etc/banner << banner_end
