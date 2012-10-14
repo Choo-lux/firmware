@@ -107,18 +107,7 @@ log_message "first_boot: setting the ssh password"
 log_message "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
 
-log_message "first_boot: rebooting..."
-sleep 10
-reboot
-
-# mark it as a new boot
-type=1
-fi
-
-log_message "boot: stopping dnsmasq"
-/etc/init.d/dnsmasq stop
-
-log_message "boot: saving the WiFi Mesh banner"
+log_message "first_boot: saving ssh banner"
 cat > /etc/banner << banner_end
   ________ __ _______ __   _______               __     
   |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
@@ -129,8 +118,20 @@ cat > /etc/banner << banner_end
   ------------------------------------------------------
   Powered by:	
   http://www.wifi-mesh.com/       http://www.openwrt.org
+  http://coova.org/
   ------------------------------------------------------
 banner_end
+
+log_message "first_boot: rebooting..."
+sleep 10
+reboot
+
+# mark it as a new boot
+type=1
+fi
+
+log_message "boot: stopping dnsmasq"
+/etc/init.d/dnsmasq stop
 
 log_message "boot: waiting for system to initialize..."
 sleep 10

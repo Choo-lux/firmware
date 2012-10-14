@@ -45,6 +45,21 @@ elif [ "$old_version" != "$new_version" ]; then
 		# Make sure we are enabled
 		/etc/init.d/wifimesh enable > /dev/null
 		
+		echo "saving the new WiFi Mesh banner"
+cat > /etc/banner << banner_end
+  ________ __ _______ __   _______               __     
+  |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
+  |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
+  |________|__|___|   |__| |__|_|__||_____|_____||__|__|
+
+  v${new_version}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
+  ------------------------------------------------------
+  Powered by:	
+  http://www.wifi-mesh.com/       http://www.openwrt.org
+  http://coova.org/
+  ------------------------------------------------------
+banner_end
+		
 		# Say about it
 		log_message "upgrade: Upgraded from ${old_version} to ${new_version} successfully, rebooting..."
 		
