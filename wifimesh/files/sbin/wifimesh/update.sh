@@ -249,6 +249,26 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.country" ]; then
 		uci set wireless.${radio_client}.country=$two
 		uci set wireless.${radio_mesh}.country=$two
+
+	# WAN configuration
+	elif [ "$one" = "network.wan.type" ]; then
+		if [ "$two" = "dhcp" ]; then
+			uci set network.wan.proto="dhcp"
+			uci set network.wan.ipaddr=""
+			uci set network.wan.netmask=""
+			uci set network.wan.dns=""
+			uci set network.wan.gateway=""
+		else
+			uci set network.wan.proto="static"
+		fi
+	elif [ "$one" = "network.wan.ip" ]; then
+		uci set network.wan.ipaddr=$two
+	elif [ "$one" = "network.wan.subnet" ]; then
+		uci set network.wan.netmask=$two
+	elif [ "$one" = "network.wan.gateway" ]; then
+		uci set network.wan.gateway=$two
+	elif [ "$one" = "network.wan.dns" ]; then
+		uci set network.wan.dns=$two
 	
 	# Filtering
 	elif [ "$one" = "system.filtering.ads" ]; then
