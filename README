@@ -1,6 +1,3 @@
-SOME INFORMATION IS MISSING!
----------------------------
-
 Note: This git repo just contains the WiFi Mesh (and modified CoovaChilli) packages suitable for OpenWrt. It does not include OpenWrt. It is update to you to install and configure the OpenWrt build environment.
 
 To get started with OpenWrt and WiFi Mesh:
