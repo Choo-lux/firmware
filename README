@@ -1,4 +1,4 @@
-Note: This git repo just contains the WiFi Mesh (and modified CoovaChilli) packages suitable for OpenWrt. It does not include OpenWrt. It is update to you to install and configure the OpenWrt build environment.
+Note: This git repo just contains the WiFi Mesh (and modified Coova-Chilli) packages suitable for OpenWrt. It does not include OpenWrt itself. It is update to you to install and configure the OpenWrt build environment.
 
 To get started with OpenWrt and WiFi Mesh:
 
@@ -9,13 +9,17 @@ http://wiki.openwrt.org/doc/howto/buildroot.exigence
 mkdir ~/openwrt
 svn co -r XXXXX svn://svn.openwrt.org/openwrt/trunk/ openwrt
 cd openwrt
+
+3) Install the packages from here into the ./feeds/net folder
+
+4) Install and update the packages
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
-3) Configure the build environment by running the following commnad:
+5) Configure the build environment by running the following commnad:
 make menuconfig
 
-4) Then select the following options:
+6) Then select the following options:
 > Architecture: ar71xx
 > Packages:
 	Network ->		Captive Portals ->	coova-chilli
@@ -24,7 +28,7 @@ make menuconfig
 	Utilities ->	compression ->	unzip
 	Base system ->	om-watchdog
 
-5) Build the firmware:
+7) Build the firmware:
 make
 
-6) Find the binaries in the ./bin folder
+8) Find the binaries in the ./bin folder
