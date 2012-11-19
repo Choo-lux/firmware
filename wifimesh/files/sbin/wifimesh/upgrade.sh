@@ -9,7 +9,7 @@ echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
 old_version=$(cat /sbin/wifimesh/version.txt)
-new_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s "http://s3.amazonaws.com/cdn.wifi-mesh.com/firmware/development/version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+new_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s "http://${firmware_server}firmware/development/version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
 if [ "${new_version+x}" = x ] && [ -z "$new_version" ]; then
 	log_message "upgrade: Could not connect to the upgrade server, aborting..."
@@ -21,10 +21,10 @@ elif [ "$old_version" != "$new_version" ]; then
 	if [ -e "/tmp/scripts.zip" ]; then rm "/tmp/scripts.zip"; fi
 	
 	echo "Downloading upgrade"
-	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /tmp/scripts.zip "http://s3.amazonaws.com/cdn.wifi-mesh.com/firmware/development/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
+	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /tmp/scripts.zip "http://${firmware_server}firmware/development/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
 	
 	echo "Checking validity"
-	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -s "http://s3.amazonaws.com/cdn.wifi-mesh.com/firmware/development/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -s "http://${firmware_server}firmware/development/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 	local_hash=$(md5sum /tmp/scripts.zip | awk '{ print $1 }')
 	
 	echo "Installing unzip"

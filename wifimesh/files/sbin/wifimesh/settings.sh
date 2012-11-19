@@ -64,12 +64,16 @@ fi
 # Define some networking-related variables
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
-mac_wlan=$(uci get wireless.radio0.macaddr)
+mac_wlan=$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')
 ip="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_lan="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
 ssid="wifimesh_$(hex_ip -c16-17)"
+
+# Get the dashboard and upgrade server urls
+dashboard_server=$(cat /sbin/wifimesh/dashboard_server.txt)
+firmware_server=$(cat /sbin/wifimesh/firmware_server.txt)
 
 # Define version information
 fw_ver=$(cat /sbin/wifimesh/version.txt)

@@ -74,7 +74,6 @@ ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ prin
 request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
 
 dashboard_protocol="http"
-dashboard_server="www.wifi-mesh.com/dashboard/"
 dashboard_url="checkin-wm.php"
 url="${dashboard_protocol}://${dashboard_server}${dashboard_url}"
 
