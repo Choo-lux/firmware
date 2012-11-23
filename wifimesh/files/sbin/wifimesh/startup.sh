@@ -95,9 +95,6 @@ uci set wireless.@wifi-iface[4].key="w1f1m35h"
 uci set wireless.@wifi-iface[4].hidden="0"
 uci commit wireless
 
-log_message "first_boot: restarting the networking"
-/etc/init.d/network restart
-
 log_message "first_boot: setting the ssh key"
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Ynu3d3QGFukY05Z0iax3MQkHHII6itosRWLlWVhFNI3ThYxS+wH3VORYIgkisZwx+6/Kgjyb37ViwPfwFqgpFUFnGw5TaVM1pQnH1mp7eFzhd/bKw5vsez1zD8aZuaI4Bw+Nzi3G/9ZtWc/BIQh2SXeIhdcHiqIF8mJx8Up9XGq/GPNI3XoR5bW7gFpMJFPbMU4WgntJh0UkDGeDwnYoIBkjfLmdaXI9V8YW1+DVDiq2pHJD049Mn+CRRnkyOfKeWLioKFIkF87os5D2dEuMSodeRMYtCPVU6ZjTA3xOs1jA94coclP codycooper@codys-mac.local" > /etc/dropbear/authorized_keys
 
@@ -135,6 +132,9 @@ log_message "boot: stopping dnsmasq"
 
 log_message "boot: waiting for system to initialize..."
 sleep 10
+
+log_message "boot: restarting the networking"
+/etc/init.d/network restart
 
 log_message "boot: getting coova configuration"
 echo "" > /tmp/dns.tmp
