@@ -64,7 +64,7 @@ if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 	nasid=$(grep HS_RADIUSNASID /etc/chilli/defaults | awk -F'HS_RADIUSNASID=' '/HS_RADIUSNASID/ {print $2}' | sed s/\"//g)
 	uamserver=$(grep HS_UAMSERVER= /etc/chilli/defaults | awk -F'HS_UAMSERVER=' '/HS_UAMSERVER/ {print $2}' | sed s/\"//g | sed '1!d')
 	
-	curl "http://"$uamserver"/WiFi-CPA/ControlPanel/heartbeat.php?router_name=$(uci get system.@system[0].hostname)&nasid="$nasid"&wan_ip=ToBeDetermined&wan_ssid="$(uci get wireless.@wifi-iface[1].ssid)"&mac="$(echo $mac_wlan | sed "s/:/-/g")"&wanmac="$(echo $mac_wan | sed "s/:/-/g")"&lanmac="$(echo $mac_lan | sed "s/:/-/g")"&model=WiFi%20Mesh&ver="$fw_ver"&node_type=G" -o /dev/null
+	curl "http://"$uamserver"/WiFi-CPA/ControlPanel/heartbeat.php?router_name=$(uci get system.@system[0].hostname | sed "s/ /+/g")&nasid="$nasid"&wan_ip=ToBeDetermined&wan_ssid="$(uci get wireless.@wifi-iface[1].ssid | sed "s/ /+/g")"&mac="$(echo $mac_wlan | sed "s/:/-/g")"&wanmac="$(echo $mac_wan | sed "s/:/-/g")"&lanmac="$(echo $mac_lan | sed "s/:/-/g")"&model=WiFi%20Mesh&ver="$fw_ver"&node_type=G" -o /dev/null
 fi
 
 echo "Acquiring link speed"
