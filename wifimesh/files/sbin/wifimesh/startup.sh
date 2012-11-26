@@ -7,8 +7,12 @@ STOP=15
 
 boot() {
 # Fix the permissions
-chmod -R +x /etc/init.d
-chmod -R +x /sbin/wifimesh
+chmod +x /etc/init.d/wifimesh > /dev/null
+chmod +x /sbin/wifimesh/check.sh > /dev/null
+chmod +x /sbin/wifimesh/settings.sh > /dev/null
+chmod +x /sbin/wifimesh/startup.sh > /dev/null
+chmod +x /sbin/wifimesh/update.sh > /dev/null
+chmod +x /sbin/wifimesh/upgrade.sh > /dev/null
 
 # Load in the settings
 . /sbin/wifimesh/settings.sh
@@ -127,7 +131,7 @@ reboot
 type=1
 fi
 
-log_message "boot: stopping dnsmasq"
+log_message "first_boot: stopping dnsmasq"
 /etc/init.d/dnsmasq stop
 
 log_message "boot: waiting for system to initialize..."

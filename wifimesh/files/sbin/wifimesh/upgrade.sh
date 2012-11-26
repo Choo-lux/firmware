@@ -38,9 +38,12 @@ elif [ "$old_version" != "$new_version" ]; then
 		mv /sbin/wifimesh/startup.sh /etc/init.d/wifimesh > /dev/null
 		
 		# Fix permissions
-		chmod -R +x /sbin/wifimesh > /dev/null
-		chmod -R +x /etc/init.d > /dev/null
-		chmod -R +x /etc/rc.d > /dev/null
+		chmod +x /etc/init.d/wifimesh > /dev/null
+		chmod +x /sbin/wifimesh/check.sh > /dev/null
+		chmod +x /sbin/wifimesh/settings.sh > /dev/null
+		chmod +x /sbin/wifimesh/startup.sh > /dev/null
+		chmod +x /sbin/wifimesh/update.sh > /dev/null
+		chmod +x /sbin/wifimesh/upgrade.sh > /dev/null
 		
 		# Make sure we are enabled
 		/etc/init.d/wifimesh enable > /dev/null
