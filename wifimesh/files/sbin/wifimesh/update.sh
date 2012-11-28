@@ -119,7 +119,7 @@ cat $response_file | while read line ; do
 	if [ "$one" = "system.ssh.key" ]; then
 		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /etc/dropbear/authorized_keys "$two"
 	elif [ "$one" = "system.ssh.password" ]; then
-		(echo -n $two && sleep 1 && echo -n $two) | passwd root
+		echo -e '$two\n$two\n' | passwd root
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
 	elif [ "$one" = "system.command" ]; then

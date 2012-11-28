@@ -24,6 +24,8 @@ start() {
     radiusconfig
     ifconfig $HS_LANIF 0.0.0.0
     /usr/sbin/chilli -c /etc/chilli.conf
+    sleep 10
+    /etc/init.d/network restart
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/chilli 2>/dev/null
 }
 
