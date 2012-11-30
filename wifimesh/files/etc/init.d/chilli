@@ -25,6 +25,7 @@ start() {
     ifconfig $HS_LANIF 0.0.0.0
     /usr/sbin/chilli -c /etc/chilli.conf
     sleep 10
+    # we need to restart the network for chilli after the system settles down.
     /etc/init.d/network restart
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/chilli 2>/dev/null
 }
