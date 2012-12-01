@@ -134,6 +134,9 @@ fi
 log_message "first_boot: stopping dnsmasq"
 /etc/init.d/dnsmasq stop
 
+log_message "first_boot: enable stp on the wan bridge"
+sleep 1 && brctl stp br-wan on
+
 log_message "boot: waiting for system to initialize..."
 sleep 10
 

@@ -28,6 +28,8 @@ start() {
     # we need to restart the network for chilli after the system settles down.
     /etc/init.d/network restart
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/chilli 2>/dev/null
+    # Enable stp on the wan bridge after the network restart
+    sleep 1 && brctl stp br-wan on
 }
 
 restart() {
