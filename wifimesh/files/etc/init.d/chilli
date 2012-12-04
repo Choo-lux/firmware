@@ -22,19 +22,17 @@ start() {
     echo 1 > /proc/sys/net/ipv4/ip_forward
     writeconfig
     radiusconfig
-    ifconfig $HS_LANIF 0.0.0.0
-    /usr/sbin/chilli -c /etc/chilli.conf
+    ifconfig br-lan 0.0.0.0
+    brctl stp br-wan on
+    sleep 1
+    /usr/sbin/chilli --debug -c /etc/chilli.conf
     sleep 10
-    # we need to restart the network for chilli after the system settles down.
-    /etc/init.d/network restart
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/chilli 2>/dev/null
-    # Enable stp on the wan bridge after the network restart
-    sleep 1 && brctl stp br-wan on
 }
 
 restart() {
-    $0 stop
-    $0 start
+    /etc/init.d/chilli stop
+    /etc/init.d/chilli start
 }
 
 stop() {
