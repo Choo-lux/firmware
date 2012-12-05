@@ -105,6 +105,15 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Y
 log_message "first_boot: setting the ssh password"
 echo -e "w1f1m35h\nw1f1m35h" | passwd root
 
+log_message "first_boot: configuring uhttpd"
+uci set uhttpd.main.realm="my.wifi-mesh.com"
+uci set uhttpd.px5g.commonname="my.wifi-mesh.com"
+uci set uhttpd.px5g.country="NZ"
+uci set uhttpd.px5g.state="Auckland"
+uci set uhttpd.px5g.location="Auckland"
+uci commit uhttpd
+echo "/cgi-bin/:admin:w1f1m35h" > /etc/httpd.conf
+
 log_message "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
 

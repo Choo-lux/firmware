@@ -120,6 +120,7 @@ cat $response_file | while read line ; do
 		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /etc/dropbear/authorized_keys "$two"
 	elif [ "$one" = "system.ssh.password" ]; then
 		echo -e "$two\n$two" | passwd root
+		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
 	elif [ "$one" = "system.command" ]; then
