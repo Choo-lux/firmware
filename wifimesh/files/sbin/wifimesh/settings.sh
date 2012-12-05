@@ -68,7 +68,7 @@ mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
 ip="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_lan="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
-gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
+ip_gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
 ssid="wifimesh_$(hex_ip -c16-17)"
 
 # Get the dashboard and upgrade server urls

@@ -51,7 +51,7 @@ uptime="${days}d:${hours}h:${min}m"
 
 echo "Doing a ping test"
 if [ ! -n "$ip_dhcp" ]; then
-	rtt=$(ping -c 5 ${gateway} | tail -1| awk '{print $4}' | cut -d '/' -f 2)
+	rtt=$(ping -c 5 ${ip_gateway} | tail -1| awk '{print $4}' | cut -d '/' -f 2)
 	role="R"
 else
 	rtt=$(ping -c 5 "www.google.com" | tail -1| awk '{print $4}' | cut -d '/' -f 2)
@@ -71,7 +71,7 @@ echo "Acquiring link speed"
 ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ print $1 }') | grep 'tx bit' | awk '{ print $3 }')
 
 # Saving Request Data
-request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
+request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"

@@ -1,9 +1,12 @@
 #!/bin/sh
 # Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
-#
+
 # Load in the settings
-. /sbin/wifi-mesh/settings.sh
+. /sbin/wifimesh/settings.sh
+
+# Load in the OpenWrt version information
+. /etc/openwrt_release
 
 cat <<EOF_01
 Content-Type: text/html
@@ -12,146 +15,195 @@ Pragma: no-cache
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xthml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-		<title>Overview: WiFi Mesh (mini) beta</title>
+		<title>WiFi Mesh (mini): Overview</title>
 		<link rel="stylesheet" type="text/css" href="/resources/style.css">
 	</head>
 	<body>
-		<table width="70%" border="0">
+		<table id="top">
 			<tr>
-				<td width="350"><a href="http://www.wifi-mesh.com/"><img src="/resources/logo.png" height="91" width="283" border="0"></a></td>
-				<td align="left" style="color:#3cb83f;font-weight:bold;">$(uci get wireless.@wifi-iface[0].ssid)<br>${ip}<br />v$(cat /etc/openwrt_version)</td>
+				<td style="width:300px;"><a href="http://www.wifi-mesh.com/" target="_new"><img src="/resources/logo.png" style="border:0;height:100px;width:300px;"></a></td>
+				<td style="width:600px;">
+					<table style="float:right;background-color:#303030;color:#fff;margin-right:2%;">
+						<tr style="font-weight:bold;"><td colspan="2">System Information</td></tr>
+						<tr>
+							<td>Hardware:</td>
+							<td>$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":")</td>
+						</tr>
+						<tr>
+							<td>Version:</td>
+							<td>WiFi Mesh v$(cat /sbin/wifimesh/version.txt) / $(cat /etc/openwrt_version)</td>
+						</tr>
+						<tr>
+							<td>Build Date:</td>
+							<td>$(uname -v)</td>
+						</tr>
+					</table>
+				</td>
 			</tr>
-
+		</table>
+		<table id="bottom">
 			<tr>
 				<td colspan="2">
 					<ul id="tabsF">
-						<li><a href="/cgi-bin/overview.cgi"><span>Overview</span></a></li>
-						<li><a href="/cgi-bin/settings.cgi"><span>Settings</span></a></li>
-						<li><a href="/cgi-bin/support.cgi"><span>Support</span></a></li>
+						<li><a id="tab1" href="/cgi-bin/overview.cgi" onmouseover="our_onmouseover('tab1');" onmouseout="our_onmouseout('tab1');"><span id="tab1span" onclick="our_onclick('tab1');">Overview</span></a></li>
+						<li><a id="tab2" href="#/cgi-bin/settings.cgi" onmouseover="our_onmouseover('tab2');" onmouseout="our_onmouseout('tab2');"><span id="tab2span" onclick="our_onclick('tab2');">Settings</span></a></li>
+						<li><a id="tab3" href="#/cgi-bin/support.cgi?" onmouseover="our_onmouseover('tab3');" onmouseout="our_onmouseout('tab3');"><span id="tab3span" onclick="our_onclick('tab3');">Support</span></a></li>
 					</ul>
 				</td>
 			</tr>
-
 			<tr>
 				<td colspan="2">
 					<fieldset>
-						<legend>Connection</legend>
-							<table>
+						<legend>Network Connections</legend>
+						<table>
+							<tr>
+								<th>Interface Name</th>
+								<th>IP address or SSID</th>
+								<th>MAC Address</th>
+							</tr>
+							<tr>
+								<td>br-lan (LAN bridge)</td>
+								<td>${ip}</td>
+								<td>$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+							<tr>
+								<td>br-wan (WAN bridge)</td>
+								<td>${ip_dhcp}</td>
+								<td>$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td>$(route -n | grep 'UG' | awk '{ print $2 }')</td>
+								<td>$()</td>
+							</tr>
+							<tr>
+								<td>wlan0&nbsp;&nbsp;&nbsp;(SSID #1)</td>
+								<td>$(uci get wireless.@wifi-iface[1].ssid)</td>
+								<td>$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+							<tr>
+								<td>wlan0-1 (SSID #2)</td>
+								<td>$(uci get wireless.@wifi-iface[2].ssid)</td>
+								<td>$(ifconfig wlan0-1 | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+							<tr>
+								<td>wlan0-2 (SSID #3)</td>
+								<td>$(uci get wireless.@wifi-iface[3].ssid)</td>
+								<td>$(ifconfig wlan0-2 | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+							<tr>
+								<td>wlan0-3 (SSID #4)</td>
+								<td>$(uci get wireless.@wifi-iface[4].ssid)</td>
+								<td>$(ifconfig wlan0-3 | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+							<tr>
+								<td>wlan0-4 (802.11s)</td>
+								<td>$(uci get wireless.@wifi-iface[0].mesh_id)</td>
+								<td>$(ifconfig wlan0-4 | grep 'HWaddr' | awk '{ print $5 }')</td>
+							</tr>
+						</table>
+					</fieldset>
+					<br />
+					<fieldset>
+						<legend>Active Sessions</legend>
+						<table>
+							<tr>
+								<th>Session Name</th>
+								<th>MAC Address</th>
+								<th>IP Address</th>
+								<th>State</th>
+								<th>Time</th>
+								<th>Bytes Total</th>
+								<th>Bytes Down</th>
+								<th>Bytes Up</th>
+								<th colspan="2">Maintenance</th>
+							</tr>
 EOF_01
-
-echo "<tr><td>Connection Type:</td><td>Internet</td></tr>"
-echo "<tr><td>Connection Speed:</td><td>$ntr</td></tr>"
-
-if [ "$node_role" -eq 0 ] ; then
-	echo "<tr><td>Device Role:</td><td>Repeater</td></tr>"
-else
-	echo "<tr><td>Device Role:</td><td>Gateway</td></tr>"
-fi
-
+chilli_query list | while read device; do
+	state="$(echo $device | awk '{ print $3 }')"
+	if [ "${state}" == "dnat" ]; then
+		state="Pending"
+	elif [ "${state}" == "pass" ]; then
+		state="Online"
+	else
+		state="Unknown ${state}"
+	fi
+	
+	echo "<tr>"
+	echo "<td>$(echo $device | awk '{ print $6 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $1 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $2 }')</td>"
+	echo "<td>${state}</td>"
+	echo "<td>$(echo $device | awk '{ print $7 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $8 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $9 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $10 }')</td>"
+	if [ "${state}" == "Online" ]; then 
+		echo "<td><a href='overview.chi?action=logoff-client&id=$(echo $device | awk '{ print $6 }')'>Logoff</a></td>"
+	else
+		echo "<td><a href='overview.chi?action=logon-client&id=$(echo $device | awk '{ print $6 }')'>Logon</a></td>"
+	fi
+	echo "<td><a href='overview.chi?action=block-client&id=$(echo $device | awk '{ print $6 }')'>Block</a></td>"
+	echo "</tr>"
+done
 cat <<EOF_02
 						</table>
 					</fieldset>
-					<br>
+					<br />
 					<fieldset>
-						<legend>Active Users</legend>
+						<legend>Mesh Neighbours</legend>
 						<table>
 							<tr>
-								<th>Name</th>
 								<th>MAC</th>
-								<th>IP</th>
-								<th>KB Total</th>
-								<th>KB Down</th>
-								<th>KB Up</th>
-								<th>Blocked?</th>
-							</tr>
-EOF_02
-
-cat /tmp/dhcp.leases |tr [*] ['U'] > /tmp/dhcpd.clients.tmp 
-sort -u < /tmp/dhcpd.clients.tmp > /tmp/dhcpd.clients 
-
-#rows to columns
-rm -f /tmp/nds_clients_h
-while read riga ; do #rows to columns
-	case $(echo $riga |awk -F = '{print $1}') in
-		ip|state|downloaded|uploaded) 
-			value=$(echo $riga |awk -F = '{print $2}')
-			record="${record} $value" 
-			;;
-		token) 
-			tok=$(echo $riga |awk -F = '{print $2}')
-			;;
-		mac) 
-			value=$(echo $riga |awk -F = '{print $2}' |tr A-Z a-z)
-			record="${record} $value" 
-			;;
-		avg_up_speed) 
-			record="${record} $tok"
-			echo $record >> /tmp/nds_clients_h 
-			record= 
-			;;
-	esac
-done < /tmp/nds_clients
- 
-#find authenticated users
-while read riga ; do
-	[ "$(echo $riga |awk '{print $3}')" == "Authenticated" ] && {
-		NDS_IP=$(echo $riga |awk '{print $1}')
-		NDS_MAC=$(echo $riga |awk '{print $2}')
-
-		#look up hostname for the given authetnticated IP
-		while read lease ; do
-			LEASE_IP=$(echo $lease |awk '{print $3}')
-			client_mac=$(echo $lease |awk '{print $2}' |tr A-Z a-z)
-
-			if [ "$NDS_IP" == "$LEASE_IP" -a "$NDS_MAC" == "$client_mac" ]; then 	
-				client_ip=$(echo $riga |awk '{print $1}')   
-				KB_d=$(echo $riga |awk '{print $4}')
-				KB_u=$(echo $riga |awk '{print $5}')
-				KB_t=$(($KB_d+$KB_u))
-				hostname=$(echo $lease |awk '{print $4}') 
-				[ "$hostname" == "$is_unknown" ] && client_hostname="unknown" || client_hostname=$hostname
-
-				echo "<tr>"
-				echo "<td>${client_hostname}</td>"
-				echo "<td>${client_mac}</td>"
-				echo "<td>${client_ip}</td>"
-				echo "<td>${KB_t}</td>"
-				echo "<td>${KB_d}</td>"
-				echo "<td>${KB_u}</td>"
-				
-				if [ -e "/tmp/$client_mac" ]; then
-					echo "<td><a href='users.cgi?action=unblock&mac=${client_mac}'>Unblock</a></td>"
-				else
-					echo "<td><a href='users.cgi?action=block&mac=${client_mac}'>Block</a></td>"
-				fi
-				
-				echo "</tr>";
-			fi
-		done < /tmp/dhcpd.clients
-	}
-done < /tmp/nds_clients_h
-
-cat <<EOF_02
-						</table>
-					</fieldset>
-					<br>
-					<fieldset>
-						<legend>Nearby Nodes</legend>
-						<table>
-							<tr>
-								<th>Name</th>
-								<th>IP</th>
 								<th>Role</th>
-								<th>RSSI</th>
-								<th>dBm</th>
+								<th>Signal</th>
+								<th>Data Rate</th>
 							</tr>
 EOF_02
-/sbin/get-rssi.sh > /tmp/page
-tail -n +2 /tmp/page | awk '{print "<tr><td>"$5"</td><td>"$1"</td><td>"$2"</td><td>"$3"</td><td>"$4"</td></tr>"}'
+iw wlan0-4 mpath dump | grep '0x' | while read device; do
+	if [ $(echo $device | awk '{ print $10 }') == "0x14" ]; then
+		role="Repeater"
+	elif [ $(echo $device | awk '{ print $10 }') == "0x15" ]; then
+		role="Repeater"
+	
+	elif [ $(echo $device | awk '{ print $10 }') == "0x5" ]; then
+		role="Gateway"
+	
+	elif [ $(echo $device | awk '{ print $10 }') == "0x0" ]; then
+		role="Offline"
+	elif [ $(echo $device | awk '{ print $10 }') == "0x2" ]; then
+		role="Offline"
+	
+	else
+		role="Unknown ($(echo $device | awk '{ print $10 }'))"
+	fi
+	
+	dbm_rate="$(iw wlan0-4 station get $(echo $device | awk '{ print $1 }') | grep 'signal:' | awk '{ print $2 }')"
+	if [ "${dbm_rate}" == "" ]; then
+		dbm_rate="n/a"
+	else
+		dbm_rate="${dbm_rate} dBm"
+	fi
+	
+	data_rate=$(iw wlan0-4 station get $(echo $device | awk '{ print $1 }') | grep 'rx bitrate:' | awk '{ print $3 }')
+	if [ "${data_rate}" == "" ]; then
+		data_rate="n/a"
+	else
+		data_rate="${data_rate} Mbps"
+	fi
+
+	echo "<tr>"
+	echo "<td>$(echo $device | awk '{ print $1 }')</td>"
+	echo "<td>${role}</td>"
+	echo "<td>${dbm_rate}</td>"
+	echo "<td>${data_rate}</td>"
+	echo "</tr>"
+done
 cat <<EOF_03
 						</table>
 					</fieldset>
-					<br>
+					<!--
+					<br />
 					<fieldset>
 						<legend>Nearby Routers</legend>
 						<table border="0" width="100%">
@@ -162,14 +214,43 @@ cat <<EOF_03
 								<th>Encryption</th>
 								<th>&nbsp;</th>
 							</tr>
-EOF_03
-iwlist ath0 scanning | awk -F '[ :=]+' '/(ESS|Qual)/{ printf "<td>"$3"</td>" } /Encr/{ print "<td>"$4"</td><td><a href='#'>Connect</a></td></tr>" } /Cell/{ printf "<tr><td>"$6":"$7":"$8":"$9":"$10":"$11"</td>" }' | tr -d '"'
-cat <<EOF_99
 						</table>
 					</fieldset>
+					-->
 				</td>
 			</tr>
 		</table>
+		<script>
+		function our_onclick(tabname) {
+			// Reset all of the other tabs back to normal
+			document.getElementById('tab1').style.background = "#303030";
+			document.getElementById('tab1span').style.color = "#4FA8FF";
+			document.getElementById('tab2').style.background = "#303030";
+			document.getElementById('tab2span').style.color = "#4FA8FF";
+			document.getElementById('tab3').style.background = "#303030";
+			document.getElementById('tab3span').style.color = "#4FA8FF";
+			
+			// and change this tab to be the nicer looking one
+			selected_tab=tabname;
+			
+			document.getElementById(tabname).style.background = "#262626";
+			document.getElementById(tabname + "span").style.color = "#FFFFFF";
+		}
+
+		function our_onmouseover(tabname) {
+			// Reset all of the other tabs back to normal
+			if(tabname != selected_tab) {document.getElementById(tabname).style.background = "#262626";}
+			document.getElementById(tabname).style.color = "#FFFFFF";
+		}
+		
+		function our_onmouseout(tabname) {
+			// Reset all of the other tabs back to normal
+			if(tabname != selected_tab) {document.getElementById(tabname).style.backgroundColor = "303030";}
+		}
+		
+		var selected_tab = 'tab1';
+		window.onload = function() {our_onclick(selected_tab);}
+		</script>
 	</body>
 </html>
-EOF_99
+EOF_03

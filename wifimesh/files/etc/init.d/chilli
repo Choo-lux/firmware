@@ -25,7 +25,7 @@ start() {
     ifconfig br-lan 0.0.0.0
     brctl stp br-wan on
     sleep 1
-    /usr/sbin/chilli --debug -c /etc/chilli.conf
+    /usr/sbin/chilli -c /etc/chilli.conf
     sleep 10
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/chilli 2>/dev/null
 }
