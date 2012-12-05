@@ -8,6 +8,49 @@
 # Load in the OpenWrt version information
 . /etc/openwrt_release
 
+# Load in any requested data too
+get_parameter() {
+	echo "$query" | tr '&' '\n' | grep "^$1=" | head -1 | sed "s/.*=//" 
+}
+
+if [ "$REQUEST_METHOD" = POST ]; then
+	query=$(head --bytes="$CONTENT_LENGTH")
+else
+	query="$QUERY_STRING"
+fi
+
+if [ $(get_parameter action) == "logoff-client" ]; then
+	cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+Location: /cgi-bin/overview.cgi
+
+$(chilli_query logoff $(get_parameter id))
+$(chilli_query logout $(get_parameter id))
+EOF_97
+exit
+elif [ $(get_parameter action) == "logon-client" ]; then
+	cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+Location: /cgi-bin/overview.cgi
+
+$(chilli_query login $(get_parameter id))
+$(chilli_query authorise $(get_parameter id))
+EOF_97
+exit
+elif [ $(get_parameter action) == "block-client" ]; then
+	cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+Location: /cgi-bin/overview.cgi
+
+$(chilli_query block $(get_parameter id))
+EOF_97
+exit
+fi
+
+# Start showing the page
 cat <<EOF_01
 Content-Type: text/html
 Pragma: no-cache
@@ -217,6 +260,7 @@ cat <<EOF_03
 						</table>
 					</fieldset>
 					-->
+					<br />
 				</td>
 			</tr>
 		</table>
