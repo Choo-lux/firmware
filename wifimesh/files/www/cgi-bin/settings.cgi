@@ -2,57 +2,55 @@
 # Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
-# general node stuff
-node_ip=$(uci get node.general.IP_mesh)
-node_name=$(cat /proc/sys/kernel/hostname)
-node_version=$(cat /etc/robin_version)
+# Load in the settings
+. /sbin/wifimesh/settings.sh
 
-# nds stuff
-nds_conf="/etc/nodogsplash/nodogsplash.conf"
-ad_url=$(uci show nodog)
-limit_download=$(cat $nds_conf | awk '$1=="DownloadLimit" {print $2}')
-limit_upload=$(cat $nds_conf | awk '$1=="UploadLimit" {print $2}')
+# Load in the OpenWrt version information
+. /etc/openwrt_release
 
-# ssid stuff
-ssid1_ssid=$(uci get mesh.ap.ssid |tr [*] [' '])
+# Load in any requested data too
+get_parameter() {
+	echo "$query" | tr '&' '\n' | grep "^$1=" | head -1 | sed "s/.*=//" 
+}
 
-ssid2_ssid="$(uci get mesh.Myap.ssid |tr [*] [' '])"
-ssid2_up=$(uci get mesh.Myap.up)
-ssid2_pass=$(uci get mesh.Myap.key)
+if [ "$REQUEST_METHOD" = POST ]; then
+	query=$(head --bytes="$CONTENT_LENGTH")
+else
+	query="$QUERY_STRING"
+fi
 
-# static ip stuff
-staticip=$(uci get installation.gw.ipaddr)
-subnet=$(uci get installation.gw.netmask)
-gateway=$(uci get installation.gw.defroute)
+if [ $(get_parameter action) == "logoff-client" ]; then
+	cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+Location: /cgi-bin/overview.cgi
 
-# port forwarding stuff
-port_forwarding=$(uci get forwarder.general.enabled)
+$(chilli_query logoff $(get_parameter id))
+$(chilli_query logout $(get_parameter id))
+EOF_97
+exit
+elif [ $(get_parameter action) == "logon-client" ]; then
+	cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+Location: /cgi-bin/overview.cgi
 
-sp1=$(uci get forwarder.rule_1.IncomingPort)
-dst1=$(uci get forwarder.rule_1.IPAddr)
-dp1=$(uci get forwarder.rule_1.DstPort)
+$(chilli_query login $(get_parameter id))
+$(chilli_query authorise $(get_parameter id))
+EOF_97
+exit
+elif [ $(get_parameter action) == "block-client" ]; then
+	cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+Location: /cgi-bin/overview.cgi
 
-sp2=$(uci get forwarder.rule_2.IncomingPort)
-dst2=$(uci get forwarder.rule_2.IPAddr)
-dp2=$(uci get forwarder.rule_2.DstPort)
+$(chilli_query block $(get_parameter id))
+EOF_97
+exit
+fi
 
-sp3=$(uci get forwarder.rule_3.IncomingPort)
-dst3=$(uci get forwarder.rule_3.IPAddr)
-dp3=$(uci get forwarder.rule_3.DstPort)
-
-sp4=$(uci get forwarder.rule_4.IncomingPort)
-dst4=$(uci get forwarder.rule_4.IPAddr)
-dp4=$(uci get forwarder.rule_4.DstPort)
-
-sp5=$(uci get forwarder.rule_5.IncomingPort)
-dst5=$(uci get forwarder.rule_5.IPAddr)
-dp5=$(uci get forwarder.rule_5.DstPort)
-
-sp6=$(uci get forwarder.rule_6.IncomingPort)
-dst6=$(uci get forwarder.rule_6.IPAddr)
-dp6=$(uci get forwarder.rule_6.DstPort)
-
-
+# Start showing the page
 cat <<EOF_01
 Content-Type: text/html
 Pragma: no-cache
@@ -60,157 +58,213 @@ Pragma: no-cache
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xthml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-		<title>Settings: WiFi Mesh (mini) beta</title>
+		<title>WiFi Mesh (mini): Overview</title>
 		<link rel="stylesheet" type="text/css" href="/resources/style.css">
 	</head>
 	<body>
-		<table width="70%" border="0">
+		<table id="top">
 			<tr>
-				<td width="350"><a href="http://www.wifi-mesh.com/"><img src="/resources/logo.png" height="91" width="283" border="0"></a></td>
-				<td align="left" style="color:#3cb83f;font-weight:bold;">$node_name<br>${node_ip}<br>${node_version}</td>
-			</tr>
-
-			<tr>
-				<td colspan="2">
-					<ul id="tabsF">
-						<li><a href="/cgi-bin/overview.cgi"><span>Overview</span></a></li>
-						<li><a href="/cgi-bin/settings.cgi"><span>Settings</span></a></li>
-						<li><a href="/cgi-bin/support.cgi"><span>Support</span></a></li>
-					</ul>
-				</td>
-			</tr>
-
-			<form method="GET" action="/cgi-bin/settings-set.cgi">
-			<input type="hidden" name="submit_type">
-			<table width="70%" border="0">
-			
-			<tr>
-				<td height="25" colspan="2">
-					<fieldset>
-						<legend>SSID #1</legend>
-						<table border="0" width="100%">
-							<tr><td height="25" width="60%">SSID #1: Status</td><td><input name="ssid1" type="radio" value="1" checked disabled>&nbsp;Enabled&nbsp;&nbsp;&nbsp;<input name="ssid1" type="radio" value="0" disabled>&nbsp;Disabled</td></tr>
-							<tr><td height="25" width="60%">SSID #1: Name</td><td><input maxlength="30" size="30" name="ssid1_ssid" value="$ssid1_ssid" readonly></td></tr>
-							<tr><td colspan="2"><hr></td></tr>
-							<tr><td height="25" width="60%">Advertisment URL</td><td><input maxlength="100" size="30" name="ad_url" value="$ad_url"></td></tr>
-							<tr><td height="25" width="60%">Download Limit (kbps)</td><td><input maxlength="5" size="6" name="limit_download" value="$limit_download"></td></tr>
-							<tr><td height="25" width="60%">Upload Limit (kbps)</td><td><input maxlength="5" size="6" name="limit_upload" value="$limit_upload"></td></tr>
-						</table>
-					</fieldset>
-				</td>
-			</tr>
-			
-			<tr><td colspan="2"><br></td></tr>
-			
-			<tr>
-				<td height="25" colspan="2">
-					<fieldset>
-						<legend>SSID #2</legend>
-						<table border="0" width="100%">
-							<tr><td height="25" width="60%">SSID #2: Status</td><td>
-EOF_01
-case $ssid2_up in
-	1) echo "<input name="ssid2" type="radio" value="1" checked>&nbsp;Enabled&nbsp;&nbsp;&nbsp;<input name="ssid2" type="radio" value="0">&nbsp;Disabled";;
-	0) echo "<input name="ssid2" type="radio" value="1">&nbsp;Enabled&nbsp;&nbsp;&nbsp;<input name="ssid2" type="radio" value="0" checked>&nbsp;Disabled" ;;
-esac
-cat <<EOF_02
-							</td><tr>
-							<tr><td height="25" width="60%">SSID #2: Name</td><td><input maxlength="30" size="30" name="ssid2_ssid" value="$ssid2_ssid"></td></tr>
-							<tr><td height="25" width="60%">SSID #2: Password</td><td><input type="password" maxlength="30" size="30" name="ssid2_pass" value="$ssid2_pass"></td></tr>
-						</table>
-					</fieldset>
-				</td>
-			</tr>
-			
-			<tr><td colspan="2"><br></td></tr>
-			
-			<tr>
-				<td height="25" colspan=2>
-					<fieldset>
-						<legend>Static IP</legend>
-						<table border="0" width="100%">
-							<tr>
-								<td height="25" width="60%">IP Address:</td>
-								<td><input type="text" name="ip" value="$staticip" maxlength="30" size="30"></td>
-							</tr>
-							<tr>
-								<td height="25" width="60%">Subnet Mask</td>
-								<td><input type="text" name="subnet" value="$subnet" maxlength="30" size="30"></td>
-							</tr>
-							<tr>
-								<td height="25" width="60%">Default Gateway</td>
-								<td><input type="text" name="gateway" value="$gateway" maxlength="30" size="30"></td>
-							</tr>
-						</table>
-					</fieldset>
-				</td>
-			</tr>
-			
-			<tr><td colspan="2"><br></td></tr>
-			
-			<tr>
-				<td height="25" colspan="2">
-					<fieldset>
-						<legend>Port Forwarding</legend>
-						
-						<table border="0" width="100%">
-							<tr>
-								<td height="25">Status:&nbsp;
-EOF_02
-
-case $port_forwarding in
-	'1')
-	echo "<input name="enabled" type="radio" value="1" checked="checked">&nbsp;Enabled&nbsp;&nbsp;&nbsp;<input name="enabled" type="radio" value="0">&nbsp;Disabled" 
-	;;
-	*)
-	echo "<input name="enabled" type="radio" value="1">&nbsp;Enabled&nbsp;&nbsp;&nbsp;<input name="enabled" type="radio" value="0" checked="checked">&nbsp;Disabled"
-	;;
-esac
-
-cat <<EOF_03
-								</td>
-							</tr>
-							<tr><td height="2"><hr></td></tr>
-
-							<tr>
-								<td height="25">TCP Port&nbsp;<input maxlength="5" size="5" name="sp1" value=$sp1>&nbsp;&nbsp;&nbsp;redirects to&nbsp;<input maxlength="15" size="15" name="dst1" value=$dst1>:<input maxlength="5" size="5" name="dp1" value=$dp1></td>
-							</tr>
-
-							<tr>
-								<td height="25">TCP Port&nbsp;<input maxlength="5" size="5" name="sp2" value=$sp2>&nbsp;&nbsp;&nbsp;redirects to&nbsp;<input maxlength="15" size="15" name="dst2" value=$dst2>:<input maxlength="5" size="5" name="dp2" value=$dp2></td>
-							</tr>
-
-							<tr>
-								<td height="25">TCP Port&nbsp;<input maxlength="5" size="5" name="sp3" value=$sp3>&nbsp;&nbsp;&nbsp;redirects to&nbsp;<input maxlength="15" size="15" name="dst3" value=$dst3>:<input maxlength="5" size="5" name="dp3" value=$dp3></td>
-							</tr>
-
-							<tr><td height="2"><hr></td></tr>
-
-							<tr>
-								<td height="25">UDP Port&nbsp;<input maxlength="5" size="5" name="sp4" value=$sp4>&nbsp;&nbsp;&nbsp;redirects to&nbsp;<input maxlength="15" size="15" name="dst4" value=$dst4>:<input maxlength="5" size="5" name="dp4" value=$dp4></td>
-							</tr>
-
-							<tr>
-								<td height="25">UDP Port&nbsp;<input maxlength="5" size="5" name="sp5" value=$sp5>&nbsp;&nbsp;&nbsp;redirects to&nbsp;<input maxlength="15" size="15" name="dst5" value=$dst5>:<input maxlength="5" size="5" name="dp5" value=$dp5></td>
-							</tr>
-
-							<tr>
-								<td height="25">UDP Port&nbsp;<input maxlength="5" size="5" name="sp6" value=$sp6>&nbsp;&nbsp;&nbsp;redirects to&nbsp;<input maxlength="15" size="15" name="dst6" value=$dst6>:<input maxlength="5" size="5" name="dp6" value=$dp6></td>
-							</tr>
-						</table>
-EOF_03
-
-cat << EOF_99
-					</td>
-				</tr>
-
-			<tr>
-				<td colspan="2" align="right">    
-					<input type= "submit" name="b1" value="Save Settings">&nbsp;<input type= "reset" name="b2" value="Reset Settings">
+				<td style="width:300px;"><a href="http://www.wifi-mesh.com/" target="_new"><img src="/resources/logo.png" style="border:0;height:100px;width:300px;"></a></td>
+				<td style="width:600px;">
+					<table style="float:right;background-color:#303030;color:#fff;margin-right:2%;">
+						<tr style="font-weight:bold;"><td colspan="2">System Information</td></tr>
+						<tr>
+							<td>Hardware:</td>
+							<td>$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50)</td>
+						</tr>
+						<tr>
+							<td>Version:</td>
+							<td>WiFi Mesh v$(cat /sbin/wifimesh/version.txt) / $(cat /etc/openwrt_version)</td>
+						</tr>
+						<tr>
+							<td>Build Date:</td>
+							<td>$(uname -v)</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>
-	</form>
-</body>
+		<table id="bottom">
+			<tr>
+				<td colspan="2">
+					<ul id="tabsF">
+						<li><a id="tab1" href="/cgi-bin/overview.cgi" onmouseover="our_onmouseover('tab1');" onmouseout="our_onmouseout('tab1');"><span id="tab1span" onclick="our_onclick('tab1');">Overview</span></a></li>
+						<li><a id="tab2" href="/cgi-bin/settings.cgi" onmouseover="our_onmouseover('tab2');" onmouseout="our_onmouseout('tab2');"><span id="tab2span" onclick="our_onclick('tab2');">Settings</span></a></li>
+						<li><a id="tab3" href="/cgi-bin/support.cgi?" onmouseover="our_onmouseover('tab3');" onmouseout="our_onmouseout('tab3');"><span id="tab3span" onclick="our_onclick('tab3');">Support</span></a></li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<fieldset>
+						<legend>Wi-Fi</legend>
+						<table>
+							<tr>
+								<td>Channel:</td>
+								<td><input type="text" name="wifi_channel" value="$(uci get wireless.radio0.channel)" placeholder="$(uci get wireless.radio0.channel)" maxchars="2" style="width:200px;" /></td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td><input type="submit" name="action" value="Save WiFi" disabled /></td>
+							</tr>
+						</table>
+					</fieldset>
+					<br />
+					<fieldset>
+						<legend>WAN Connectivity</legend>
+						<table>
+							<tr>
+								<td>Type:</td>
+								<td>
+									<select name="wan_type" style="width:200px;">
+EOF_01
+if [ "$(uci get network.wan.proto)" == "static" ]; then
+	echo "<option value='static' selected>Static"
+else
+	echo "<option value='static'>Static"
+fi
+
+if [ "$(uci get network.wan.proto)" == "dhcp" ]; then
+	echo "<option value='dhcp' selected>DHCP Client"
+else
+	echo "<option value='dhcp'>DHCP Client"
+fi
+
+if [ "$(uci get network.wan.proto)" == "3g" ]; then
+	echo "<option value='3g' selected>2G/3G/CDMA"
+else
+	echo "<option value='3g'>2G/3G/CDMA"
+fi
+cat <<EOF_02
+									</select>
+								</td>
+							</tr>
+EOF_02
+
+if [ "$(uci get network.wan.proto)" == "dhcp" ]; then
+	echo "<tr><td colspan='2'>DHCP does not need further configuration.</td></tr>"
+elif [ "$(uci get network.wan.proto)" == "3g" ]; then
+	echo "<tr>"
+	echo "<td>Signal:</td>"
+	echo "<td>$(comgt sig -d /dev/ttyACM1 | cut -d ":" -f 2 | cut -d ',' -f 1 | cut -b 2-50)</td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>Carrier:</td>"
+	echo "<td>$(comgt reg -d /dev/ttyACM1 | grep 'Registered' | cut -d ":" -f 2 | cut -d ',' -f 1 | sed 's/"//g' | cut -b 2-50)</td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>Device:</td>"
+	echo "<td><select name='wan_device' style='width:200px;'>"
+	ls /dev | grep 'tty' | while read serial; do
+		if [ "$(uci get network.wan.device)" == "/dev/${serial}" ]; then
+			echo "<option value='${serial}' selected>${serial}"
+		else
+			echo "<option value='${serial}'>${serial}"
+		fi
+	done
+	echo "</select>"
+	echo "</td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>Mode:</td>"
+	echo "<td><select name='wan_service' style='width:200px;'>"
+	if [ "$(uci get network.wan.service)" == "umts" ]; then
+		echo "<option value='umts' selected>2G &amp; 3G"
+	else
+		echo "<option value='umts'>2G &amp; 3G"
+	fi
+	
+	if [ "$(uci get network.wan.service)" == "umts_only" ]; then
+		echo "<option value='umts_only' selected>Only 3G"
+	else
+		echo "<option value='umts_only'>Only 3G"
+	fi
+	
+	if [ "$(uci get network.wan.service)" == "gprs_only" ]; then
+		echo "<option value='gprs_only' selected>Only 2G"
+	else
+		echo "<option value='gprs_only'>Only 2G"
+	fi
+	
+	if [ "$(uci get network.wan.service)" == "evdo" ]; then
+		echo "<option value='evdo' selected>CDMA"
+	else
+		echo "<option value='evdo'>CDMA"
+	fi
+	echo "</select>"
+	echo "</td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>APN:</td>"
+	echo "<td><input type='text' name='wan_apn' value='$(uci get network.wan.apn)' placeholder='$(uci get network.wan.apn)' style='width:200px;' /></td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>PIN:</td>"
+	echo "<td><input type='text' name='wan_pin' value='$(uci get network.wan.pin)' placeholder='(optional) $(uci get network.wan.pin)' style='width:200px;' /></td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>Username:</td>"
+	echo "<td><input type='text' name='wan_username' value='$(uci get network.wan.username)' placeholder='(optional) $(uci get network.wan.username)' style='width:200px;' /></td>"
+	echo "</tr>"
+	
+	echo "<tr>"
+	echo "<td>Password:</td>"
+	echo "<td><input type='text' name='wan_password' value='$(uci get network.wan.password)' placeholder='(optional) $(uci get network.wan.password)' style='width:200px;' /></td>"
+	echo "</tr>"
+elif [ "$(uci get network.wan.proto)" == "static" ]; then
+	echo "true"
+else
+	echo "<tr><td colspan='2'>You are using a custom WAN configuration.</td></tr>"
+fi
+
+cat <<EOF_03
+							<tr>
+								<td>&nbsp;</td>
+								<td><input type="submit" name="action" value="Save WAN" disabled /></td>
+							</tr>
+						</table>
+					</fieldset>
+					<br />
+				</td>
+			</tr>
+		</table>
+		<script>
+		function our_onclick(tabname) {
+			// Reset all of the other tabs back to normal
+			document.getElementById('tab1').style.background = "#303030";
+			document.getElementById('tab1span').style.color = "#4FA8FF";
+			document.getElementById('tab2').style.background = "#303030";
+			document.getElementById('tab2span').style.color = "#4FA8FF";
+			document.getElementById('tab3').style.background = "#303030";
+			document.getElementById('tab3span').style.color = "#4FA8FF";
+			
+			// and change this tab to be the nicer looking one
+			selected_tab=tabname;
+			
+			document.getElementById(tabname).style.background = "#262626";
+			document.getElementById(tabname + "span").style.color = "#FFFFFF";
+		}
+
+		function our_onmouseover(tabname) {
+			// Reset all of the other tabs back to normal
+			if(tabname != selected_tab) {document.getElementById(tabname).style.background = "#262626";}
+			document.getElementById(tabname).style.color = "#FFFFFF";
+		}
+		
+		function our_onmouseout(tabname) {
+			// Reset all of the other tabs back to normal
+			if(tabname != selected_tab) {document.getElementById(tabname).style.backgroundColor = "303030";}
+		}
+		
+		var selected_tab = 'tab2';
+		window.onload = function() {our_onclick(selected_tab);}
+		</script>
+	</body>
 </html>
-EOF_99
+EOF_03
