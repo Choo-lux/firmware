@@ -46,6 +46,7 @@ uci set network.wan.ifname="eth0"
 uci set network.wan.proto="dhcp"
 uci set network.lan.ifname=""
 uci set network.lan.ipaddr="${ip_lan}"
+if [[ "$(ifconfig -a|grep eth1|awk '{ print $1}')" == eth1 ]]; then uci set network.lan.ifname="eth1"; fi
 uci commit network
 
 # Enable the wifi radios
