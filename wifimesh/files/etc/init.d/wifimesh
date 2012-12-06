@@ -113,6 +113,7 @@ uci set uhttpd.px5g.state="Auckland"
 uci set uhttpd.px5g.location="Auckland"
 uci commit uhttpd
 echo "/cgi-bin/:admin:w1f1m35h" > /etc/httpd.conf
+/etc/init.d/uhttpd enable
 
 log_message "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
