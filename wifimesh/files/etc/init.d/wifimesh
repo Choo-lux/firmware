@@ -32,6 +32,9 @@ uci set firewall.@zone[1].input="ACCEPT"
 uci commit firewall
 /etc/init.d/firewall restart
 
+hardware=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2}')
+log_message "first_boot: hardware platform is $hardware"
+
 log_message "first_boot: disable dnsmasq"
 /etc/init.d/dnsmasq disable
 
@@ -46,7 +49,11 @@ uci set network.wan.ifname="eth0"
 uci set network.wan.proto="dhcp"
 uci set network.lan.ifname=""
 uci set network.lan.ipaddr="${ip_lan}"
-if [[ "$(ifconfig -a|grep eth1|awk '{ print $1}')" == eth1 ]]; then uci set network.lan.ifname="eth1"; fi
+# support for multiple physical adapters - flip the adapters if listed
+if [[ "$(ifconfig -a|grep eth1|awk '{ print $1}')" == eth1 ]]; then
+	uci set network.lan.ifname="eth1"
+	if [ -n "$(grep -F $hardware "/sbin/wifimesh/flipETH.list")" ]; then uci set network.lan.ifname="eth0" && uci set network.wan.ifname="eth1"; fi
+fi
 uci commit network
 
 # Enable the wifi radios
