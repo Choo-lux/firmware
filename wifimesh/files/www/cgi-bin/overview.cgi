@@ -8,6 +8,25 @@
 # Load in the OpenWrt version information
 . /etc/openwrt_release
 
+# Checks if a password exists before the page may be viewed
+if [ ! -f "/etc/httpd.conf" ]; then
+cat <<EOF_96
+Content-Type: text/html
+Pragma: no-cache
+
+<html>
+	<head>
+		<title>403 Forbidden</title>
+	</head>
+	<body>
+		<h1>403 Forbidden</h1>
+		<p>You must configure a password on this node before this page may be viewed.</p>
+	</body>
+</html>
+EOF_96
+exit
+fi
+
 # Load in any requested data too
 get_parameter() {
 	echo "$query" | tr '&' '\n' | grep "^$1=" | head -1 | sed "s/.*=//" 

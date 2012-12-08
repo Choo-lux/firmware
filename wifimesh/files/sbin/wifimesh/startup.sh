@@ -120,8 +120,38 @@ uci set uhttpd.px5g.country="NZ"
 uci set uhttpd.px5g.state="Auckland"
 uci set uhttpd.px5g.location="Auckland"
 uci commit uhttpd
-echo "/cgi-bin/:admin:w1f1m35h" > /etc/httpd.conf
 /etc/init.d/uhttpd enable
+
+log_message "first_boot: configuring coova-chilli"
+echo "HS_LANIF='wlan0'
+HS_WANIF='br-wan'
+HS_NETWORK='$(route -n | grep 'tun0' | awk '{ print $1 }')'
+HS_NETMASK='255.255.255.0'
+HS_UAMLISTEN='$(ifconfig tun0 | grep 'inet addr' | awk '{ print $2 }' | cut -d : -f 2)'
+HS_NASMAC='$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }' | sed 's/:/-/g')'
+HS_NASIP='$(ifconfig tun0 | grep 'inet addr' | awk '{ print $2 }' | cut -d : -f 2)'
+HS_UAMPORT='3990'
+HS_UAMUIPORT='4990'
+HS_DNS1='8.8.8.8'
+HS_DNS2='8.8.4.4'
+HS_NASID='000'
+HS_RADIUS='localhost'
+HS_RADIUS2='localhost'
+HS_RADSECRET='secret'
+HS_UAMSECRET='secret'
+HS_UAMALIASNAME='chilli'
+HS_AAA='http'
+HS_UAMAAAURL='http://localhost/aaa.txt'
+HS_UAMSERVER='$HS_UAMLISTEN'
+HS_UAMFORMAT='http://$(ifconfig tun0 | grep 'inet addr' | awk '{ print $2 }' | cut -d : -f 2)/first_boot.html'
+HS_UAMHOMEPAGE='http://\$HS_UAMLISTEN:\$HS_UAMPORT/www/coova.html'
+HS_TCP_PORTS='22 23 80 443'
+HS_MODE='hotspot'
+HS_TYPE='chillispot'
+HS_WWWDIR='/etc/chilli/www'
+HS_WWWBIN='/etc/chilli/wwwsh'
+HS_RAD_PROTO='chap'" > /etc/chilli/defaults
+/etc/init.d/chilli enable
 
 log_message "first_boot: removing first_boot file"
 rm /sbin/wifimesh/first_boot
