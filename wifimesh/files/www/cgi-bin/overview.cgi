@@ -19,33 +19,66 @@ else
 	query="$QUERY_STRING"
 fi
 
-if [ $(get_parameter action) == "logoff-client" ]; then
+if [ $(get_parameter action) == "reboot" ]; then
+cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+
+<html>
+	<head>
+		<title>Rebooting...</title>
+		<meta http-equiv="refresh" content="0;URL='/cgi-bin/overview.cgi'" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+</html>
+EOF_97
+reboot
+exit
+elif [ $(get_parameter action) == "logoff-client" ]; then
+	$(chilli_query logoff ip $(get_parameter id))
+	$(chilli_query logout ip $(get_parameter id))
+	
 	cat <<EOF_97
 Content-Type: text/html
 Pragma: no-cache
-Location: /cgi-bin/overview.cgi
 
-$(chilli_query logoff $(get_parameter id))
-$(chilli_query logout $(get_parameter id))
+<html>
+	<head>
+		<meta http-equiv="refresh" content="0;URL='/cgi-bin/overview.cgi'" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+</html>
 EOF_97
 exit
 elif [ $(get_parameter action) == "logon-client" ]; then
+	$(chilli_query login ip $(get_parameter id))
+	$(chilli_query authorize ip $(get_parameter id))
+	
 	cat <<EOF_97
 Content-Type: text/html
 Pragma: no-cache
-Location: /cgi-bin/overview.cgi
 
-$(chilli_query login $(get_parameter id))
-$(chilli_query authorise $(get_parameter id))
+<html>
+	<head>
+		<meta http-equiv="refresh" content="0;URL='/cgi-bin/overview.cgi'" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+</html>
 EOF_97
 exit
 elif [ $(get_parameter action) == "block-client" ]; then
+	$(chilli_query block ip $(get_parameter id))
+	
 	cat <<EOF_97
 Content-Type: text/html
 Pragma: no-cache
-Location: /cgi-bin/overview.cgi
 
-$(chilli_query block $(get_parameter id))
+<html>
+	<head>
+		<meta http-equiv="refresh" content="0;URL='/cgi-bin/overview.cgi'" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+</html>
 EOF_97
 exit
 fi
@@ -59,7 +92,9 @@ Pragma: no-cache
 <html>
 	<head>
 		<title>WiFi Mesh (mini): Overview</title>
-		<link rel="stylesheet" type="text/css" href="/resources/style.css">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<link rel="stylesheet" type="text/css" href="/resources/style.css" />
 	</head>
 	<body>
 		<table id="top">
@@ -92,10 +127,6 @@ Pragma: no-cache
 						<li><a id="tab2" href="/cgi-bin/settings.cgi" onmouseover="our_onmouseover('tab2');" onmouseout="our_onmouseout('tab2');"><span id="tab2span" onclick="our_onclick('tab2');">Settings</span></a></li>
 						<li><a id="tab3" href="/cgi-bin/support.cgi?" onmouseover="our_onmouseover('tab3');" onmouseout="our_onmouseout('tab3');"><span id="tab3span" onclick="our_onclick('tab3');">Support</span></a></li>
 					</ul>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
 					<fieldset>
 						<legend>Network Connections</legend>
 						<table>
@@ -182,11 +213,11 @@ chilli_query list | while read device; do
 	echo "<td>$(echo $device | awk '{ print $9 }')</td>"
 	echo "<td>$(echo $device | awk '{ print $10 }')</td>"
 	if [ "${state}" == "Online" ]; then 
-		echo "<td><a href='overview.chi?action=logoff-client&id=$(echo $device | awk '{ print $6 }')'>Logoff</a></td>"
+		echo "<td><a href='overview.cgi?action=logoff-client&id=$(echo $device | awk '{ print $2 }')'>Logoff</a></td>"
 	else
-		echo "<td><a href='overview.chi?action=logon-client&id=$(echo $device | awk '{ print $6 }')'>Logon</a></td>"
+		echo "<td><a href='overview.cgi?action=logon-client&id=$(echo $device | awk '{ print $2 }')'>Logon</a></td>"
 	fi
-	echo "<td><a href='overview.chi?action=block-client&id=$(echo $device | awk '{ print $6 }')'>Block</a></td>"
+	echo "<td><a href='overview.cgi?action=block-client&id=$(echo $device | awk '{ print $2 }')'>Block</a></td>"
 	echo "</tr>"
 done
 cat <<EOF_02

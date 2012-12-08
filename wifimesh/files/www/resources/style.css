@@ -1,7 +1,7 @@
 body {font-family:bitstream,sans-serif,arial,verdana;font-size:10pt;color:#303030;background-color:#303030;}
 a:link, a:visited, a:hover, a:active {color: #303030;}
 
-fieldset {width:95%;}
+fieldset {width:97.5%;border-top:1px solid #303030;border-bottom:0;border-left:0;border-right:0;}
 fieldset table {background:transparent;}
 fieldset table td {font-family:courier;padding:2px;}
 legend {background:#303030;color:#fff;padding:6px;}
@@ -9,17 +9,20 @@ legend {background:#303030;color:#fff;padding:6px;}
 #top {background-color:#303030;width:75%;margin-top:1%;margin-left:auto;margin-right:auto;}
 #bottom {background-color:#4FA8FF;width:75%;margin-top:1%;margin-left:auto;margin-right:auto;border:1px solid #4FA8FF;border-radius:4px;}
 
-#tabsF{float:left;width:96.5%;font-size:93%;line-height:normal;border-bottom:1px solid#666;}
-#tabsF ul{margin:0;padding:10px 10px 0 50px;list-style:none;}
-#tabsF li{display:inline;margin:0;padding:0;}
-#tabsF a{float:left;padding-top: 4px;-webkit-border-top-left-radius: 4px;-webkit-border-top-right-radius: 4px;-moz-border-radius-topleft: 4px;-moz-border-radius-topright: 4px;border-top-left-radius: 4px;border-top-right-radius: 4px;margin-right:1px;padding:0 0 0 4px;text-decoration:none;}
-#tabsF a span{float:left;display:block;padding:5px 15px 4px 6px;}
-#tabsF a span{float:none;}
-#tabsF a:hover,#tabsF a:active{background-position:0%-42px;}
-#tabsF a:hover span,#tabsF a:active span{background-position:100%-42px;}
+#tabsF {float:left;width:96.5%;font-size:93%;line-height:normal;margin-top:-3px;}
+#tabsF ul {margin:0;padding:10px 10px 0 50px;list-style:none;}
+#tabsF li {display:inline;margin:0;padding:0;}
+#tabsF a {float:left;padding-top: 4px;-webkit-border-bottom-left-radius: 4px;-webkit-border-bottom-right-radius: 4px;-moz-border-radius-bottomleft: 4px;-moz-border-radius-bottomright: 4px;border-bottom-left-radius: 4px;border-bottom-right-radius: 4px;margin-right:1px;padding:0 0 0 4px;text-decoration:none;}
+#tabsF a span {float:left;display:block;padding:5px 15px 4px 6px;}
+#tabsF a span {float:none;}
+#tabsF a:hover, #tabsF a:active {background-position:0%-42px;}
+#tabsF a:hover span, #tabsF a:active span {background-position:100%-42px;}
+#tabsF a {color: #4FA8FF !important;background-color:#303030;border:1px solid #303030;}
+#tabsF a:hover span,#tabsF a:active span {color: #FFFFFF !important;}
 
-#tabsF a{color: #4FA8FF !important;background-color:#303030;border:1px solid #303030;}
-#tabsF a:hover span,#tabsF a:active span{color: #FFFFFF !important;}
+#tab1 {border-top:1px solid #4FA8FF;margin-left:-25px;}
+#tab2 {border-top:1px solid #4FA8FF;}
+#tab3 {border-top:1px solid #4FA8FF;}
 
 /* responsive design for mobile */
 /* phone */

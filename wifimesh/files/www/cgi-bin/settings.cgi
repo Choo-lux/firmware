@@ -100,7 +100,7 @@ Pragma: no-cache
 						<legend>Wi-Fi</legend>
 						<table>
 							<tr>
-								<td>Channel:</td>
+								<td style='width:75px;'>Channel:</td>
 								<td><input type="text" name="wifi_channel" value="$(uci get wireless.radio0.channel)" placeholder="$(uci get wireless.radio0.channel)" maxchars="2" style="width:200px;" /></td>
 							</tr>
 							<tr>
@@ -114,7 +114,7 @@ Pragma: no-cache
 						<legend>WAN Connectivity</legend>
 						<table>
 							<tr>
-								<td>Type:</td>
+								<td style='width:75px;'>Type:</td>
 								<td>
 									<select name="wan_type" style="width:200px;">
 EOF_01

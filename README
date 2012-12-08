@@ -22,10 +22,17 @@ make menuconfig
 6) Then select the following options:
 > Architecture: ar71xx
 > Packages:
-	Network ->		Captive Portals ->	coova-chilli
-					File Transfer ->	curl
-					wifimesh
-	Utilities ->	compression ->	unzip
+	Network	->	Captive Portals	->	coova-chilli
+	Network ->	File Transfer	->	curl
+	Network ->	Web Servers	->	uhttpd
+	Network ->	Web Servers	->	uhttpd		->	uhttpd-mod-tls
+	Network ->	chat
+	Network ->	wifimesh
+	Kernel Modules->USB Support	->	kmod-usb-acm
+	Kernel Modules->USB Support	->	kmod-usb-serial
+	Kernel Modules->USB Support	->	kmod-usb-serial-wwan
+	Utilities ->	Compression ->		unzip
+	Utilities ->	comgt
 	Base system ->	om-watchdog
 
 7) Build the firmware:
