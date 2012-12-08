@@ -187,7 +187,6 @@ Pragma: no-cache
 								<th>IP Address</th>
 								<th>State</th>
 								<th>Time</th>
-								<th>Bytes Total</th>
 								<th>Bytes Down</th>
 								<th>Bytes Up</th>
 								<th colspan="2">Maintenance</th>
@@ -209,7 +208,6 @@ chilli_query list | while read device; do
 	echo "<td>$(echo $device | awk '{ print $2 }')</td>"
 	echo "<td>${state}</td>"
 	echo "<td>$(echo $device | awk '{ print $7 }')</td>"
-	echo "<td>$(echo $device | awk '{ print $8 }')</td>"
 	echo "<td>$(echo $device | awk '{ print $9 }')</td>"
 	echo "<td>$(echo $device | awk '{ print $10 }')</td>"
 	if [ "${state}" == "Online" ]; then 
