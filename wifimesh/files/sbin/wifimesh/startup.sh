@@ -158,24 +158,6 @@ sleep 1 && brctl stp br-wan on
 log_message "boot: waiting for system to initialize..."
 sleep 10
 
-log_message "boot: getting coova configuration"
-echo "" > /tmp/dns.tmp
-cat /tmp/resolv.conf.auto | grep 'nameserver' | while read line; do
-line=$(echo $line | awk '{ print $2 }')
-
-if [ -z $dns1 ] ; then
-	echo "&dns1=${line}" >> /tmp/dns.tmp
-	dns1=1
-elif [ -z $dns2 ]; then
-	echo "&dns2=${line}" >> /tmp/dns.tmp
-	dns2=1
-fi
-done
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/defaults "http://${dashboard_server}checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
-
-log_message "boot: getting coova logo"
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/www/coova.jpg "http://${dashboard_server}checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
-
 log_message "boot: initial report to the dashboard"
 /sbin/wifimesh/update.sh ${type}
 

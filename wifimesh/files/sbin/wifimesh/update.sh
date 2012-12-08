@@ -158,6 +158,21 @@ cat $response_file | while read line ; do
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="lan"
 			
+			# get the config to use for chilli
+			echo "" > /tmp/dns.tmp
+			cat /tmp/resolv.conf.auto | grep 'nameserver' | while read line; do
+				line=$(echo $line | awk '{ print $2 }')
+				
+				if [ -z $dns1 ] ; then
+					echo "&dns1=${line}" >> /tmp/dns.tmp
+					dns1=1
+				elif [ -z $dns2 ]; then
+					echo "&dns2=${line}" >> /tmp/dns.tmp
+					dns2=1
+				fi
+			done
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -o /etc/chilli/defaults "http://${dashboard_server}checkin-wm.php?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
+			
 			# get the page to use as the splash page
 			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
 			
