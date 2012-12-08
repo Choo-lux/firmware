@@ -32,9 +32,6 @@ uci set firewall.@zone[1].input="ACCEPT"
 uci commit firewall
 /etc/init.d/firewall restart
 
-hardware=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2}')
-log_message "first_boot: hardware platform is $hardware"
-
 log_message "first_boot: disable dnsmasq"
 /etc/init.d/dnsmasq disable
 
@@ -49,10 +46,12 @@ uci set network.wan.ifname="eth0"
 uci set network.wan.proto="dhcp"
 uci set network.lan.ifname=""
 uci set network.lan.ipaddr="${ip_lan}"
-# support for multiple physical adapters - flip the adapters if listed
-if [[ "$(ifconfig -a|grep eth1|awk '{ print $1}')" == eth1 ]]; then
+if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then # Adds support for multiple physical adapters, flips the adapters if listed
 	uci set network.lan.ifname="eth1"
-	if [ -n "$(grep -F $hardware "/sbin/wifimesh/flipETH.list")" ]; then uci set network.lan.ifname="eth0" && uci set network.wan.ifname="eth1"; fi
+	if [ -n "$(grep -F $hardware "/sbin/wifimesh/flipETH.list")" ]; then
+		uci set network.lan.ifname="eth0"
+		uci set network.wan.ifname="eth1"
+	fi
 fi
 uci commit network
 
@@ -107,10 +106,10 @@ uci set wireless.@wifi-iface[4].key="w1f1m35h"
 uci set wireless.@wifi-iface[4].hidden="1"
 uci commit wireless
 
-log_message "first_boot: setting the ssh key"
+log_message "first_boot: setting the ssh default key"
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Ynu3d3QGFukY05Z0iax3MQkHHII6itosRWLlWVhFNI3ThYxS+wH3VORYIgkisZwx+6/Kgjyb37ViwPfwFqgpFUFnGw5TaVM1pQnH1mp7eFzhd/bKw5vsez1zD8aZuaI4Bw+Nzi3G/9ZtWc/BIQh2SXeIhdcHiqIF8mJx8Up9XGq/GPNI3XoR5bW7gFpMJFPbMU4WgntJh0UkDGeDwnYoIBkjfLmdaXI9V8YW1+DVDiq2pHJD049Mn+CRRnkyOfKeWLioKFIkF87os5D2dEuMSodeRMYtCPVU6ZjTA3xOs1jA94coclP codycooper@codys-mac.local" > /etc/dropbear/authorized_keys
 
-log_message "first_boot: setting the ssh password"
+log_message "first_boot: setting the ssh default password"
 echo -e "w1f1m35h\nw1f1m35h" | passwd root
 
 log_message "first_boot: configuring uhttpd"
@@ -153,7 +152,7 @@ HS_WWWBIN='/etc/chilli/wwwsh'
 HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
 
-log_message "first_boot: removing first_boot file"
+log_message "first_boot: removing first_boot marker file"
 rm /sbin/wifimesh/first_boot
 
 log_message "first_boot: saving ssh banner"
@@ -171,7 +170,7 @@ cat > /etc/banner << banner_end
   ------------------------------------------------------
 banner_end
 
-log_message "first_boot: rebooting..."
+log_message "first_boot: done, rebooting..."
 sleep 10
 reboot
 
@@ -179,13 +178,13 @@ reboot
 type=1
 fi
 
-log_message "first_boot: stopping dnsmasq"
+log_message "boot: stopping dnsmasq"
 /etc/init.d/dnsmasq stop
 
-log_message "first_boot: enable stp on the wan bridge"
+log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
 
-log_message "boot: waiting for system to initialize..."
+log_message "boot: waiting for system to initialise..."
 sleep 10
 
 log_message "boot: initial report to the dashboard"
