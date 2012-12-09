@@ -223,7 +223,7 @@ chilli_query list | while read device; do
 	
 	echo "<tr>"
 	echo "<td>$(echo $device | awk '{ print $6 }')</td>"
-	echo "<td>$(echo $device | awk '{ print $1 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $1 }' | sed 's/-/:/g')</td>"
 	echo "<td>$(echo $device | awk '{ print $2 }')</td>"
 	echo "<td>${state}</td>"
 	echo "<td>$(echo $device | awk '{ print $7 }')</td>"
