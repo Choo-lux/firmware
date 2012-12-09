@@ -71,7 +71,7 @@ echo "Acquiring link speed"
 ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ print $1 }') | grep 'tx bit' | awk '{ print $3 }')
 
 # Saving Request Data
-request_data="ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${fw_ver}&mesh_ver=${mesh_ver}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
@@ -108,7 +108,7 @@ echo "Applying settings"
 
 # define the hosts file
 echo "127.0.0.1 localhost" > /etc/hosts
-echo "${ip} my.wifi-mesh.com my.robin-mesh.com my.open-mesh.com node chilli" >> /etc/hosts
+echo "${ip_lan} my.wifi-mesh.com my.robin-mesh.com my.open-mesh.com node chilli" >> /etc/hosts
 
 cat $response_file | while read line ; do
 	one=$(echo $line | awk '{print $1}')
@@ -123,6 +123,8 @@ cat $response_file | while read line ; do
 		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
+	elif [ "$one" = "system.firmware.branch" ]; then
+		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "system.command" ]; then
 		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /tmp/command.sh "$two"
 		chmod +x /tmp/command.sh
@@ -171,13 +173,13 @@ cat $response_file | while read line ; do
 					dns2=1
 				fi
 			done
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/defaults" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
 			
 			# get the page to use as the splash page
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
 			
 			# get the logo to use on the splash page
-			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
+			curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
 			# do start coova on boot
 			/etc/init.d/chilli enable

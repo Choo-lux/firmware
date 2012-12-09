@@ -4,8 +4,8 @@
 
 # IP Hexor
 hex_ip() {
-	let ip=0x$(echo $mac_wlan | cut $1)
-	echo $ip
+	let tmp1=0x$(echo $mac_wlan | cut $1)
+	echo $tmp1
 }
 
 log_message() {
@@ -65,7 +65,6 @@ fi
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
-ip="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_lan="10.$(hex_ip -c13-14).$(hex_ip -c16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 ip_gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
@@ -78,12 +77,9 @@ firmware_server=$(cat /sbin/wifimesh/firmware_server.txt)
 # Replace them with the defaults if they are not defined by text files in /sbin/wifimesh
 if [ -z "${dashboard_server}" ]; then dashboard_server="www.wifi-mesh.com/dashboard/"; fi
 if [ -z "${firmware_server}" ]; then firmware_server="cdn.wifi-mesh.com/"; fi
+if [ -z "${firmware_branch}" ]; then firmware_branch="stable"; fi
 
 # Define version information
-fw_ver=$(cat /sbin/wifimesh/version.txt)
-
-mesh_ver=$(opkg list_installed | grep 'ath9k' | awk '{ print $3 }')
-temp=$(echo $mesh_ver | tr "+" "\n")
-for mesh_ver in $temp; do
-	break
-done
+firmware_version=$(cat /sbin/wifimesh/firmware_version.txt)
+kernel_version=$(cat /sbin/wifimesh/kernel_version.txt)
+mesh_version=$(opkg list_installed | grep 'ath9k - ' | awk '{ print $3 }' |cut -d + -f 2)
