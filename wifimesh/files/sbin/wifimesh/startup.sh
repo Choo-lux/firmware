@@ -48,7 +48,7 @@ uci set network.lan.ifname=""
 uci set network.lan.ipaddr="${ip_lan}"
 if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then # Adds support for multiple physical adapters, flips the adapters if listed
 	uci set network.lan.ifname="eth1"
-	if [ -n "$(grep -F $hardware "/sbin/wifimesh/flipETH.list")" ]; then
+	if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f 2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
 		uci set network.lan.ifname="eth0"
 		uci set network.wan.ifname="eth1"
 	fi
