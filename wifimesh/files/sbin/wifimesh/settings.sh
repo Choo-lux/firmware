@@ -75,8 +75,8 @@ dashboard_server=$(cat /sbin/wifimesh/dashboard_server.txt)
 firmware_server=$(cat /sbin/wifimesh/firmware_server.txt)
 
 # Replace them with the defaults if they are not defined by text files in /sbin/wifimesh
-if [ -z "${dashboard_server}" ]; then dashboard_server="www.wifi-mesh.com/dashboard/"; fi
-if [ -z "${firmware_server}" ]; then firmware_server="cdn.wifi-mesh.com/"; fi
+if [ -z "${dashboard_server}" ]; then dashboard_server="dashboard.wifi-mesh.co.nz/"; fi
+if [ -z "${firmware_server}" ]; then firmware_server="cdn.wifi-mesh.co.nz/"; fi
 if [ -z "${firmware_branch}" ]; then firmware_branch="stable"; fi
 
 # Define version information
