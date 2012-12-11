@@ -156,7 +156,7 @@ Pragma: no-cache
 							</tr>
 							<tr>
 								<td>br-lan (LAN bridge)</td>
-								<td>${ip}</td>
+								<td>${ip_lan}</td>
 								<td>$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }')</td>
 							</tr>
 							<tr>
