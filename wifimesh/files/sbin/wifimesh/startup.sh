@@ -113,8 +113,8 @@ log_message "first_boot: setting the ssh default password"
 echo -e "w1f1m35h\nw1f1m35h" | passwd root
 
 log_message "first_boot: configuring uhttpd"
-uci set uhttpd.main.realm="my.wifi-mesh.com"
-uci set uhttpd.px5g.commonname="my.wifi-mesh.com"
+uci set uhttpd.main.realm="my.wifi-mesh.co.nz"
+uci set uhttpd.px5g.commonname="my.wifi-mesh.co.nz"
 uci set uhttpd.px5g.country="NZ"
 uci set uhttpd.px5g.state="Auckland"
 uci set uhttpd.px5g.location="Auckland"
@@ -165,7 +165,7 @@ cat > /etc/banner << banner_end
   v${fw_ver}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
-  http://www.wifi-mesh.com/       http://www.openwrt.org
+  http://www.wifi-mesh.co.nz/     http://www.openwrt.org
   http://coova.org/
   ------------------------------------------------------
 banner_end

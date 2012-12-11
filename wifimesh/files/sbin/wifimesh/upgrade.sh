@@ -13,7 +13,7 @@ echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
 old_package_version=$(cat /sbin/wifimesh/package_version.txt)
-new_package_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+new_package_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
 if [ "${new_package_version+x}" = x ] && [ -z "$new_package_version" ]; then
 	log_message "upgrade: Could not connect to the upgrade server, aborting..."
@@ -25,10 +25,10 @@ elif [ "$old_package_version" != "$new_package_version" ]; then
 	if [ -e "/tmp/scripts.zip" ]; then rm "/tmp/scripts.zip"; fi
 	
 	echo "Downloading package upgrade"
-	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /tmp/scripts.zip "http://${firmware_server}firmware/${firmware_branch}/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
+	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/scripts.zip "http://${firmware_server}firmware/${firmware_branch}/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
 	
 	echo "Checking validity"
-	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -s "http://${firmware_server}firmware/${firmware_branch}/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 	local_hash=$(md5sum /tmp/scripts.zip | awk '{ print $1 }')
 	
 	if [ ! -e "/tmp/scripts.zip" ]; then
@@ -61,7 +61,7 @@ cat > /etc/banner << banner_end
   v${new_package_version}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
-  http://www.wifi-mesh.com/       http://www.openwrt.org
+  http://www.wifi-mesh.co.nz/     http://www.openwrt.org
   http://coova.org/
   ------------------------------------------------------
 banner_end
@@ -80,7 +80,7 @@ exit
 
 
 old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt)
-new_kernel_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/${architecture}/kernel_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+new_kernel_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/${architecture}/kernel_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
 #device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | sed 's/ /_/g')
 #new_kernel_version=$(cat /tmp/kernel_version.txt)
@@ -96,10 +96,10 @@ elif [ "$old_kernel_version" != "$new_kernel_version" ]; then
 	if [ -e "/tmp/scripts.zip" ]; then rm "/tmp/scripts.zip"; fi
 	
 	echo "Downloading kernel upgrade"
-	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -k -s -o /tmp/scripts.zip "http://${firmware_server}firmware/${firmware_branch}/${architecture}/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
+	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/scripts.zip "http://${firmware_server}firmware/${firmware_branch}/${architecture}/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
 	
 	echo "Checking validity"
-	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.com/)" -s "http://${firmware_server}firmware/${firmware_branch}/${architecture}/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/${architecture}/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 	local_hash=$(md5sum /tmp/scripts.zip | awk '{ print $1 }')
 	
 	if [ "${actual_hash}" = "${local_hash}" ]; then
