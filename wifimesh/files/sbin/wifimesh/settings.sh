@@ -9,7 +9,7 @@ hex_ip() {
 }
 
 log_message() {
-	#echo "$(date) $1" >> /etc/perma.log
+	echo "$(date) $1" >> /etc/perma.log
 	echo $1
 }
 
@@ -80,6 +80,6 @@ if [ -z "${firmware_server}" ]; then firmware_server="cdn.wifi-mesh.co.nz/"; fi
 if [ -z "${firmware_branch}" ]; then firmware_branch="stable"; fi
 
 # Define version information
-firmware_version=$(cat /sbin/wifimesh/firmware_version.txt)
+package_version=$(cat /sbin/wifimesh/package_version.txt)
 kernel_version=$(cat /sbin/wifimesh/kernel_version.txt)
 mesh_version=$(opkg list_installed | grep 'ath9k - ' | awk '{ print $3 }' |cut -d + -f 2)

@@ -71,7 +71,7 @@ echo "Acquiring link speed"
 ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ print $1 }') | grep 'tx bit' | awk '{ print $3 }')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${firmware_version}&mesh_ver=${mesh_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&mesh_ver=${mesh_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
@@ -125,11 +125,11 @@ cat $response_file | while read line ; do
 		uci set system.@system[0].hostname="$two"
 	elif [ "$one" = "system.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
-	elif [ "$one" = "system.command" ]; then
-		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/command.sh "$two"
-		chmod +x /tmp/command.sh
-		. /tmp/command.sh
-		rm /tmp/command.sh
+	#elif [ "$one" = "system.command" ]; then
+		#curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/command.sh "$two"
+		#chmod +x /tmp/command.sh
+		#. /tmp/command.sh
+		#rm /tmp/command.sh
 	elif [ "$one" = "servers.ntp.server" ]; then
 		uci set system.ntp.server="$two"
 	elif [ "$one" = "servers.ntp.timezone" ]; then
