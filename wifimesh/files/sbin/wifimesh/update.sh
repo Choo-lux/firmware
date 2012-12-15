@@ -125,11 +125,6 @@ cat $response_file | while read line ; do
 		uci set system.@system[0].hostname="$two"
 	elif [ "$one" = "system.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
-	#elif [ "$one" = "system.command" ]; then
-		#curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/command.sh "$two"
-		#chmod +x /tmp/command.sh
-		#. /tmp/command.sh
-		#rm /tmp/command.sh
 	elif [ "$one" = "servers.ntp.server" ]; then
 		uci set system.ntp.server="$two"
 	elif [ "$one" = "servers.ntp.timezone" ]; then
