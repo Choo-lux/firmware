@@ -8,11 +8,17 @@ STOP=15
 boot() {
 # Fix the permissions
 chmod +x /etc/init.d/wifimesh > /dev/null
+
 chmod +x /sbin/wifimesh/check.sh > /dev/null
 chmod +x /sbin/wifimesh/settings.sh > /dev/null
 chmod +x /sbin/wifimesh/startup.sh > /dev/null
 chmod +x /sbin/wifimesh/update.sh > /dev/null
 chmod +x /sbin/wifimesh/upgrade.sh > /dev/null
+
+chmod +x /www/cgi-bin/overview.cgi > /dev/null
+chmod +x /www/cgi-bin/settings.cgi > /dev/null
+chmod +x /www/cgi-bin/help.cgi > /dev/null
+chmod +x /www/cgi-bin/first_boot.cgi > /dev/null
 
 # Load in the settings
 . /sbin/wifimesh/settings.sh
@@ -74,7 +80,7 @@ uci set wireless.@wifi-iface[0].mesh_id="wifimesh"
 uci set wireless.@wifi-iface[0].encryption="none"
 
 uci set wireless.@wifi-iface[1].device="radio0"
-uci set wireless.@wifi-iface[1].network="wan"
+uci set wireless.@wifi-iface[1].network="lan"
 uci set wireless.@wifi-iface[1].mode="ap"
 uci set wireless.@wifi-iface[1].ssid="${ssid}"
 uci set wireless.@wifi-iface[1].encryption="none"
@@ -122,7 +128,7 @@ uci commit uhttpd
 /etc/init.d/uhttpd enable
 
 log_message "first_boot: configuring coova-chilli"
-echo "HS_LANIF='wlan0'
+echo "HS_LANIF='br-lan'
 HS_WANIF='br-wan'
 HS_NETWORK='$(echo $ip_lan | cut -d . -f 1-3).0'
 HS_NETMASK='255.255.255.0'
