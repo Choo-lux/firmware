@@ -24,6 +24,79 @@ EOF_96
 exit
 fi
 
+# Load in any requested data too
+get_parameter() {
+	echo "$query" | tr '&' '\n' | grep "^$1=" | head -1 | sed "s/.*=//" 
+}
+
+if [ "$REQUEST_METHOD" = POST ]; then
+	query=$(head --bytes="$CONTENT_LENGTH")
+else
+	query="$QUERY_STRING"
+fi
+
+if [ $(get_parameter action) == "configure" ]; then
+# Authorise all of the connected clients
+chilli_query list | while read device; do
+	chilli_query authorize ip $(echo $device | awk '{ print $2 }')
+	chilli_query login ip $(echo $device | awk '{ print $2 }')
+done
+
+# Redirect the currently connected client to the Dashboard to add the node
+cat <<EOF_96
+Content-Type: text/html
+Pragma: no-cache
+
+<html>
+	<head>
+		<title>Redirecting...</title>
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="refresh" content="0;URL='http://
+EOF_96
+echo $(cat /sbin/wifimesh/dashboard_server.txt)
+cat <<EOF_97
+overview.php?action=add-node-first_boot&url=
+EOF_97
+echo $(chilli_query list | grep '10.176.247.13' | awk '{ print $15 }')
+cat <<EOF_98
+&mac=
+EOF_98
+echo $mac_lan
+cat <<EOF_99
+'" />
+	</head>
+</html>
+EOF_99
+exit
+elif [ $(get_parameter action) == "disable" ]; then
+echo "/cgi-bin/:admin:w1f1m35h" > /etc/httpd.conf
+
+/etc/init.d/chilli disable
+/etc/init.d/chilli stop
+
+uci set wireless.@wifi-iface[1].network="wan"
+uci commit wireless
+
+wifi
+
+cat <<EOF_97
+Content-Type: text/html
+Pragma: no-cache
+
+<html>
+	<head>
+		<title>Redirecting...</title>
+		<meta http-equiv="refresh" content="10;URL='/cgi-bin/overview.cgi'" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+	<body>
+		<h1>Please wait...</h1>
+	</body>
+</html>
+EOF_97
+exit
+fi
+
 # Start showing the page
 cat <<EOF_01
 Content-Type: text/html
@@ -70,9 +143,9 @@ Pragma: no-cache
 					</ul>
 					<fieldset>
 						<legend>Welcome to WiFi Mesh!</legend>
-						<p>Before you can get started using WiFi Mesh you need to either configure your node at the WiFi Mesh Dashboard or disable the Captive Portal.</p>
-						<p><a href="/cgi-bin/first_boot.cgi?action=configure-node">Configure Node</a></p>
-						<p><a href="/cgi-bin/first_boot.cgi?action=disable-coova">Disable Captive Portal</a></p>
+						<p>Before you can get started using WiFi Mesh you need to either configure your node at the dashboard or disable the Captive Portal.</p>
+						<p><a href="/cgi-bin/first_boot.cgi?action=configure">Configure Node</a></p>
+						<p><a href="/cgi-bin/first_boot.cgi?action=disable">Disable Captive Portal</a></p>
 					</fieldset>
 					<br />
 				</td>
@@ -108,4 +181,4 @@ Pragma: no-cache
 		</script>
 	</body>
 </html>
-EOF_03
+EOF_01
