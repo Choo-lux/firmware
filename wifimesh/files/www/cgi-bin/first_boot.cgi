@@ -55,7 +55,7 @@ Pragma: no-cache
 EOF_96
 echo $(cat /sbin/wifimesh/dashboard_server.txt)
 cat <<EOF_97
-overview.php?action=add-node-first_boot&url=
+first_boot.php?url=
 EOF_97
 echo $(chilli_query list | grep '10.176.247.13' | awk '{ print $15 }')
 cat <<EOF_98
