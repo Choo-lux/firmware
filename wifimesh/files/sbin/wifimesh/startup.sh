@@ -184,6 +184,12 @@ reboot
 type=1
 fi
 
+if [ -f "/etc/rc.d/S99chilli" ]; then
+	log_message "boot: forcing DNS for CoovaChilli clients"
+	iptables -t nat -A PREROUTING -i tun0 -p udp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
+	iptables -t nat -A PREROUTING -i tun0 -p tcp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
+fi
+
 log_message "boot: stopping dnsmasq"
 /etc/init.d/dnsmasq stop
 
