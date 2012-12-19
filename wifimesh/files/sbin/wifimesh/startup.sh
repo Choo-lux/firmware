@@ -168,7 +168,7 @@ cat > /etc/banner << banner_end
   |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
   |________|__|___|   |__| |__|_|__||_____|_____||__|__|
 
-  v${fw_ver}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
+  v${package_version}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
   http://www.wifi-mesh.co.nz/     http://www.openwrt.org
