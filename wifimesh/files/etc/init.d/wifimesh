@@ -40,6 +40,7 @@ uci commit firewall
 
 log_message "first_boot: disable dnsmasq"
 /etc/init.d/dnsmasq disable
+/etc/init.d/dnsmasq stop
 
 log_message "first_boot: configuring the bridges"
 brctl addbr br-wan
@@ -111,6 +112,7 @@ uci set wireless.@wifi-iface[4].encryption="psk2"
 uci set wireless.@wifi-iface[4].key="w1f1m35h"
 uci set wireless.@wifi-iface[4].hidden="1"
 uci commit wireless
+/etc/init.d/network restart
 
 log_message "first_boot: setting the ssh default key"
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Ynu3d3QGFukY05Z0iax3MQkHHII6itosRWLlWVhFNI3ThYxS+wH3VORYIgkisZwx+6/Kgjyb37ViwPfwFqgpFUFnGw5TaVM1pQnH1mp7eFzhd/bKw5vsez1zD8aZuaI4Bw+Nzi3G/9ZtWc/BIQh2SXeIhdcHiqIF8mJx8Up9XGq/GPNI3XoR5bW7gFpMJFPbMU4WgntJh0UkDGeDwnYoIBkjfLmdaXI9V8YW1+DVDiq2pHJD049Mn+CRRnkyOfKeWLioKFIkF87os5D2dEuMSodeRMYtCPVU6ZjTA3xOs1jA94coclP codycooper@codys-mac.local" > /etc/dropbear/authorized_keys
@@ -126,6 +128,7 @@ uci set uhttpd.px5g.state="Auckland"
 uci set uhttpd.px5g.location="Auckland"
 uci commit uhttpd
 /etc/init.d/uhttpd enable
+/etc/init.d/uhttpd restart
 
 log_message "first_boot: configuring coova-chilli"
 echo "HS_LANIF='br-lan'
@@ -157,6 +160,7 @@ HS_WWWDIR='/etc/chilli/www'
 HS_WWWBIN='/etc/chilli/wwwsh'
 HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
+/etc/init.d/chilli start
 
 log_message "first_boot: removing first_boot marker file"
 rm /sbin/wifimesh/first_boot
@@ -168,7 +172,7 @@ cat > /etc/banner << banner_end
   |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
   |________|__|___|   |__| |__|_|__||_____|_____||__|__|
 
-  v${fw_ver}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
+  v${package_version}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
   http://www.wifi-mesh.co.nz/     http://www.openwrt.org
@@ -177,8 +181,8 @@ cat > /etc/banner << banner_end
 banner_end
 
 log_message "first_boot: done, rebooting..."
-sleep 10
-reboot
+#sleep 10
+#reboot
 
 # mark it as a new boot
 type=1
@@ -189,9 +193,6 @@ if [ -f "/etc/rc.d/S99chilli" ]; then
 	iptables -t nat -A PREROUTING -i tun0 -p udp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
 	iptables -t nat -A PREROUTING -i tun0 -p tcp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
 fi
-
-log_message "boot: stopping dnsmasq"
-/etc/init.d/dnsmasq stop
 
 log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on

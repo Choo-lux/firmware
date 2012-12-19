@@ -178,12 +178,14 @@ cat $response_file | while read line ; do
 			
 			# do start coova on boot
 			/etc/init.d/chilli enable
+			/etc/init.d/chilli restart
 		else
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="wan"
 			
 			# don't start coova on boot
 			/etc/init.d/chilli disable
+			/etc/init.d/chilli stop
 		fi
 	
 	# SSID #2 (formerly Private SSID)
@@ -290,14 +292,17 @@ done
 # Save all of that
 uci commit
 
+# Restart all of the services
+/etc/init.d/network restart
+/etc/init.d/uhttpd restart
+
 # Clear out the old files
 if [ -e $status_file ]; then rm $status_file; fi
 if [ -e $response_file ]; then rm $response_file; fi
 if [ -e $temp_file ]; then rm $temp_file; fi
 
 echo "----------------------------------------------------------------"
-echo "Successfully applied new settings, rebooting..."
+echo "Successfully applied new settings"
 
-log_message "update: Successfully applied new settings, rebooting..."
-
-reboot
+log_message "update: Successfully applied new settings"
+#reboot
