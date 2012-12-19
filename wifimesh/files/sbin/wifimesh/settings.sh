@@ -9,7 +9,7 @@ hex_ip() {
 }
 
 log_message() {
-	echo "$(date) $1" >> /etc/perma.log
+	#echo "$(date) $1" >> /etc/perma.log
 	echo $1
 }
 
