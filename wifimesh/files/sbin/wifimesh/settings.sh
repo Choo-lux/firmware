@@ -4,7 +4,11 @@
 
 # IP Hexor
 hex_ip() {
-	let tmp1=0x$(echo $mac_wlan | cut $1)
+	if [ -z "${mac_wlan}" ]; then
+		let tmp1=0x$(echo $mac_lan | cut $1)
+	else
+		let tmp1=0x$(echo $mac_wlan | cut $1)
+	fi
 	echo $tmp1
 }
 
