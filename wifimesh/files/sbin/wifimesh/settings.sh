@@ -77,6 +77,7 @@ ssid="wifimesh_$(hex_ip -c16-17)"
 # Get the dashboard and upgrade server urls
 dashboard_server=$(cat /sbin/wifimesh/dashboard_server.txt)
 firmware_server=$(cat /sbin/wifimesh/firmware_server.txt)
+firmware_branch=$(cat /sbin/wifimesh/firmware_branch.txt)
 
 # Replace them with the defaults if they are not defined by text files in /sbin/wifimesh
 if [ -z "${dashboard_server}" ]; then dashboard_server="dashboard.wifi-mesh.co.nz/"; fi
