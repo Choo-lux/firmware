@@ -178,7 +178,12 @@ cat $response_file | while read line ; do
 			
 			# do start coova on boot
 			/etc/init.d/chilli enable
-			/etc/init.d/chilli restart
+			/etc/init.d/chilli stop
+			/etc/init.d/chilli start
+			
+			# forces DNS for coova clients
+			iptables -t nat -A PREROUTING -i tun0 -p udp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
+			iptables -t nat -A PREROUTING -i tun0 -p tcp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
 		else
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="wan"
