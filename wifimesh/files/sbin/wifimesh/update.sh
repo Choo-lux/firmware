@@ -176,9 +176,12 @@ cat $response_file | while read line ; do
 			# get the logo to use on the splash page
 			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
-			# restarts coova later in the script
-			log_message "update: setting coova restart flag"
-			touch /tmp/coovarst
+			# restarts coovachilli
+			chmod +x /var/run/chilli.tun0.sh
+			/var/run/chilli.tun0.sh
+			/etc/init.d/chilli stop
+			sleep 5
+			/etc/init.d/chilli start
 			
 			# forces DNS for coova clients
 			uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
@@ -298,15 +301,6 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
-if [ -f /tmp/coovarst ]; then
-	# actually restarts coovachilli
-	log_message "update: restarting CoovaChilli"
-	
-	/etc/init.d/chilli stop
-	sleep 1 && /etc/init.d/chilli enable
-	sleep 1 && /etc/init.d/chilli start
-	rm -f /tmp/coovarst
-fi
 /etc/init.d/uhttpd restart
 
 # Clear out the old files
