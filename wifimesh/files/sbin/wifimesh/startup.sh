@@ -159,7 +159,6 @@ HS_TYPE='chillispot'
 HS_WWWDIR='/etc/chilli/www'
 HS_WWWBIN='/etc/chilli/wwwsh'
 HS_RAD_PROTO='chap'" > /etc/chilli/defaults
-cp -f /sbin/wifimesh/coova.html /etc/chilli/www/
 /etc/init.d/chilli enable
 /etc/init.d/chilli start
 
@@ -192,6 +191,8 @@ fi
 if [ -f "/etc/rc.d/S99chilli" ]; then
 	log_message "boot: forcing DNS for CoovaChilli clients"
 	uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
+	uci commit network
+	/etc/init.d/network restart
 fi
 
 

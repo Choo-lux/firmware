@@ -191,7 +191,10 @@ fi
 if [ -f "/etc/rc.d/S99chilli" ]; then
 	log_message "boot: forcing DNS for CoovaChilli clients"
 	uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
+	uci commit network
+	/etc/init.d/network restart
 fi
+
 
 log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
