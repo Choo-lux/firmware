@@ -51,6 +51,9 @@ elif [ "$old_package_version" != "$new_package_version" ]; then
 		# Make sure we are enabled
 		/etc/init.d/wifimesh enable > /dev/null
 		
+		# Load in the cron jobs
+		crontab /sbin/wifimesh/cron.txt
+		
 		echo "saving the new WiFi Mesh banner"
 cat > /etc/banner << banner_end
   ________ __ _______ __   _______               __     
