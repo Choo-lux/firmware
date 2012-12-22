@@ -181,8 +181,8 @@ cat $response_file | while read line ; do
 			touch /tmp/coovarst
 			
 			# forces DNS for coova clients
-			iptables -t nat -A PREROUTING -i tun0 -p udp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
-			iptables -t nat -A PREROUTING -i tun0 -p tcp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
+			uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
+
 		else
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="wan"
@@ -298,7 +298,6 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
-
 if [ -f /tmp/coovarst ]; then
 	echo "Restarting CoovaChilli"
 	# do start coova on boot
@@ -307,7 +306,6 @@ if [ -f /tmp/coovarst ]; then
 	sleep 1 && /etc/init.d/chilli start
 	rm -f /tmp/coovarst
 fi
-
 /etc/init.d/uhttpd restart
 
 # Clear out the old files

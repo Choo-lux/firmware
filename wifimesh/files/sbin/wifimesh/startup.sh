@@ -159,6 +159,7 @@ HS_TYPE='chillispot'
 HS_WWWDIR='/etc/chilli/www'
 HS_WWWBIN='/etc/chilli/wwwsh'
 HS_RAD_PROTO='chap'" > /etc/chilli/defaults
+cp -f /sbin/wifimesh/coova.html /etc/chilli/www/
 /etc/init.d/chilli enable
 /etc/init.d/chilli start
 
@@ -181,8 +182,8 @@ cat > /etc/banner << banner_end
 banner_end
 
 log_message "first_boot: done, rebooting..."
-#sleep 10
-#reboot
+sleep 10
+reboot
 
 # mark it as a new boot
 type=1
@@ -190,9 +191,9 @@ fi
 
 if [ -f "/etc/rc.d/S99chilli" ]; then
 	log_message "boot: forcing DNS for CoovaChilli clients"
-	iptables -t nat -A PREROUTING -i tun0 -p udp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
-	iptables -t nat -A PREROUTING -i tun0 -p tcp --dport 53 -j DNAT --to $(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2)
+	uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
 fi
+
 
 log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
