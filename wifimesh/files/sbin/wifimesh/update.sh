@@ -176,8 +176,8 @@ cat $response_file | while read line ; do
 			# get the logo to use on the splash page
 			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
-			# Restart coova - pending
-			echo "setting coova restart flag"
+			# restarts coova later in the script
+			log_message "update: setting coova restart flag"
 			touch /tmp/coovarst
 			
 			# forces DNS for coova clients
@@ -299,8 +299,9 @@ uci commit
 # Restart all of the services
 /etc/init.d/network restart
 if [ -f /tmp/coovarst ]; then
-	echo "Restarting CoovaChilli"
-	# do start coova on boot
+	# actually restarts coovachilli
+	log_message "update: restarting CoovaChilli"
+	
 	/etc/init.d/chilli stop
 	sleep 1 && /etc/init.d/chilli enable
 	sleep 1 && /etc/init.d/chilli start
