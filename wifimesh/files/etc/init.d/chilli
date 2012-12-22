@@ -37,6 +37,8 @@ restart() {
 
 stop() {
     echo "Stopping chilli"
+    chmod +x /var/run/chilli.tun0.sh
+	/var/run/chilli.tun0.sh
     [ -f /var/run/chilli.pid ] && { 
         kill $(cat /var/run/chilli.pid)
         [ $? = 0 ] && {

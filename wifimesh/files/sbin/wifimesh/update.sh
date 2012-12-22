@@ -177,11 +177,7 @@ cat $response_file | while read line ; do
 			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
 			# restarts coovachilli
-			chmod +x /var/run/chilli.tun0.sh
-			/var/run/chilli.tun0.sh
-			/etc/init.d/chilli stop
-			sleep 5
-			/etc/init.d/chilli start
+			/etc/init.d/chilli restart
 			
 			# forces DNS for coova clients
 			uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
