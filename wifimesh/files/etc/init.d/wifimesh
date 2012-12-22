@@ -199,6 +199,9 @@ fi
 log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
 
+log_message "boot: loading in cronjobs"
+crontab /sbin/wifimesh/cron.txt
+
 log_message "boot: waiting for system to initialise..."
 sleep 10
 
@@ -207,9 +210,6 @@ log_message "boot: initial report to the dashboard"
 
 log_message "boot: initial upgrade check"
 /sbin/wifimesh/upgrade.sh
-
-log_message "boot: loading in cronjobs"
-crontab /sbin/wifimesh/cron.txt
 }
 
 start() {
