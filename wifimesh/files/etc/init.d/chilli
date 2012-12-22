@@ -9,45 +9,39 @@ STOP=15
 check_required
 
 start() {
-    echo "Starting chilli"
-    if [ ! -d "/var/lock/subsys" ]; then
-       mkdir /var/lock/subsys
-    fi
-    /sbin/modprobe tun >/dev/null 2>&1
-    if [ ! -d "/dev/net" ]; then
-        mkdir /dev/net
-    fi
-    cd /dev/net
-    mknod tun char 10 200
-    echo 1 > /proc/sys/net/ipv4/ip_forward
-    writeconfig
-    radiusconfig
-    ifconfig br-lan 0.0.0.0
-    brctl stp br-wan on
-    sleep 1
-    /usr/sbin/chilli -c /etc/chilli.conf
-    sleep 10
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/chilli 2>/dev/null
-}
-
-restart() {
-    /etc/init.d/chilli stop
-    /etc/init.d/chilli start
+	echo "Starting chilli"
+	if [ ! -d "/var/lock/subsys" ]; then
+		mkdir /var/lock/subsys
+	fi
+	/sbin/modprobe tun >/dev/null 2>&1
+	if [ ! -d "/dev/net" ]; then
+		mkdir /dev/net
+	fi
+	cd /dev/net
+	mknod tun char 10 200
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+	writeconfig
+	radiusconfig
+	ifconfig br-lan 0.0.0.0
+	brctl stp br-wan on
+	sleep 1
+	/usr/sbin/chilli -c /etc/chilli.conf
+	touch /var/lock/subsys/chilli
 }
 
 stop() {
-    echo "Stopping chilli"
-    chmod +x /var/run/chilli.tun0.sh
+	echo "Stopping chilli"
+	chmod +x /var/run/chilli.tun0.sh
 	/var/run/chilli.tun0.sh
-    [ -f /var/run/chilli.pid ] && { 
-        kill $(cat /var/run/chilli.pid)
-        [ $? = 0 ] && {
-            rm -f /var/lock/subsys/chilli /var/run/chilli.pid 2>/dev/null
-        }
-    }
-    killall chilli
+	[ -f /var/run/chilli.pid ] && { 
+		kill $(cat /var/run/chilli.pid)
+		[ $? = 0 ] && {
+			rm -f /var/lock/subsys/chilli /var/run/chilli.pid 2>/dev/null
+		}
+	}
+	killall chilli
 }
 
 boot() {
-    start
+	start
 }

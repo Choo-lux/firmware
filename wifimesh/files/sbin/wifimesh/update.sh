@@ -177,18 +177,18 @@ cat $response_file | while read line ; do
 			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
 			# restarts coovachilli
-			/etc/init.d/chilli restart
+			/etc/init.d/chilli enable
+			echo "1" > /tmp/coova_flag
 			
 			# forces DNS for coova clients
 			uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
-
 		else
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="wan"
 			
-			# don't start coova on boot
+			# stops coovachilli
 			/etc/init.d/chilli disable
-			/etc/init.d/chilli stop
+			echo "2" > /tmp/coova_flag
 		fi
 	
 	# SSID #2 (formerly Private SSID)
@@ -297,7 +297,17 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
-/etc/init.d/uhttpd restart
+#/etc/init.d/uhttpd restart
+
+if [ $(cat /tmp/coova_flag) -eq 1 ]; then
+	echo "restarting coovachilli"
+	/etc/init.d/chilli stop
+	sleep 5
+	/etc/init.d/chilli start
+elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
+	echo "stopping coovachilli"
+	/etc/init.d/chilli stop
+fi
 
 # Clear out the old files
 if [ -e $status_file ]; then rm $status_file; fi
