@@ -39,7 +39,7 @@ stop() {
 			rm -f /var/lock/subsys/chilli /var/run/chilli.pid 2>/dev/null
 		}
 	}
-	killall chilli
+	pkill chilli
 }
 
 boot() {
