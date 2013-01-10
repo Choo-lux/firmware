@@ -162,6 +162,11 @@ HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
 /etc/init.d/chilli start
 
+# Move the firmware default coova.html file into the actual directory, if necessary
+if [ -e "/sbin/wifimesh/coova.html" ]; then
+	mv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html
+fi
+
 log_message "first_boot: removing first_boot marker file"
 rm /sbin/wifimesh/first_boot
 
