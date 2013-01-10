@@ -35,35 +35,31 @@ else
 	log_message "No Client radio detected."
 fi
 
-# note:
-# we only support single radio devices for the moment so the next part is commented out
-
 # Mesh
-#if [ "$(uci get wireless.radio0.hwmode)" = "11na" ]; then
-#	# 5.X GHz Mesh on radio0
-#	radio_mesh="radio0"
-#	radio_mesh_freq="58"
-#elif [ "$(uci get wireless.radio1.hwmode)" = "11na" ]; then
-#	# 5.X GHz Mesh on radio1
-#	radio_mesh="radio1"
-#	radio_mesh_freq="58"
-#elif [ "$(uci get wireless.radio2.hwmode)" = "11na" ]; then
-#	# 5.X GHz Mesh on radio2
-#	radio_mesh="radio2"
-#	radio_mesh_freq="58"
-#else
-#	# No Mesh radio
-#	if [ -n "${radio_client}" ]; then
-#		# 2.4 GHz Mesh using $radio_client
+if [ "$(uci get wireless.radio0.hwmode)" = "11na" ]; then
+	# 5.X GHz Mesh on radio0
+	radio_mesh="radio0"
+	radio_mesh_freq="58"
+elif [ "$(uci get wireless.radio1.hwmode)" = "11na" ]; then
+	# 5.X GHz Mesh on radio1
+	radio_mesh="radio1"
+	radio_mesh_freq="58"
+elif [ "$(uci get wireless.radio2.hwmode)" = "11na" ]; then
+	# 5.X GHz Mesh on radio2
+	radio_mesh="radio2"
+	radio_mesh_freq="58"
+else
+	# No dedicated Mesh radio
+	if [ -n "${radio_client}" ]; then
+		# 2.4 GHz Mesh using $radio_client
 		radio_mesh="${radio_client}"
 		radio_mesh_freq="${radio_client_freq}"
-#	else
-#		# No radios at all
-#		log_message "No Mesh radio detected."
-#		echo "No Mesh radio detected."
-#	fi
-#fi
-
+	else
+		# No radios at all
+		log_message "No Mesh radio detected."
+		echo "No Mesh radio detected."
+	fi
+fi
 
 # Define some networking-related variables
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
