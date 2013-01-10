@@ -260,6 +260,14 @@ cat $response_file | while read line ; do
 		uci set wireless.${radio_mesh}.country=$two
 
 	# WAN configuration
+	elif [ "$one" = "network.wan.enabled" ]; then
+		if [ "$two" = "0" ]; then
+			brctl delif br-wan eth0
+			brctl addif br-lan eth0
+		else
+			brctl delif br-lan eth0
+			brctl addif br-wan eth0
+		fi
 	elif [ "$one" = "network.wan.type" ]; then
 		if [ "$two" = "dhcp" ]; then
 			uci set network.wan.proto="dhcp"
