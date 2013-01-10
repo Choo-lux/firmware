@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
+# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
 # Load in the settings
@@ -68,11 +68,39 @@ if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 	curl -s "http://"$uamserver"/WiFi-CPA/ControlPanel/heartbeat.php?router_name=$(uci get system.@system[0].hostname | sed "s/ /+/g")&nasid="$nasid"&wan_ip=ToBeDetermined&wan_ssid="$(uci get wireless.@wifi-iface[1].ssid | sed "s/ /+/g")"&mac="$(echo $mac_wlan | sed "s/:/-/g")"&wanmac="$(echo $mac_wan | sed "s/:/-/g")"&lanmac="$(echo $mac_lan | sed "s/:/-/g")"&model=WiFi%20Mesh&ver="$fw_ver"&node_type=G" -o /dev/null
 fi
 
+echo "Obtaining CoovaChilli client data"
+if [ -z "$(ps | grep '[c]hilli')" ]; then
+	if [ -e "/tmp/chilli_clients" ]; then rm /tmp/chilli_clients; fi
+	chilli_query list | while read record ; do
+		session=$(echo $record | awk '{print $5}')
+		if [ 1 -eq "$session" ] ; then
+			mac_addr=$(echo $record |awk '{print $1}'|sed y/-/:/ |tr A-Z a-z)
+			user_name=$(echo $record | awk '{print $6}')
+			
+			kb_up=$(echo $record | awk '{print $10}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
+			kb_down=$(echo $record | awk '{print $9}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
+			kb_total=$(echo $kb_up $kb_down |awk '{print ($1 + $2)}')
+			
+			record="+${kb_total},${kb_down},${kb_up},${mac_addr},${user_name}"
+			echo $record >> /tmp/chilli_clients
+			
+			tot_kb_up=$(echo $tot_kb_up $kb_up |awk '{print ($1 + $2)}')
+			tot_kb_down=$(echo $tot_kb_down $kb_down |awk '{print ($1 + $2)}')
+		fi
+	done
+fi
+if [ -e "/tmp/chilli_clients" ]; then
+	top_users=$(cat /tmp/chilli_clients)
+	top_users=$(echo $top_users | sed 's/ //g')
+else
+	top_users=""
+fi
+
 echo "Acquiring link speed"
 ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ print $1 }') | grep 'tx bit' | awk '{ print $3 }')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&mesh_ver=${mesh_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&mesh_ver=${mesh_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&top_users=${top_users}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
