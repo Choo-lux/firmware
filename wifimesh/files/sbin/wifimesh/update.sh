@@ -58,9 +58,10 @@ else
 	role="G"
 fi
 
-echo "Performing captive portal heartbeat"
 # For WiFiRUSH
 if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
+	echo "Performing captive portal heartbeat"
+	
 	nasid=$(grep HS_RADIUSNASID /etc/chilli/defaults | awk -F'HS_RADIUSNASID=' '/HS_RADIUSNASID/ {print $2}' | sed s/\"//g)
 	uamserver=$(grep HS_UAMSERVER= /etc/chilli/defaults | awk -F'HS_UAMSERVER=' '/HS_UAMSERVER/ {print $2}' | sed s/\"//g | sed '1!d')
 	
