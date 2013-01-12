@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
+# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
 # Load in the settings
@@ -109,11 +109,12 @@ Pragma: no-cache
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<link rel="stylesheet" type="text/css" href="/resources/style.css" />
+		<script type="text/javascript" src="/resources/script.js"></script>
 	</head>
 	<body>
 		<table id="top">
 			<tr>
-				<td style="width:300px;"><a href="http://www.wifi-mesh.com/" target="_new"><img src="/resources/logo.png" style="border:0;height:100px;width:300px;"></a></td>
+				<td style="width:300px;"><a href="http://www.wifi-mesh.co.nz/" target="_new"><img src="/resources/logo.png" style="border:0;height:100px;width:300px;"></a></td>
 				<td style="width:600px;">
 					<table style="float:right;background-color:#303030;color:#fff;margin-right:2%;">
 						<tr style="font-weight:bold;"><td colspan="2">System Information</td></tr>
@@ -128,6 +129,10 @@ Pragma: no-cache
 						<tr>
 							<td>Build Date:</td>
 							<td>$(uname -v)</td>
+						</tr>
+						<tr>
+							<td>Connectivity:</td>
+							<td>LAN: <font color="grey" id="lan_status_top">n/a</font> | WAN: <font color="grey" id="wan_status_top">n/a</font> | DNS: <font color="grey" id="dns_status_top">n/a</font></td>
 						</tr>
 					</table>
 				</td>
@@ -151,34 +156,6 @@ Pragma: no-cache
 				</td>
 			</tr>
 		</table>
-		<script>
-		function our_onclick(tabname) {
-			// Reset all of the other tabs back to normal
-			document.getElementById('tab1').style.background = "#303030";
-			document.getElementById('tab1span').style.color = "#4FA8FF";
-			document.getElementById('tab2').style.background = "#303030";
-			document.getElementById('tab2span').style.color = "#4FA8FF";
-			document.getElementById('tab3').style.background = "#303030";
-			document.getElementById('tab3span').style.color = "#4FA8FF";
-			
-			// and change this tab to be the nicer looking one
-			selected_tab=tabname;
-			
-			document.getElementById(tabname).style.background = "#262626";
-			document.getElementById(tabname + "span").style.color = "#FFFFFF";
-		}
-
-		function our_onmouseover(tabname) {
-			// Reset all of the other tabs back to normal
-			if(tabname != selected_tab) {document.getElementById(tabname).style.background = "#262626";}
-			document.getElementById(tabname).style.color = "#FFFFFF";
-		}
-		
-		function our_onmouseout(tabname) {
-			// Reset all of the other tabs back to normal
-			if(tabname != selected_tab) {document.getElementById(tabname).style.backgroundColor = "303030";}
-		}
-		</script>
 	</body>
 </html>
 EOF_01

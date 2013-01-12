@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
+# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
 # Load in the settings
@@ -8,16 +8,26 @@
 echo "WiFi Mesh Connection Checker"
 echo "----------------------------------------------------------------"
 
-# Test Global Internet Connectivity (connects to an HTTP server)
-if [ "$(curl http://www.google.com/)" ]; then
-	connected=1
+# Tests LAN Connectivity
+if [ "$(ping -c 2 ${ip_gateway})" ]; then
+	lan_status=1
 else
-	connected=0
+	lan_status=0
 fi
 
-# If we are connected
-if [ "$connected" = "1" ]; then
-	log_message "check: We are connected to the Internet"
+# Tests WAN Connectivity
+if [ "$(ping -c 2 www.google.com)" ]; then
+	wan_status=1
 else
-	log_message "check: We are NOT connected to the Internet"
+	wan_status=0
 fi
+
+# Tests DNS Connectivity
+if [ "$(nslookup www.google.com)" ]; then
+	dns_status=1
+else
+	dns_status=0
+fi
+
+# Log that result
+log_message "check: LAN: ${lan_status} | WAN: ${wan_status} | DNS: ${dns_status}"
