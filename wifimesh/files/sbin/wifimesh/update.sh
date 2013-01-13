@@ -69,7 +69,7 @@ if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 fi
 
 echo "Obtaining CoovaChilli client data"
-if [ -z "$(ps | grep '[c]hilli')" ]; then
+if [ -n "$(ps | grep '[c]hilli')" ]; then
 	if [ -e "/tmp/chilli_clients" ]; then rm /tmp/chilli_clients; fi
 	chilli_query list | while read record ; do
 		session=$(echo $record | awk '{print $5}')
