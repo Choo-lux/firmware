@@ -233,8 +233,7 @@ Pragma: no-cache
 						<table>
 							<tr>
 								<th>Session Name</th>
-								<th>MAC Address</th>
-								<th>IP Address</th>
+								<th>IP/MAC Address</th>
 								<th>State</th>
 								<th>Time</th>
 								<th>Bytes Down</th>
@@ -254,8 +253,7 @@ chilli_query list | while read device; do
 	
 	echo "<tr>"
 	echo "<td>$(echo $device | awk '{ print $6 }')</td>"
-	echo "<td>$(echo $device | awk '{ print $1 }' | sed 's/-/:/g')</td>"
-	echo "<td>$(echo $device | awk '{ print $2 }')</td>"
+	echo "<td>$(echo $device | awk '{ print $2 }')<br />$(echo $device | awk '{ print $1 }' | sed 's/-/:/g')</td>"
 	echo "<td>${state}</td>"
 	echo "<td>$(echo $device | awk '{ print $7 }')</td>"
 	echo "<td>$(echo $device | awk '{ print $9 }')</td>"
@@ -324,22 +322,6 @@ done
 cat <<EOF_03
 						</table>
 					</fieldset>
-					<!--
-					<br />
-					<fieldset>
-						<legend>Nearby Routers</legend>
-						<table border="0" width="100%">
-							<tr>
-								<th>MAC</th>
-								<th>SSID</th>
-								<th>Signal</th>
-								<th>Encryption</th>
-								<th>&nbsp;</th>
-							</tr>
-						</table>
-					</fieldset>
-					-->
-					<br />
 				</td>
 			</tr>
 		</table>
