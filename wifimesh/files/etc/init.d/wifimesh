@@ -180,8 +180,8 @@ cat > /etc/banner << banner_end
   v${package_version}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
-  http://www.wifi-mesh.co.nz/     http://www.openwrt.org
-  http://coova.org/
+  http://www.wifi-mesh.co.nz     http://www.openwrt.org
+  http://coova.org               http://www.wifirush.com
   ------------------------------------------------------
 banner_end
 
