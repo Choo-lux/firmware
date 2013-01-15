@@ -20,44 +20,37 @@ log_message() {
 # Radio Detection
 # Client
 if [ "$(uci get wireless.radio0.hwmode)" = "11ng" ]; then
-	# 2.4 GHz Clients on radio0
+	# 2.4GHz Clients on radio0
 	radio_client="radio0"
-	radio_client_freq="24"
 elif [ "$(uci get wireless.radio1.hwmode)" = "11ng" ]; then
-	# 2.4 GHz Clients on radio1
+	# 2.4GHz Clients on radio1
 	radio_client="radio1"
-	radio_client_freq="24"
 elif [ "$(uci get wireless.radio2.hwmode)" = "11ng" ]; then
-	# 2.4 GHz Clients on radio2
+	# 2.4GHz Clients on radio2
 	radio_client="radio2"
-	radio_client_freq="24"
 else
 	log_message "No Client radio detected."
 fi
 
 # Mesh
 if [ "$(uci get wireless.radio0.hwmode)" = "11na" ]; then
-	# 5.X GHz Mesh on radio0
+	# 5GHz Mesh on radio0
 	radio_mesh="radio0"
-	radio_mesh_freq="58"
 elif [ "$(uci get wireless.radio1.hwmode)" = "11na" ]; then
-	# 5.X GHz Mesh on radio1
+	# 5GHz Mesh on radio1
 	radio_mesh="radio1"
-	radio_mesh_freq="58"
 elif [ "$(uci get wireless.radio2.hwmode)" = "11na" ]; then
-	# 5.X GHz Mesh on radio2
+	# 5GHz Mesh on radio2
 	radio_mesh="radio2"
-	radio_mesh_freq="58"
 else
 	# No dedicated Mesh radio
 	if [ -n "${radio_client}" ]; then
 		# 2.4 GHz Mesh using $radio_client
 		radio_mesh="${radio_client}"
-		radio_mesh_freq="${radio_client_freq}"
+		log_message "NOTICE: No Mesh radio detected, falling back to the Client radio."
 	else
 		# No radios at all
-		log_message "No Mesh radio detected."
-		echo "No Mesh radio detected."
+		log_message "WARNING: No WiFi radios detected, WiFi will not work."
 	fi
 fi
 
