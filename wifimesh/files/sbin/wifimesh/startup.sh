@@ -19,6 +19,7 @@ chmod +x /www/cgi-bin/overview.cgi > /dev/null
 chmod +x /www/cgi-bin/settings.cgi > /dev/null
 chmod +x /www/cgi-bin/help.cgi > /dev/null
 chmod +x /www/cgi-bin/first_boot.cgi > /dev/null
+chmod +x /www/cgi-bin/status.cgi > /dev/null
 
 # Load in the settings
 . /sbin/wifimesh/settings.sh
