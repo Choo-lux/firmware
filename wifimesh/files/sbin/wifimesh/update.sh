@@ -81,7 +81,7 @@ if [ -n "$(ps | grep '[c]hilli')" ]; then
 			kb_down=$(echo $record | awk '{print $9}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
 			kb_total=$(echo $kb_up $kb_down |awk '{print ($1 + $2)}')
 			
-			record="+${kb_total},${kb_down},${kb_up},${mac_addr},${user_name}"
+			record=";${kb_total},${kb_down},${kb_up},${mac_addr},${user_name}"
 			echo $record >> /tmp/chilli_clients
 			
 			tot_kb_up=$(echo $tot_kb_up $kb_up |awk '{print ($1 + $2)}')
