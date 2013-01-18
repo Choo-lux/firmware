@@ -74,14 +74,16 @@ if [ -n "$(ps | grep '[c]hilli')" ]; then
 	chilli_query list | while read record ; do
 		session=$(echo $record | awk '{print $5}')
 		if [ 1 -eq "$session" ] ; then
-			mac_addr=$(echo $record |awk '{print $1}'|sed y/-/:/ |tr A-Z a-z)
+			mac_address=$(echo $record | awk '{print $1}'|sed y/-/:/ |tr A-Z a-z)
+			ip_address=$(echo $record | awk '{print $2}')
+			token=$(echo $record | awk '{print $4}')
 			user_name=$(echo $record | awk '{print $6}')
 			
-			kb_up=$(echo $record | awk '{print $10}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
 			kb_down=$(echo $record | awk '{print $9}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
+			kb_up=$(echo $record | awk '{print $10}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
 			kb_total=$(echo $kb_up $kb_down |awk '{print ($1 + $2)}')
 			
-			record=";${kb_total},${kb_down},${kb_up},${mac_addr},${user_name}"
+			record=";${kb_total},${kb_down},${kb_up},${mac_address},${user_name},${ip_address},${token}"
 			echo $record >> /tmp/chilli_clients
 			
 			tot_kb_up=$(echo $tot_kb_up $kb_up |awk '{print ($1 + $2)}')
@@ -104,13 +106,13 @@ request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
-url="${dashboard_protocol}://${dashboard_server}${dashboard_url}"
+url="${dashboard_protocol}://${dashboard_server}${dashboard_url}?${request_data}"
 
 echo "----------------------------------------------------------------"
 echo "Sending data:"
-echo "$url?$request_data"
+echo "$url"
 
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "-d ${request_data}" "${url}" > $response_file
+curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "${url}" > $response_file
 
 curl_result=$?
 curl_data=$(cat $response_file)
