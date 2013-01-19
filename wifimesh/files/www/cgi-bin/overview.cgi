@@ -129,7 +129,7 @@ Pragma: no-cache
 						</tr>
 						<tr>
 							<td>Version:</td>
-							<td>WiFi Mesh v$(cat /sbin/wifimesh/version.txt) / $(cat /etc/openwrt_version)</td>
+							<td>WiFi Mesh v$(cat /sbin/wifimesh/package_version.txt) / $(cat /etc/openwrt_version)</td>
 						</tr>
 						<tr>
 							<td>Build Date:</td>
