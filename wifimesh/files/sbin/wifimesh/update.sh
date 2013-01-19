@@ -291,11 +291,11 @@ cat $response_file | while read line ; do
 	# WAN configuration
 	elif [ "$one" = "network.wan.enabled" ]; then
 		if [ "$two" = "0" ]; then
-			brctl delif br-wan eth0
-			brctl addif br-lan eth0
+			uci set network.wan.ifname=""
+			uci set network.lan.ifname="eth0"
 		else
-			brctl delif br-lan eth0
-			brctl addif br-wan eth0
+			uci set network.wan.ifname="eth0"
+			uci set network.lan.ifname=""
 		fi
 	elif [ "$one" = "network.wan.type" ]; then
 		if [ "$two" = "dhcp" ]; then
