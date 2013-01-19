@@ -242,13 +242,13 @@ Pragma: no-cache
 							</tr>
 EOF_01
 chilli_query list | while read device; do
-	state="$(echo $device | awk '{ print $3 }')"
-	if [ "${state}" == "dnat" ]; then
-		state="Pending"
-	elif [ "${state}" == "pass" ]; then
+	state="$(echo $device | awk '{ print $5 }')"
+	if [ "${state}" == "0" ]; then
+		state="Offline"
+	elif [ "${state}" == "1" ]; then
 		state="Online"
 	else
-		state="Unknown ${state}"
+		state="Unknown (${state})"
 	fi
 	
 	echo "<tr>"
