@@ -72,23 +72,21 @@ echo "Obtaining CoovaChilli client data"
 if [ -n "$(ps | grep '[c]hilli')" ]; then
 	if [ -e "/tmp/chilli_clients" ]; then rm /tmp/chilli_clients; fi
 	chilli_query list | while read record ; do
-		session=$(echo $record | awk '{print $5}')
-		if [ 1 -eq "$session" ] ; then
-			mac_address=$(echo $record | awk '{print $1}'|sed y/-/:/ |tr A-Z a-z)
-			ip_address=$(echo $record | awk '{print $2}')
-			token=$(echo $record | awk '{print $4}')
-			user_name=$(echo $record | awk '{print $6}')
-			
-			kb_down=$(echo $record | awk '{print $9}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
-			kb_up=$(echo $record | awk '{print $10}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
-			kb_total=$(echo $kb_up $kb_down |awk '{print ($1 + $2)}')
-			
-			record=";${kb_total},${kb_down},${kb_up},${mac_address},${user_name},${ip_address},${token}"
-			echo $record >> /tmp/chilli_clients
-			
-			tot_kb_up=$(echo $tot_kb_up $kb_up |awk '{print ($1 + $2)}')
-			tot_kb_down=$(echo $tot_kb_down $kb_down |awk '{print ($1 + $2)}')
-		fi
+		mac_address=$(echo $record | awk '{print $1}'|sed y/-/:/ |tr A-Z a-z)
+		ip_address=$(echo $record | awk '{print $2}')
+		token=$(echo $record | awk '{print $4}')
+		status=$(echo $record | awk '{print $5}')
+		user_name=$(echo $record | awk '{print $6}')
+		
+		kb_down=$(echo $record | awk '{print $9}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
+		kb_up=$(echo $record | awk '{print $10}' |tr '/' ' ' |awk 'OFMT = "%.0f" {print ($1 / 1024)}')
+		kb_total=$(echo $kb_up $kb_down |awk '{print ($1 + $2)}')
+		
+		record=";${kb_total},${kb_down},${kb_up},${mac_address},${user_name},${ip_address},${token},${status}"
+		echo $record >> /tmp/chilli_clients
+		
+		tot_kb_up=$(echo $tot_kb_up $kb_up |awk '{print ($1 + $2)}')
+		tot_kb_down=$(echo $tot_kb_down $kb_down |awk '{print ($1 + $2)}')
 	done
 fi
 if [ -e "/tmp/chilli_clients" ]; then
