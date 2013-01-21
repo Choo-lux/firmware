@@ -62,16 +62,16 @@ fi
 if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 	echo "Performing captive portal heartbeat"
 
-	mac_lan=$(ifconfig br-lan | awk '/HWaddr/ {print $5}')
-	mac_wlan=$(ifconfig br-lan | awk '/HWaddr/ {print $5}')
-	mac_wan=${mac_wan}
-	ip_wan=${ip_dhcp}
+	cpmac_lan=$(ifconfig br-lan | awk '/HWaddr/ {print $5}')
+	cpmac_wlan=$(ifconfig br-lan | awk '/HWaddr/ {print $5}')
+	cpmac_wan=${mac_wan}
+	cpip_wan=${ip_dhcp}
 	machine=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
-	fw_ver=${package_version}
+	cpfw_ver=${package_version}
 	nasid=$(grep HS_RADIUSNASID /etc/chilli/defaults | awk -F'HS_RADIUSNASID=' '/HS_RADIUSNASID/ {print $2}' | sed s/\"//g)
 	uamserver=$(grep HS_UAMSERVER= /etc/chilli/defaults | awk -F'HS_UAMSERVER=' '/HS_UAMSERVER/ {print $2}' | sed s/\"//g | sed '1!d')
 
-	curl -s "http://"$uamserver"/WiFi-CPA/ControlPanel/heartbeat.php?router_name=$(uci get system.@system[0].hostname | sed "s/ /+/g")&nasid="$nasid"&wan_ip=$ip_wan&wan_ssid="$(uci get wireless.@wifi-iface[1].ssid | sed "s/ /+/g")"&mac="$(echo $mac_wlan | sed "s/:/-/g")"&wanmac="$(echo $mac_wan | sed "s/:/-/g")"&lanmac="$(echo $mac_lan | sed "s/:/-/g")"&model="$machine"&ver="$fw_ver"&node_type=mesh" -o /dev/null
+	curl -s "http://"$uamserver"/WiFi-CPA/ControlPanel/heartbeat.php?router_name=$(uci get system.@system[0].hostname | sed "s/ /+/g")&nasid="$nasid"&wan_ip=$cpip_wan&wan_ssid="$(uci get wireless.@wifi-iface[1].ssid | sed "s/ /+/g")"&mac="$(echo $cpmac_wlan | sed "s/:/-/g")"&wanmac="$(echo $cpmac_wan | sed "s/:/-/g")"&lanmac="$(echo $cpmac_lan | sed "s/:/-/g")"&model="$machine"&ver="$cpfw_ver"&node_type=mesh" -o /dev/null
 fi
 
 echo "Obtaining CoovaChilli client data"
@@ -298,10 +298,12 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.wan.enabled" ]; then
 		if [ "$two" = "0" ]; then
 			uci set network.wan.ifname=""
-			uci set network.lan.ifname="eth0"
 		else
-			uci set network.wan.ifname="eth0"
-			uci set network.lan.ifname=""
+			if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
+				uci set network.wan.ifname="eth1"
+			else
+				uci set network.wan.ifname="eth0"
+			fi
 		fi
 	elif [ "$one" = "network.wan.type" ]; then
 		if [ "$two" = "dhcp" ]; then
