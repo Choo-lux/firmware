@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
+# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
 # IP Hexor

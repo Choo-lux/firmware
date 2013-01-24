@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright © 2011-2012 WiFi Mesh: New Zealand Ltd.
+# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
 # Load in the settings
@@ -61,7 +61,7 @@ cat > /etc/banner << banner_end
   |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
   |________|__|___|   |__| |__|_|__||_____|_____||__|__|
 
-  v${new_package_version}       (c) 2011-2012 WiFi Mesh: New Zealand Ltd.
+  v${new_package_version}       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
   http://www.wifi-mesh.co.nz/     http://www.openwrt.org
