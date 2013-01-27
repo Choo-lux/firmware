@@ -114,6 +114,7 @@ Pragma: no-cache
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<link rel="stylesheet" type="text/css" href="/resources/style.css" />
+		<script>var selected_tab = 'tab1';</script>
 		<script type="text/javascript" src="/resources/script.js"></script>
 	</head>
 	<body>
@@ -125,7 +126,7 @@ Pragma: no-cache
 						<tr style="font-weight:bold;"><td colspan="2">System Information</td></tr>
 						<tr>
 							<td>Hardware:</td>
-							<td>$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50)</td>
+							<td>$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50) / $(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')</td>
 						</tr>
 						<tr>
 							<td>Version:</td>

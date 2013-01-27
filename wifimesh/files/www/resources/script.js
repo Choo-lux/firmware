@@ -101,7 +101,6 @@ function update_status() {
 	xmlhttp.send(null);
 }
 
-var selected_tab = 'tab1';
 window.onload = function() {
 	our_onclick(selected_tab);
 	update_status();
