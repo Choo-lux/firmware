@@ -106,7 +106,7 @@ echo "Acquiring link speed"
 ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ print $1 }') | grep 'tx bit' | awk '{ print $3 }')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&mesh_ver=${mesh_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&top_users=${top_users}&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&top_users=${top_users}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
