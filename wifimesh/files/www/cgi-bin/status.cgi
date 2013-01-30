@@ -7,7 +7,7 @@
 
 # Start testing!
 # Tests LAN Connectivity
-if [ "$(ping -c 2 ${ip_gateway})" ]; then
+if [ "$(ping -c 1 ${ip_gateway})" ]; then
 	lan_status=1
 	lan_ip="${ip_gateway}"
 else
@@ -16,7 +16,7 @@ else
 fi
 
 # Tests WAN Connectivity
-wan=$(curl http://maintenance.wifi-mesh.co.nz/check-ip.php?mac=${mac_lan})
+wan=$(wget -qO- http://maintenance.wifi-mesh.co.nz/check-ip.php?mac=${mac_lan})
 if [ "${wan}" ]; then
 	wan_status=1
 	wan_ip="${wan}"
