@@ -113,6 +113,7 @@ Pragma: no-cache
 		<title>WiFi Mesh (mini): Overview</title>
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta http-equiv="refresh" content="12" />
 		<link rel="stylesheet" type="text/css" href="/resources/style.css" />
 		<script>var selected_tab = 'tab1';</script>
 		<script type="text/javascript" src="/resources/script.js"></script>
