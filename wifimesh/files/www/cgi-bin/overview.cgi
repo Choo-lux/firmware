@@ -327,6 +327,8 @@ cat <<EOF_03
 				</td>
 			</tr>
 		</table>
+		<br />
+		<br />
 	</body>
 </html>
 EOF_03
