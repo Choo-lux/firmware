@@ -8,6 +8,11 @@
 echo "WiFi Mesh Connection Checker"
 echo "----------------------------------------------------------------"
 
+# Chucks out any bad mesh paths that may be added from time to time
+iw wlan0-4 mpath dump | grep '0x0' | while read line; do
+	iw wlan0-4 mpath del $(echo $line | awk '{ print $1 }')
+done
+
 # Tests LAN Connectivity
 if [ "$(ping -c 2 ${ip_gateway})" ]; then
 	lan_status=1
