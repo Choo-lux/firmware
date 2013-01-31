@@ -174,9 +174,15 @@ else
 fi
 
 if [ "$(uci get network.wan.proto)" == "3g" ]; then
-	echo "<option value='3g' selected>2G/3G/CDMA"
+	echo "<option value='3g' selected>2G/3G/4G (LTE)"
 else
-	echo "<option value='3g'>2G/3G/CDMA"
+	echo "<option value='3g'>2G/3G/4G (LTE)"
+fi
+
+if [ "$(uci get network.wan.proto)" == "evdo" ]; then
+	echo "<option value='evdo' selected>CDMA/EVDO"
+else
+	echo "<option value='evdo'>CDMA/EVDO"
 fi
 cat <<EOF_02
 									</select>
