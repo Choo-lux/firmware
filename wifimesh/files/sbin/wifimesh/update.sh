@@ -102,11 +102,26 @@ else
 	top_users=""
 fi
 
-echo "Acquiring link speed"
-ntr=$(iw wlan0-4 station get $(iw wlan0-4 mpath dump | grep '0x15' | awk '{ print $1 }') | grep 'tx bit' | awk '{ print $3 }')
+echo "Acquiring routing information"
+echo "" > /tmp/checkin/rank
+echo "" > /tmp/checkin/nbs
+echo "" > /tmp/checkin/rssi
+echo "" > /tmp/checkin/speed
+
+iw wlan0-4 mpath dump | tail -n +2 | while read line; do
+	echo $(echo $line | awk '{ print $5 }' | sed 's/ /,/g')";" >> /tmp/checkin/rank
+	echo $(echo $line | awk '{ print $1,$2 }' | sed 's/ /,/g')";" >> /tmp/checkin/nbs
+	echo $(iw wlan0-4 station get $(echo $line | awk '{ print $2 }') | grep 'signal:' | awk '{ print $2 }')";" >> /tmp/checkin/rssi
+	echo $(iw wlan0-4 station get $(echo $line | awk '{ print $2 }') | grep 'tx bitrate:' | awk '{ print $3 }')";" >> /tmp/checkin/speed
+done
+
+rank=$(cat /tmp/checkin/rank | tr '\n' ' ' | sed 's/ //g')
+nbs=$(cat /tmp/checkin/nbs | tr '\n' ' ' | sed 's/ //g')
+rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
+speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&NTR=${ntr}&RTT=${rtt}&role=${role}&hops=&nbs=&rssi=&top_users=${top_users}&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&RTT=${rtt}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
