@@ -44,7 +44,6 @@ elif [ "$old_package_version" != "$new_package_version" ]; then
 		chmod +x /etc/init.d/wifimesh > /dev/null
 		chmod +x /sbin/wifimesh/check.sh > /dev/null
 		chmod +x /sbin/wifimesh/settings.sh > /dev/null
-		chmod +x /sbin/wifimesh/startup.sh > /dev/null
 		chmod +x /sbin/wifimesh/update.sh > /dev/null
 		chmod +x /sbin/wifimesh/upgrade.sh > /dev/null
 		
@@ -54,7 +53,7 @@ elif [ "$old_package_version" != "$new_package_version" ]; then
 		# Load in the cron jobs
 		crontab /sbin/wifimesh/cron.txt
 		
-		echo "saving the new WiFi Mesh banner"
+		echo "Saving the new WiFi Mesh banner"
 cat > /etc/banner << banner_end
   ________ __ _______ __   _______               __     
   |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
@@ -64,8 +63,8 @@ cat > /etc/banner << banner_end
   v${new_package_version}       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
-  http://www.wifi-mesh.co.nz/     http://www.openwrt.org
-  http://coova.org/
+  http://www.wifi-mesh.co.nz/    http://www.openwrt.org
+  http://coova.org/              http://www.wifirush.com
   ------------------------------------------------------
 banner_end
 		
