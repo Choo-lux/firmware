@@ -120,8 +120,14 @@ nbs=$(cat /tmp/checkin/nbs | tr '\n' ' ' | sed 's/ //g')
 rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
 speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
+if [ "$(cat /sys/class/net/$(uci get network.wan.ifname)/carrier)" -eq "1" ]; then
+	role="G"
+else
+	role="R"
+fi
+
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&RTT=${rtt}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&RTT=${rtt}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&role=${role}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
