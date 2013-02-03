@@ -5,9 +5,9 @@
 # IP Hexor
 hex_ip() {
 	if [ -z "${mac_wlan}" ]; then
-		let tmp1=0x$(echo $mac_lan | cut $1)
+		let tmp1=0x$(echo $mac_lan | cut -c$1)
 	else
-		let tmp1=0x$(echo $mac_wlan | cut $1)
+		let tmp1=0x$(echo $mac_wlan | cut -c$1)
 	fi
 	echo $tmp1
 }
@@ -25,10 +25,10 @@ radio_mesh="radio0"
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
-ip_lan="10.$(hex_ip -c 13-14).$(hex_ip -c 16-17).1"
+ip_lan="10.$(hex_ip 13-14).$(hex_ip 16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 ip_gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
-ssid="wifimesh_$(hex_ip -c 16-17)"
+ssid="wifimesh_$(hex_ip 16-17)"
 
 # Get the dashboard and upgrade server urls
 dashboard_server=$(cat /sbin/wifimesh/dashboard_server.txt)
