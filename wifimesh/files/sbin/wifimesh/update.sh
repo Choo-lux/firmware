@@ -126,8 +126,12 @@ else
 	role="R"
 fi
 
+echo "Getting the model information"
+model_cpu=$(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
+model_device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | tr ' ' '+')
+
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&RTT=${rtt}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&role=${role}&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&RTT=${rtt}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&role=${role}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
