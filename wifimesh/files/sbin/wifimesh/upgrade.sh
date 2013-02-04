@@ -13,6 +13,10 @@ echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
 old_package_version=$(cat /sbin/wifimesh/package_version.txt)
+if [ "${firmware_branch}" = "fixed" ]; then
+	log_message "upgrade: We are locked on v${old_package_version}. Enable upgrades at the dashboard."
+	exit
+fi
 new_package_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
 if [ "${new_package_version+x}" = x ] && [ -z "$new_package_version" ]; then
