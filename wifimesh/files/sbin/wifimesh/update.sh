@@ -170,6 +170,9 @@ echo "Applying settings"
 echo "127.0.0.1 localhost" > /etc/hosts
 echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chilli" >> /etc/hosts
 
+# define the coova flag
+echo "0" > /tmp/coova_flag
+
 cat $response_file | while read line ; do
 	one=$(echo $line | awk '{print $1}')
 	two=$(echo $line | awk '{print $2}')
