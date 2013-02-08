@@ -277,19 +277,18 @@ cat <<EOF_02
 						<table>
 							<tr>
 								<th>MAC</th>
-								<th>Role</th>
+								<th>State</th>
 								<th>Signal</th>
 								<th>Data Rate</th>
 							</tr>
 EOF_02
 iw wlan0-4 mpath dump | grep '0x' | while read device; do
 	if [ $(echo $device | awk '{ print $10 }') == "0x14" ]; then
-		role="Repeater"
+		role="Online"
 	elif [ $(echo $device | awk '{ print $10 }') == "0x15" ]; then
-		role="Repeater"
-	
+		role="Online"
 	elif [ $(echo $device | awk '{ print $10 }') == "0x5" ]; then
-		role="Gateway"
+		role="Online"
 	
 	elif [ $(echo $device | awk '{ print $10 }') == "0x0" ]; then
 		role="Offline"
