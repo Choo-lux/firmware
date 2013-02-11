@@ -25,6 +25,7 @@ radio_mesh="radio0"
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
+mac_mesh=$(ifconfig wlan0-4 | grep 'HWaddr' | awk '{ print $5 }')
 ip_lan="10.$(hex_ip 13-14).$(hex_ip 16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 ip_gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
