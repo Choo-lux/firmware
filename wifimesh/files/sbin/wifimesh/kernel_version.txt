@@ -1,1 +1,2 @@
-3.3.8-1-5aa3bd44f8b08085bc74fc2e0b2ec107
+Ubiquiti_Bullet_M	version	hash	openwrt-ar71xx-generic-ubnt-bullet-m-squashfs-sysupgrade.bin
+TP-LINK_TP_WR740N_v4	version	hash	openwrt-ar71xx-generic-tl-wr740n-v4-squashfs-sysupgrade.bin
