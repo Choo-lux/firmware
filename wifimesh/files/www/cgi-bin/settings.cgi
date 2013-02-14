@@ -38,34 +38,27 @@ else
 	query="$QUERY_STRING"
 fi
 
-if [ $(get_parameter action) == "logoff-client" ]; then
-	cat <<EOF_97
+if [ $(get_parameter action) == "save-wifi" ]; then
+cat <<EOF_96
 Content-Type: text/html
 Pragma: no-cache
-Location: /cgi-bin/overview.cgi
 
-$(chilli_query logoff $(get_parameter id))
-$(chilli_query logout $(get_parameter id))
-EOF_97
-exit
-elif [ $(get_parameter action) == "logon-client" ]; then
-	cat <<EOF_97
-Content-Type: text/html
-Pragma: no-cache
-Location: /cgi-bin/overview.cgi
+<html>
+	<head>
+		<title>Redirecting...</title>
+		<meta http-equiv="refresh" content="4;URL='/cgi-bin/settings.cgi'" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+	<body>
+		<h1>Please wait...</h1>
+	</body>
+</html>
+EOF_96
 
-$(chilli_query login $(get_parameter id))
-$(chilli_query authorise $(get_parameter id))
-EOF_97
-exit
-elif [ $(get_parameter action) == "block-client" ]; then
-	cat <<EOF_97
-Content-Type: text/html
-Pragma: no-cache
-Location: /cgi-bin/overview.cgi
+uci set wireless.radio0.channel="$(get_parameter channel)"
+uci commit wireless
+wifi
 
-$(chilli_query block $(get_parameter id))
-EOF_97
 exit
 fi
 
@@ -77,7 +70,7 @@ Pragma: no-cache
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xthml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-		<title>WiFi Mesh (mini): Overview</title>
+		<title>WiFi Mesh (mini): Settings</title>
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<link rel="stylesheet" type="text/css" href="/resources/style.css">
@@ -125,7 +118,6 @@ Pragma: no-cache
 				<td colspan="2">
 					<fieldset>
 						<legend>Firmware Upgrade</legend>
-						<form action="#" enctype="multipart/form-data">
 							<table>
 								<tr>
 									<td style='width:75px;'>Firmware:</td>
@@ -136,21 +128,22 @@ Pragma: no-cache
 									<td><input type="submit" name="action" value="Upload Firmware" disabled /></td>
 								</tr>
 							</table>
-						</form>
 					</fieldset>
 					<br />
 					<fieldset>
 						<legend>Wi-Fi</legend>
-						<table>
-							<tr>
-								<td style='width:75px;'>Channel:</td>
-								<td><input type="text" name="wifi_channel" value="$(uci get wireless.radio0.channel)" placeholder="$(uci get wireless.radio0.channel)" maxchars="2" style="width:200px;" onclick="alert('Please note: You should only change the Wi-Fi Channel here if the node has become orphaned from the rest of the network and is no longer reporting to the Dashboard.\n\nIt is recommended to make the change from the Dashboard, where possible.');" /></td>
-							</tr>
-							<tr>
-								<td>&nbsp;</td>
-								<td><input type="submit" name="action" value="Save WiFi" disabled /></td>
-							</tr>
-						</table>
+						<form action="/cgi-bin/settings.cgi" method="get">
+							<table>
+								<tr>
+									<td style='width:75px;'>Channel:</td>
+									<td><input type="text" name="channel" value="$(uci get wireless.radio0.channel)" placeholder="$(uci get wireless.radio0.channel)" maxchars="2" style="width:200px;" /></td>
+								</tr>
+								<tr>
+									<td><input type="hidden" name="action" value="save-wifi" /></td>
+									<td><input type="submit" value="Save WiFi" /></td>
+								</tr>
+							</table>
+						</form>
 					</fieldset>
 					<br />
 					<fieldset>
