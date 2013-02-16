@@ -49,15 +49,6 @@ min=$(expr $diff / 60)
 
 uptime="${days}d:${hours}h:${min}m"
 
-echo "Doing a ping test"
-if [ ! -n "$ip_dhcp" ]; then
-	rtt=$(ping -c 5 ${ip_gateway} | tail -1| awk '{print $4}' | cut -d '/' -f 2)
-	role="R"
-else
-	rtt=$(ping -c 5 "www.google.com" | tail -1| awk '{print $4}' | cut -d '/' -f 2)
-	role="G"
-fi
-
 # For WiFiRUSH
 if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 	echo "Performing captive portal heartbeat"
@@ -120,9 +111,12 @@ nbs=$(cat /tmp/checkin/nbs | tr '\n' ' ' | sed 's/ //g')
 rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
 speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
+echo "Doing a ping test"
 if [ "$(cat /sys/class/net/$(uci get network.wan.ifname)/carrier)" -eq "1" ]; then
+	rtt=$(ping -c 3 "maintenance.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 	role="G"
 else
+	rtt=$(ping -c 3 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 	role="R"
 fi
 
