@@ -54,7 +54,7 @@ if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 	echo "Performing captive portal heartbeat"
 
 	cpmac_lan=$(ifconfig br-lan | awk '/HWaddr/ {print $5}')
-	cpmac_wlan=$(ifconfig br-lan | awk '/HWaddr/ {print $5}')
+	cpmac_wlan=$(ifconfig wlan0 | awk '/HWaddr/ {print $5}')
 	cpmac_wan=${mac_wan}
 	cpip_wan=${ip_dhcp}
 	machine=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
