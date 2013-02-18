@@ -14,7 +14,10 @@ change_mesh_channel() {
 	# Wait a little bit for the mesh to initialise
 	sleep 10
 	
-	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" == "true" ]; then
+	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
+		# Nope, it's not this channel
+		echo "false"
+	else
 		# We have mesh routes now, we can connect to the dashboard to make sure that this is the correct channel
 		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${dashboard_server}checkin-wm.php?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&action=channel-config" > /tmp/checkin/orphan_channel
 		curl_result=$?
@@ -26,11 +29,11 @@ change_mesh_channel() {
 			wifi
 		fi
 		
+		# Re-inject the cron jobs
+		crontab /sbin/wifimesh/cron.txt
+		
 		# Say that all is well
 		echo "true"
-	else
-		# Nope, it's not this channel
-		echo "false"
 	fi
 }
 
