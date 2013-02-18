@@ -7,6 +7,7 @@ STOP=15
 
 boot() {
 # Fix the permissions
+chmod +x /etc/init.d/chilli > /dev/null
 chmod +x /etc/init.d/wifimesh > /dev/null
 
 chmod +x /sbin/wifimesh/check.sh > /dev/null
