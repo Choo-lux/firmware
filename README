@@ -22,6 +22,7 @@ make menuconfig
 6) Then select the following options:
 > Architecture: ar71xx
 > Packages:
+	Base system ->	om-watchdog
 	Network	->	Captive Portals	->	coova-chilli
 	Network ->	File Transfer	->	curl
 	Network ->	Web Servers	->	uhttpd
@@ -33,7 +34,6 @@ make menuconfig
 	Kernel Modules->USB Support	->	kmod-usb-serial-wwan
 	Utilities ->	Compression ->		unzip
 	Utilities ->	comgt
-	Base system ->	om-watchdog
 
 7) Build the firmware:
 make

@@ -140,7 +140,7 @@ curl_data=$(cat $response_file)
 if [ "$curl_result" -eq "0" ]; then
 	echo "Checked in to the dashboard successfully,"
 	
-	if [ "$(grep -q "." $response_file)" -eq "1" ]; then
+	if grep -q "." $response_file; then
 		echo "we have new settings to apply!"
 	else
 		echo "we will maintain the existing settings."
