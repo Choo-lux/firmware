@@ -40,6 +40,11 @@ change_mesh_channel() {
 echo "WiFi Mesh Connection Checker"
 echo "----------------------------------------------------------------"
 
+# Chucks out any bad mesh paths that may be added from time to time
+iw wlan0-4 mpath dump | grep '00:00:00:00:00:00' | while read line; do
+	iw wlan0-4 mpath del $(echo $line | awk '{ print $1 }')
+done
+
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
 if [ "${role}" == "R" ]; then
 	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
@@ -73,11 +78,6 @@ if [ "${role}" == "R" ]; then
 		fi
 	fi
 fi
-
-# Chucks out any bad mesh paths that may be added from time to time
-iw wlan0-4 mpath dump | grep '00:00:00:00:00:00' | while read line; do
-	iw wlan0-4 mpath del $(echo $line | awk '{ print $1 }')
-done
 
 # Tests LAN Connectivity
 if [ "$(ping -c 2 ${ip_gateway})" ]; then
