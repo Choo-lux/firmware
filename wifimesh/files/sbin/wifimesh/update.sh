@@ -112,12 +112,10 @@ rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
 speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
 echo "Doing a ping test"
-if [ "$(cat /sys/class/net/$(uci get network.wan.ifname)/carrier)" -eq "1" ]; then
+if [ "${role}" == "G" ]; then
 	rtt=$(ping -c 3 "maintenance.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
-	role="G"
 else
 	rtt=$(ping -c 3 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
-	role="R"
 fi
 
 echo "Getting the model information"
@@ -136,14 +134,13 @@ echo "Sending data:"
 echo "$url"
 
 curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "${url}" > $response_file
-
 curl_result=$?
 curl_data=$(cat $response_file)
 
 if [ "$curl_result" -eq "0" ]; then
 	echo "Checked in to the dashboard successfully,"
 	
-	if grep -q "." $response_file; then
+	if [ "$(grep -q "." $response_file)" -eq "1" ]; then
 		echo "we have new settings to apply!"
 	else
 		echo "we will maintain the existing settings."
@@ -355,8 +352,6 @@ cat $response_file | while read line ; do
 	# Filtering
 	elif [ "$one" = "system.filtering.ads" ]; then
 		echo $(curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k $two) >> /etc/hosts
-	#elif [ "$one" = "system.filtering.torrents" ]; then
-		#
 	elif [ "$one" = "system.filtering.dns" ]; then
 		echo "${two} guide.opendns.com" >> /etc/hosts
 		echo "${two} hit-nxdomain.opendns.com" >> /etc/hosts
@@ -370,7 +365,6 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
-#/etc/init.d/uhttpd restart
 
 if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 	echo "restarting coovachilli"
@@ -391,4 +385,3 @@ echo "----------------------------------------------------------------"
 echo "Successfully applied new settings"
 
 log_message "update: Successfully applied new settings"
-#reboot

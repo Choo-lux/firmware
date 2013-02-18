@@ -31,6 +31,12 @@ ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }'
 ip_gateway=$(route -n | grep 'UG' | awk '{ print $2 }')
 ssid="wifimesh_$(hex_ip 16-17)"
 
+if [ "$(cat /sys/class/net/$(uci get network.wan.ifname)/carrier)" -eq "1" ]; then
+	role="G"
+else
+	role="R"
+fi
+
 # Get the dashboard and upgrade server urls
 dashboard_server=$(cat /sbin/wifimesh/dashboard_server.txt)
 firmware_server=$(cat /sbin/wifimesh/firmware_server.txt)
