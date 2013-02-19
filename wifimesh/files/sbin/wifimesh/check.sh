@@ -54,33 +54,36 @@ fi
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
 if [ "${role}" == "R" ]; then
 	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
-		crontab -r
-		log_message "check: orphan: we have an orphaned node, checking channels!"
-
-		if [ "$(change_mesh_channel 11)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 11"
-		elif [ "$(change_mesh_channel 5)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 5"
-		elif [ "$(change_mesh_channel 6)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 6"
-		elif [ "$(change_mesh_channel 1)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 1"
-		elif [ "$(change_mesh_channel 2)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 2"
-		elif [ "$(change_mesh_channel 3)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 3"
-		elif [ "$(change_mesh_channel 4)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 4"
-		elif [ "$(change_mesh_channel 7)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 7"
-		elif [ "$(change_mesh_channel 8)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 8"
-		elif [ "$(change_mesh_channel 9)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 9"
-		elif [ "$(change_mesh_channel 10)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 10"
-		else
-			log_message "check: orphan: WARNING: could not recover orphan node!"
+		sleep 15
+		if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
+			crontab -r
+			log_message "check: orphan: we have an orphaned node, checking channels!"
+	
+			if [ "$(change_mesh_channel 11)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 11"
+			elif [ "$(change_mesh_channel 5)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 5"
+			elif [ "$(change_mesh_channel 6)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 6"
+			elif [ "$(change_mesh_channel 1)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 1"
+			elif [ "$(change_mesh_channel 2)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 2"
+			elif [ "$(change_mesh_channel 3)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 3"
+			elif [ "$(change_mesh_channel 4)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 4"
+			elif [ "$(change_mesh_channel 7)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 7"
+			elif [ "$(change_mesh_channel 8)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 8"
+			elif [ "$(change_mesh_channel 9)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 9"
+			elif [ "$(change_mesh_channel 10)" == "true" ]; then
+				log_message "check: orphan: found neighbours on channel 10"
+			else
+				log_message "check: orphan: WARNING: could not recover orphan node!"
+			fi
 		fi
 	fi
 fi
