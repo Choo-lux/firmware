@@ -207,6 +207,9 @@ crontab /sbin/wifimesh/cron.txt
 log_message "boot: waiting for system to initialise..."
 sleep 10
 
+log_message "boot: initial connectivity check"
+/sbin/wifimesh/check.sh
+
 log_message "boot: initial report to the dashboard"
 /sbin/wifimesh/update.sh ${type}
 
