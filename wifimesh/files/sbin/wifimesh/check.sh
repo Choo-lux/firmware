@@ -9,12 +9,16 @@ change_mesh_channel() {
 	# Change channels to the one sent to this function
 	uci set wireless.radio0.channel="$1"
 	uci commit wireless
-	wifi
+	/etc/init.d/network restart
 	
 	# Wait a little bit for the mesh to initialise
 	sleep 10
 	
-	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
+	# Check if a ping will respond
+	ping $(route -n | grep 'UG' | awk '{ print $2 }') > /dev/null
+	if [ $? -eq 1 ]; then
+		echo "false"
+	elif [ -z "$(iw wlan0-4 mpath dump | grep '0x' | grep -v '00:00:00:00:00:00')" ]; then
 		# Nope, it's not this channel
 		echo "false"
 	else
@@ -26,8 +30,10 @@ change_mesh_channel() {
 		if [ "$curl_result" -eq "0" ]; then
 			uci set wireless.radio0.channel="${curl_data}"
 			uci commit wireless
-			wifi
 		fi
+		
+		# Restart the networking
+		/etc/init.d/network restart
 		
 		# Re-inject the cron jobs
 		crontab /sbin/wifimesh/cron.txt
@@ -41,9 +47,9 @@ echo "WiFi Mesh Connection Checker"
 echo "----------------------------------------------------------------"
 
 # Chucks out any bad mesh paths that may be added from time to time
-iw wlan0-4 mpath dump | grep '00:00:00:00:00:00' | while read line; do
-	iw wlan0-4 mpath del $(echo $line | awk '{ print $1 }')
-done
+if [ "$(iw wlan0-4 mpath dump | grep '00:00:00:00:00')" ]; then
+	/etc/init.d/network restart
+fi
 
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
 if [ "${role}" == "R" ]; then
