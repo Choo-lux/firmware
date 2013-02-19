@@ -32,11 +32,11 @@ change_mesh_channel() {
 			uci commit wireless
 		fi
 		
-		# Restart the networking
-		/etc/init.d/network restart
-		
 		# Re-inject the cron jobs
 		crontab /sbin/wifimesh/cron.txt
+		
+		# Restart the networking
+		/etc/init.d/network restart
 		
 		# Say that all is well
 		echo "true"
