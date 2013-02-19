@@ -165,6 +165,8 @@ HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli start
 
 log_message "first_boot: enabling cron and wifimesh at boot"
+crontab /sbin/wifimesh/cron.txt
+
 /etc/init.d/cron enable
 /etc/init.d/wifimesh enable
 

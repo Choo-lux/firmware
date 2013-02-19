@@ -5,6 +5,13 @@
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
+# Check if there is currently a check_lock in progress
+if [ -f /tmp/lock/check.tmp ]; then
+    log_message "check: already in progress"
+    exit
+fi
+echo "locked" > /tmp/lock/check.tmp
+
 change_mesh_channel() {
 	# Change channels to the one sent to this function
 	uci set wireless.radio0.channel="$1"
@@ -32,9 +39,6 @@ change_mesh_channel() {
 			uci commit wireless
 		fi
 		
-		# Re-inject the cron jobs
-		crontab /sbin/wifimesh/cron.txt
-		
 		# Restart the networking
 		/etc/init.d/network restart
 		
@@ -56,7 +60,6 @@ if [ "${role}" == "R" ]; then
 	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
 		sleep 15
 		if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
-			crontab -r
 			log_message "check: orphan: we have an orphaned node, checking channels!"
 	
 			if [ "$(change_mesh_channel 11)" == "true" ]; then
@@ -111,3 +114,8 @@ fi
 
 # Log that result
 log_message "check: LAN: ${lan_status} | WAN: ${wan_status} | DNS: ${dns_status}"
+
+# Check if there is currently a check_lock in progress
+if [ -f /tmp/lock/check.tmp ]; then
+    rm /tmp/lock/check.tmp
+fi
