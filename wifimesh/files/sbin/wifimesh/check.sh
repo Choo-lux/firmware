@@ -57,14 +57,14 @@ if [ "${role}" == "R" ]; then
 		crontab -r
 		log_message "check: orphan: we have an orphaned node, checking channels!"
 
-		if [ "$(change_mesh_channel 1)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 1"
+		if [ "$(change_mesh_channel 11)" == "true" ]; then
+			log_message "check: orphan: found neighbours on channel 11"
 		elif [ "$(change_mesh_channel 5)" == "true" ]; then
 			log_message "check: orphan: found neighbours on channel 5"
 		elif [ "$(change_mesh_channel 6)" == "true" ]; then
 			log_message "check: orphan: found neighbours on channel 6"
-		elif [ "$(change_mesh_channel 11)" == "true" ]; then
-			log_message "check: orphan: found neighbours on channel 11"
+		elif [ "$(change_mesh_channel 1)" == "true" ]; then
+			log_message "check: orphan: found neighbours on channel 1"
 		elif [ "$(change_mesh_channel 2)" == "true" ]; then
 			log_message "check: orphan: found neighbours on channel 2"
 		elif [ "$(change_mesh_channel 3)" == "true" ]; then
