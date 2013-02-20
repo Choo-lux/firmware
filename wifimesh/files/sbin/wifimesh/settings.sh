@@ -21,6 +21,9 @@ log_message() {
 radio_client="radio0"
 radio_mesh="radio0"
 
+channel_client=$(uci get wireless.${radio_client}.channel)
+channel_mesh=$(uci get wireless.${radio_mesh}.channel)
+
 # Define some networking-related variables
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
