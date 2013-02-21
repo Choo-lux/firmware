@@ -204,8 +204,8 @@ fi
 log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
 
-log_message "boot: enable mesh constraints (70 dBm)"
-sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 70
+log_message "boot: enable mesh constraints (80 dBm)"
+sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt

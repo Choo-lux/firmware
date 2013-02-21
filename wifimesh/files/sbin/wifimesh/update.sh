@@ -368,7 +368,7 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
-sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 70
+sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
 
 if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 	echo "restarting coovachilli"
