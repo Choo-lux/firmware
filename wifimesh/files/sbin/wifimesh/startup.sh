@@ -164,6 +164,11 @@ HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
 /etc/init.d/chilli start
 
+log_message "first_boot: configuring the VPN"
+uci delete openvpn.custom_config
+uci delete openvpn.sample_server
+uci commit openvpn
+
 log_message "first_boot: enabling cron and wifimesh at boot"
 crontab /sbin/wifimesh/cron.txt
 

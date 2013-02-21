@@ -352,6 +352,17 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.channel.client" ]; then
 		uci set wireless.radio0.channel=$two
 	
+	elif [ "$one" = "network.vpn.enabled" ]; then
+		uci set openvpn.sample_client.enabled=$two
+	elif [ "$one" = "network.vpn.server" ]; then
+		uci set openvpn.sample_client.remote=$two
+	elif [ "$one" = "network.vpn.key" ]; then
+		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.key" $two
+	elif [ "$one" = "network.vpn.certificate" ]; then
+		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.certificate" $two
+	elif [ "$one" = "network.vpn.ca" ]; then
+		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/ca.crt" $two
+	
 	# Filtering
 	elif [ "$one" = "system.filtering.ads" ]; then
 		echo $(curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k $two) >> /etc/hosts
