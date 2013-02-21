@@ -359,7 +359,7 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.vpn.key" ]; then
 		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.key" $two
 	elif [ "$one" = "network.vpn.certificate" ]; then
-		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.certificate" $two
+		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.crt" $two
 	elif [ "$one" = "network.vpn.ca" ]; then
 		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/ca.crt" $two
 	
