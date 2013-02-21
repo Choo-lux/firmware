@@ -206,14 +206,12 @@ sleep 1 && brctl stp br-wan on
 
 log_message "boot: enable mesh constraints (70 dBm)"
 sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 70
-uci commit wireless
-wifi
-
-log_message "boot: waiting for system to initialise..."
-sleep 10
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt
+
+log_message "boot: waiting for system to initialise..."
+sleep 10
 
 log_message "boot: initial connectivity check"
 /sbin/wifimesh/check.sh
