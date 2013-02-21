@@ -41,6 +41,7 @@ change_mesh_channel() {
 		
 		# Restart the networking
 		/etc/init.d/network restart
+		sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 70
 		
 		# Say that all is well
 		echo "true"
@@ -53,6 +54,7 @@ echo "----------------------------------------------------------------"
 # Chucks out any bad mesh paths that may be added from time to time
 if [ "$(iw wlan0-4 mpath dump | grep '00:00:00:00:00')" ]; then
 	/etc/init.d/network restart
+	sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 70
 fi
 
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
