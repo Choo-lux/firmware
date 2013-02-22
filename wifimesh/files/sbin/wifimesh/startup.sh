@@ -68,6 +68,10 @@ uci commit network
 log_message "first_boot: configuring the wifi"
 uci set wireless.${radio_mesh}.disabled="0"
 uci set wireless.${radio_client}.disabled="0"
+uci set wireless.${radio_mesh}.distance="2000"
+uci set wireless.${radio_client}.distance="2000"
+uci set wireless.${radio_mesh}.country="US"
+uci set wireless.${radio_client}.country="US"
 
 # Create the wifi interfaces (if they don't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
