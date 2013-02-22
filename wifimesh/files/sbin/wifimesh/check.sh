@@ -6,14 +6,11 @@
 . /sbin/wifimesh/settings.sh
 
 # Check if there is currently a check_lock in progress
-if [ -f /tmp/lock/check.tmp ]; then
+if [ -e "/tmp/lock_check.tmp" ]; then
     log_message "check: already in progress (lock)"
     exit
-elif [ $(ps | grep 'check.sh' | grep -v 'grep') ]; then
-    log_message "check: already in progress (ps)"
-    exit
 fi
-echo "locked" > /tmp/lock/check.tmp
+echo "locked" > /tmp/lock_check.tmp
 
 change_mesh_channel() {
 	# Change channels to the one sent to this function
@@ -121,6 +118,6 @@ fi
 log_message "check: LAN: ${lan_status} | WAN: ${wan_status} | DNS: ${dns_status}"
 
 # Check if there is currently a check_lock in progress
-if [ -f /tmp/lock/check.tmp ]; then
-    rm /tmp/lock/check.tmp
+if [ -f "/tmp/lock_check.tmp" ]; then
+    rm "/tmp/lock_check.tmp"
 fi
