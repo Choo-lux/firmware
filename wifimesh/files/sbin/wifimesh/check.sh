@@ -7,7 +7,10 @@
 
 # Check if there is currently a check_lock in progress
 if [ -f /tmp/lock/check.tmp ]; then
-    log_message "check: already in progress"
+    log_message "check: already in progress (lock)"
+    exit
+elif [ $(ps | grep 'check.sh' | grep -v 'grep') ]; then
+    log_message "check: already in progress (ps)"
     exit
 fi
 echo "locked" > /tmp/lock/check.tmp
