@@ -83,11 +83,9 @@ banner_end
 else
 	log_message "upgrade: v${old_package_version} is the latest package version available."
 fi
-exit
 
 
-old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt)
-
+old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt | grep $device | awk '{ print $2 }')
 new_kernel_file=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/${architecture}/kernel_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 new_kernel_version=$(echo $new_kernel_file | grep $device | awk '{ print $2 }')
 new_kernel_hash=$(echo $new_kernel_file | grep $device | awk '{ print $3 }')
