@@ -17,34 +17,28 @@ change_mesh_channel() {
 	uci set wireless.radio0.channel="$1"
 	uci commit wireless
 	/etc/init.d/network restart
+	/etc/init.d/chilli stop && sleep 3 && /etc/init.d/chilli start
+	sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
 	
 	# Wait a little bit for the mesh to initialise
-	sleep 10
+	sleep 9
 	
 	# Check if a ping will respond
-	ping $(route -n | grep 'UG' | awk '{ print $2 }') > /dev/null
+	ping -c 2 $(route -n | grep 'UG' | awk '{ print $2 }') > /dev/null
 	if [ $? -eq 1 ]; then
+		# We couldn't ping the gateway, something is wrong with this route
 		echo "false"
-	elif [ -z "$(iw wlan0-4 mpath dump | grep '0x' | grep -v '00:00:00:00:00:00')" ]; then
-		# Nope, it's not this channel
-		echo "false"
-	else
-		# We have mesh routes now, we can connect to the dashboard to make sure that this is the correct channel
-		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${dashboard_server}checkin-wm.php?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&action=channel-config" > /tmp/checkin/orphan_channel
-		curl_result=$?
-		curl_data=$(cat /tmp/checkin/orphan_channel)
-		
-		if [ "$curl_result" -eq "0" ]; then
-			uci set wireless.radio0.channel="${curl_data}"
-			uci commit wireless
-		fi
-		
-		# Restart the networking
-		/etc/init.d/network restart
-		sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
-		
+	elif [ "$(iw wlan0-4 mpath dump | grep '0x15')" ]; then
 		# Say that all is well
 		echo "true"
+		if [ -f "/tmp/lock_check.tmp" ]; then rm "/tmp/lock_check.tmp"; fi
+	elif [ "$(iw wlan0-4 mpath dump | grep '0x5')" ]; then
+		# Say that all is well
+		echo "true"
+		if [ -f "/tmp/lock_check.tmp" ]; then rm "/tmp/lock_check.tmp"; fi
+	else
+		# Nope, it's not this channel
+		echo "false"
 	fi
 }
 
@@ -53,42 +47,31 @@ echo "----------------------------------------------------------------"
 
 # Chucks out any bad mesh paths that may be added from time to time
 if [ "$(iw wlan0-4 mpath dump | grep '00:00:00:00:00')" ]; then
+	log_message "check: throwing out bad routes"
 	/etc/init.d/network restart
-	sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
+	/etc/init.d/chilli stop && sleep 3 && /etc/init.d/chilli start
+	iw wlan0-4 set mesh_param mesh_rssi_threshold 80 && sleep 10
 fi
 
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
 if [ "${role}" == "R" ]; then
-	if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
-		sleep 15
+	if [ -z "$(iw wlan0-4 mpath dump | grep '0x' | grep -v '00:00:00:00:00')" ]; then
+		log_message "check: we have no routes, sleeping..."
+		sleep 10
 		if [ -z "$(iw wlan0-4 mpath dump | grep '0x')" ]; then
-			log_message "check: orphan: we have an orphaned node, checking channels!"
-	
+			log_message "check: we still have no routes, we have an orphaned node, checking channels!"
+			
 			if [ "$(change_mesh_channel 11)" == "true" ]; then
 				log_message "check: orphan: found neighbours on channel 11"
 			elif [ "$(change_mesh_channel 5)" == "true" ]; then
 				log_message "check: orphan: found neighbours on channel 5"
-			elif [ "$(change_mesh_channel 6)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 6"
 			elif [ "$(change_mesh_channel 1)" == "true" ]; then
 				log_message "check: orphan: found neighbours on channel 1"
-			elif [ "$(change_mesh_channel 2)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 2"
-			elif [ "$(change_mesh_channel 3)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 3"
-			elif [ "$(change_mesh_channel 4)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 4"
-			elif [ "$(change_mesh_channel 7)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 7"
-			elif [ "$(change_mesh_channel 8)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 8"
-			elif [ "$(change_mesh_channel 9)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 9"
-			elif [ "$(change_mesh_channel 10)" == "true" ]; then
-				log_message "check: orphan: found neighbours on channel 10"
 			else
 				log_message "check: orphan: WARNING: could not recover orphan node!"
 			fi
+			
+			exit
 		fi
 	fi
 fi
@@ -98,6 +81,19 @@ if [ "$(ping -c 2 ${ip_gateway})" ]; then
 	lan_status=1
 else
 	lan_status=0
+	
+	log_message "check: we have no connectivity to the gateway, we have an orphaned node, checking channels!"
+	if [ "$(change_mesh_channel 11)" == "true" ]; then
+		log_message "check: orphan: found neighbours on channel 11"
+	elif [ "$(change_mesh_channel 5)" == "true" ]; then
+		log_message "check: orphan: found neighbours on channel 5"
+	elif [ "$(change_mesh_channel 1)" == "true" ]; then
+		log_message "check: orphan: found neighbours on channel 1"
+	else
+		log_message "check: orphan: WARNING: could not recover orphan node!"
+	fi
+	
+	exit
 fi
 
 # Tests WAN Connectivity
