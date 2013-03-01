@@ -26,7 +26,6 @@ make menuconfig
 	Network	->	Captive Portals	->	coova-chilli
 	Network ->	File Transfer	->	curl
 	Network ->	Web Servers	->	uhttpd
-	Network ->	Web Servers	->	uhttpd		->	uhttpd-mod-tls
 	Network ->	chat
 	Network ->	wifimesh
 	Kernel Modules->USB Support	->	kmod-usb-acm

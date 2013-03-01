@@ -56,6 +56,7 @@ Pragma: no-cache
 EOF_96
 
 uci set wireless.radio0.channel="$(get_parameter channel)"
+uci set wireless.@wifi-iface[0].mesh_id="$(get_parameter mesh_id)"
 uci commit wireless
 wifi
 
@@ -137,6 +138,10 @@ Pragma: no-cache
 								<tr>
 									<td style='width:75px;'>Channel:</td>
 									<td><input type="text" name="channel" value="$(uci get wireless.radio0.channel)" placeholder="$(uci get wireless.radio0.channel)" maxchars="2" style="width:200px;" /></td>
+								</tr>
+								<tr>
+									<td style='width:75px;'>Mesh ID:</td>
+									<td><input type="text" name="mesh_id" value="$(uci get wireless.@wifi-iface[0].mesh_id)" placeholder="$(uci get wireless.@wifi-iface[0].mesh_id)" maxchars="2" style="width:200px;" /></td>
 								</tr>
 								<tr>
 									<td><input type="hidden" name="action" value="save-wifi" /></td>

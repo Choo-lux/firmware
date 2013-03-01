@@ -7,20 +7,13 @@ STOP=15
 
 boot() {
 # Fix the permissions
-chmod +x /etc/init.d/chilli > /dev/null
-chmod +x /etc/init.d/wifimesh > /dev/null
+chmod 0777 /etc/init.d/chilli > /dev/null
+chmod 0777 /etc/init.d/wifimesh > /dev/null
+chmod 0777 /sbin/wifimesh/*.sh > /dev/null
+chmod 0777 /www/cgi-bin/*.cgi > /dev/null
 
-chmod +x /sbin/wifimesh/check.sh > /dev/null
-chmod +x /sbin/wifimesh/settings.sh > /dev/null
-chmod +x /sbin/wifimesh/startup.sh > /dev/null
-chmod +x /sbin/wifimesh/update.sh > /dev/null
-chmod +x /sbin/wifimesh/upgrade.sh > /dev/null
-
-chmod +x /www/cgi-bin/overview.cgi > /dev/null
-chmod +x /www/cgi-bin/settings.cgi > /dev/null
-chmod +x /www/cgi-bin/help.cgi > /dev/null
-chmod +x /www/cgi-bin/first_boot.cgi > /dev/null
-chmod +x /www/cgi-bin/status.cgi > /dev/null
+# Start wifimesh at boot
+/etc/init.d/wifimesh enable
 
 # Load in the settings
 . /sbin/wifimesh/settings.sh
@@ -173,19 +166,12 @@ uci delete openvpn.custom_config
 uci delete openvpn.sample_server
 uci commit openvpn
 
-log_message "first_boot: enabling cron and wifimesh at boot"
+log_message "first_boot: enabling cron at boot"
 crontab /sbin/wifimesh/cron.txt
-
 /etc/init.d/cron enable
-/etc/init.d/wifimesh enable
 
 # Move the firmware default coova.html file into the actual directory, if necessary
-if [ -e "/sbin/wifimesh/coova.html" ]; then
-	mv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html
-fi
-
-log_message "first_boot: removing first_boot marker file"
-rm /sbin/wifimesh/first_boot
+if [ -e "/sbin/wifimesh/coova.html" ]; the nmv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html fi
 
 log_message "first_boot: saving ssh banner"
 cat > /etc/banner << banner_end
@@ -202,6 +188,9 @@ cat > /etc/banner << banner_end
   ------------------------------------------------------
 banner_end
 
+log_message "first_boot: removing first_boot marker file"
+rm /sbin/wifimesh/first_boot
+
 log_message "first_boot: done, rebooting..."
 sleep 10
 reboot
@@ -214,7 +203,7 @@ log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
 
 log_message "boot: enable mesh constraints (80 dBm)"
-sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
+sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 0
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt

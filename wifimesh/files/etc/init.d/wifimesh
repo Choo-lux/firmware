@@ -68,6 +68,10 @@ uci commit network
 log_message "first_boot: configuring the wifi"
 uci set wireless.${radio_mesh}.disabled="0"
 uci set wireless.${radio_client}.disabled="0"
+uci set wireless.${radio_mesh}.distance="2000"
+uci set wireless.${radio_client}.distance="2000"
+uci set wireless.${radio_mesh}.country="US"
+uci set wireless.${radio_client}.country="US"
 
 # Create the wifi interfaces (if they don't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
@@ -164,6 +168,11 @@ HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
 /etc/init.d/chilli start
 
+log_message "first_boot: configuring the VPN"
+uci delete openvpn.custom_config
+uci delete openvpn.sample_server
+uci commit openvpn
+
 log_message "first_boot: enabling cron and wifimesh at boot"
 crontab /sbin/wifimesh/cron.txt
 
@@ -205,7 +214,7 @@ log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
 
 log_message "boot: enable mesh constraints (80 dBm)"
-sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 80
+sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 0
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt
