@@ -379,6 +379,7 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
+/etc/init.d/openvpn restart
 sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 0
 
 if [ $(cat /tmp/coova_flag) -eq 1 ]; then

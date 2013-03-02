@@ -165,6 +165,7 @@ log_message "first_boot: configuring the VPN"
 uci delete openvpn.custom_config
 uci delete openvpn.sample_server
 uci commit openvpn
+/etc/init.d/openvpn enable
 
 log_message "first_boot: enabling cron at boot"
 crontab /sbin/wifimesh/cron.txt
