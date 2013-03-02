@@ -199,8 +199,8 @@ Pragma: no-cache
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
-								<td>$(route -n | grep 'UG' | awk '{ print $2 }')</td>
-								<td>$()</td>
+								<td>$(route -n | grep 'UG' | grep 'br-wan' | awk '{ print $2 }')</td>
+								<td>n/a</td>
 							</tr>
 							<tr>
 								<td>wlan0&nbsp;&nbsp;&nbsp;(SSID #1)</td>
