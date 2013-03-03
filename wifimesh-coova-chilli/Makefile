@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2007-2010 OpenWrt.org
+# Copyright (C) 2012-2013 WiFi Mesh: New Zealand Limited
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -7,11 +8,11 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=coova-chilli
+PKG_NAME:=wifimesh-coova-chilli
 PKG_VERSION:=1.2.9
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=coova-chilli-1.2.9.tar.gz
 PKG_SOURCE_URL:=http://ap.coova.org/chilli
 PKG_MD5SUM:=a493d0562fc3b05fe86d8ad65f7f2dc0
 
@@ -20,8 +21,8 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/coova-chilli
-  SUBMENU:=Captive Portals
+define Package/wifimesh-coova-chilli
+  SUBMENU:=WiFi Mesh
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=+kmod-tun +librt
@@ -29,7 +30,7 @@ define Package/coova-chilli
   URL:=http://www.coova.org/CoovaChilli
 endef
 
-define Package/coova-chilli/description
+define Package/wifimesh-coova-chilli/description
 	CoovaChilli is an open source access controller for wireless LAN
 	access points and is based on ChilliSpot. It is used for authenticating
 	users of a wireless (or wired) LAN. It supports web based login (UAM)
@@ -82,11 +83,11 @@ endef
 #			--enable-miniportal \
 #	
 
-define Package/coova-chilli/conffiles
+define Package/wifimesh-coova-chilli/conffiles
 /etc/chilli.conf
 endef
 
-define Package/coova-chilli/install
+define Package/wifimesh-coova-chilli/install
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_CONF) $(PKG_INSTALL_DIR)/etc/chilli.conf $(1)/etc/
 	$(INSTALL_DIR) $(1)/etc/chilli
@@ -97,5 +98,5 @@ define Package/coova-chilli/install
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/lib*.so.* $(1)/usr/lib/
 endef
 
-$(eval $(call BuildPackage,coova-chilli))
+$(eval $(call BuildPackage,wifimesh-coova-chilli))
 

@@ -1,3 +1,11 @@
+#
+# Copyright (C) 2007-2010 OpenWrt.org
+# Copyright (C) 2012-2013 WiFi Mesh: New Zealand Limited
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wifimesh
@@ -8,19 +16,17 @@ PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/wifimesh/Default
-  URL:=http://www.wifi-mesh.co.nz/
-  MAINTAINER:=Cody Cooper <cody@wifi-mesh.co.nz>
-endef
-
 define Package/wifimesh
+	SUBMENU:=WiFi Mesh
 	SECTION:=net
 	CATEGORY:=Network
-	TITLE:=WiFi Mesh
+	DEPENDS:=+om-watchdog +curl +uhttpd +unzip +wifimesh-coova-chilli +openvpn
+	TITLE:=WiFi Mesh (base)
+	URL:=http://www.wifi-mesh.co.nz/
 endef
 
 define Package/wifimesh/description
-	Auto configuring, reporting and meshing set of scripts.
+	Auto configuration, dashboard reporting and 802.11s meshing.
 endef
 
 define Build/Prepare
