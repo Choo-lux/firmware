@@ -172,7 +172,7 @@ crontab /sbin/wifimesh/cron.txt
 /etc/init.d/cron enable
 
 # Move the firmware default coova.html file into the actual directory, if necessary
-if [ -e "/sbin/wifimesh/coova.html" ]; then mv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html fi
+if [ -e "/sbin/wifimesh/coova.html" ]; then mv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html; fi
 
 log_message "first_boot: saving ssh banner"
 cat > /etc/banner << banner_end
@@ -208,18 +208,6 @@ sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 0
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt
-
-log_message "boot: waiting for system to initialise..."
-sleep 10
-
-log_message "boot: initial connectivity check"
-/sbin/wifimesh/check.sh
-
-log_message "boot: initial report to the dashboard"
-/sbin/wifimesh/update.sh ${type}
-
-log_message "boot: initial upgrade check"
-/sbin/wifimesh/upgrade.sh
 }
 
 start() {
