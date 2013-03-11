@@ -20,7 +20,7 @@ define Package/wifimesh
 	SUBMENU:=WiFi Mesh
 	SECTION:=net
 	CATEGORY:=Network
-	DEPENDS:=+om-watchdog +curl +uhttpd +unzip +wifimesh-coova-chilli +openvpn
+	DEPENDS:=+om-watchdog +curl +uhttpd +unzip +coova-chilli +openvpn
 	TITLE:=WiFi Mesh (base)
 	URL:=http://www.wifi-mesh.co.nz/
 endef

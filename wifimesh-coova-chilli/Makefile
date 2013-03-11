@@ -8,7 +8,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=wifimesh-coova-chilli
+PKG_NAME:=coova-chilli
 PKG_VERSION:=1.2.9
 PKG_RELEASE:=1
 
@@ -21,7 +21,7 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/wifimesh-coova-chilli
+define Package/coova-chilli
   SUBMENU:=WiFi Mesh
   SECTION:=net
   CATEGORY:=Network
@@ -30,7 +30,7 @@ define Package/wifimesh-coova-chilli
   URL:=http://www.coova.org/CoovaChilli
 endef
 
-define Package/wifimesh-coova-chilli/description
+define Package/coova-chilli/description
 	CoovaChilli is an open source access controller for wireless LAN
 	access points and is based on ChilliSpot. It is used for authenticating
 	users of a wireless (or wired) LAN. It supports web based login (UAM)
@@ -83,11 +83,11 @@ endef
 #			--enable-miniportal \
 #	
 
-define Package/wifimesh-coova-chilli/conffiles
+define Package/coova-chilli/conffiles
 /etc/chilli.conf
 endef
 
-define Package/wifimesh-coova-chilli/install
+define Package/coova-chilli/install
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_CONF) $(PKG_INSTALL_DIR)/etc/chilli.conf $(1)/etc/
 	$(INSTALL_DIR) $(1)/etc/chilli
@@ -98,5 +98,5 @@ define Package/wifimesh-coova-chilli/install
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/lib*.so.* $(1)/usr/lib/
 endef
 
-$(eval $(call BuildPackage,wifimesh-coova-chilli))
+$(eval $(call BuildPackage,coova-chilli))
 
