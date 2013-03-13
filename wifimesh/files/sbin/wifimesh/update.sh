@@ -313,6 +313,10 @@ cat $response_file | while read line ; do
 		uci set wireless.${radio_client}.channel=$two
 	elif [ "$one" = "network.mesh.channel" ]; then
 		uci set wireless.${radio_mesh}.channel=$two
+	elif [ "$one" = "network.client.txpower" ]; then
+		uci set wireless.${radio_client}.txpower=$two
+	elif [ "$one" = "network.mesh.txpower" ]; then
+		uci set wireless.${radio_mesh}.txpower=$two
 	elif [ "$one" = "network.distance" ]; then
 		uci set wireless.${radio_mesh}.distance=$two
 	elif [ "$one" = "network.country" ]; then
