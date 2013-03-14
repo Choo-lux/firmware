@@ -366,16 +366,6 @@ cat $response_file | while read line ; do
 		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.crt" $two
 	elif [ "$one" = "network.vpn.ca" ]; then
 		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/ca.crt" $two
-	
-	# Filtering
-	elif [ "$one" = "system.filtering.ads" ]; then
-		echo $(curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k $two) >> /etc/hosts
-	elif [ "$one" = "system.filtering.dns" ]; then
-		echo "${two} guide.opendns.com" >> /etc/hosts
-		echo "${two} hit-nxdomain.opendns.com" >> /etc/hosts
-		echo "${two} block.opendns.com" >> /etc/hosts
-		echo "${two} block.a.opendns.com" >> /etc/hosts
-	fi
 done
 
 # Save all of that
