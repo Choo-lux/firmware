@@ -403,7 +403,6 @@ uci commit
 # Restart all of the services
 /etc/init.d/network restart
 /etc/init.d/openvpn restart
-sleep 1 && iw ${if_mesh} set mesh_param mesh_rssi_threshold 0
 
 if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 	echo "restarting coovachilli"
