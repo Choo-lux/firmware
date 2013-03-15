@@ -17,10 +17,10 @@ echo "----------------------------------------------------------------"
 
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
 if [ "${role}" == "R" ]; then
-	if [ -z "$(iw wlan0-4 mpath dump | grep '0x' | grep -v '00:00:00:00:00')" ]; then
+	if [ -z "$(iw ${if_mesh} mpath dump | grep '0x' | grep -v '00:00:00:00:00')" ]; then
 		log_message "check: we have no routes, sleeping..."
 		sleep 10
-		if [ -z "$(iw wlan0-4 mpath dump | grep '0x' | grep -v '00:00:00:00:00')" ]; then
+		if [ -z "$(iw ${if_mesh} mpath dump | grep '0x' | grep -v '00:00:00:00:00')" ]; then
 			log_message "check: we still have no routes, we have an orphaned node, checking channels!"
 			
 			log_message "check: searching for neighbours on channel 11"

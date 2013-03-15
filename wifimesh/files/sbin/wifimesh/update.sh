@@ -99,11 +99,11 @@ echo "" > /tmp/checkin/nbs
 echo "" > /tmp/checkin/rssi
 echo "" > /tmp/checkin/speed
 
-iw wlan0-4 mpath dump | tail -n +2 | while read line; do
+iw ${if_mesh} mpath dump | tail -n +2 | while read line; do
 	echo $(echo $line | awk '{ print $5 }' | sed 's/ /,/g')";" >> /tmp/checkin/rank
 	echo $(echo $line | awk '{ print $1,$2 }' | sed 's/ /,/g')";" >> /tmp/checkin/nbs
-	echo $(iw wlan0-4 station get $(echo $line | awk '{ print $2 }') | grep 'signal:' | awk '{ print $2 }')";" >> /tmp/checkin/rssi
-	echo $(iw wlan0-4 station get $(echo $line | awk '{ print $2 }') | grep 'tx bitrate:' | awk '{ print $3 }')";" >> /tmp/checkin/speed
+	echo $(iw ${if_mesh} station get $(echo $line | awk '{ print $2 }') | grep 'signal:' | awk '{ print $2 }')";" >> /tmp/checkin/rssi
+	echo $(iw ${if_mesh} station get $(echo $line | awk '{ print $2 }') | grep 'tx bitrate:' | awk '{ print $3 }')";" >> /tmp/checkin/speed
 done
 
 rank=$(cat /tmp/checkin/rank | tr '\n' ' ' | sed 's/ //g')
@@ -194,7 +194,14 @@ cat $response_file | while read line ; do
 	
 	# SSID #1 (formerly Public SSID)
 	elif [ "$one" = "network.ssid1.enabled" ]; then
-		uci set wireless.@wifi-iface[1].enabled="$two"
+		if [ "$two" == "1" ]; then
+			if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
+			uci set wireless.@wifi-iface[1].network="wan"
+			uci set wireless.@wifi-iface[1].mode="ap"
+			uci set wireless.@wifi-iface[1].device="radio0"
+		else
+			uci delete wireless.@wifi-iface[1]
+		fi
 	elif [ "$one" = "network.ssid1.hide" ]; then
 		uci set wireless.@wifi-iface[1].hidden="$two"
 	elif [ "$one" = "network.ssid1.ssid" ]; then
@@ -253,7 +260,14 @@ cat $response_file | while read line ; do
 	
 	# SSID #2 (formerly Private SSID)
 	elif [ "$one" = "network.ssid2.enabled" ]; then
-		uci set wireless.@wifi-iface[2].enabled="$two"
+		if [ "$two" == "1" ]; then
+			if [ -z "$(uci get wireless.@wifi-iface[2])" ]; then uci add wireless wifi-iface; fi
+			uci set wireless.@wifi-iface[2].network="wan"
+			uci set wireless.@wifi-iface[2].mode="ap"
+			uci set wireless.@wifi-iface[2].device="radio0"
+		else
+			uci delete wireless.@wifi-iface[2]
+		fi
 	elif [ "$one" = "network.ssid2.hide" ]; then
 		uci set wireless.@wifi-iface[2].hidden="$two"
 	elif [ "$one" = "network.ssid2.ssid" ]; then
@@ -272,7 +286,14 @@ cat $response_file | while read line ; do
 	
 	# SSID #3
 	elif [ "$one" = "network.ssid3.enabled" ]; then
-		uci set wireless.@wifi-iface[3].enabled="$two"
+		if [ "$two" == "1" ]; then
+			if [ -z "$(uci get wireless.@wifi-iface[3])" ]; then uci add wireless wifi-iface; fi
+			uci set wireless.@wifi-iface[3].network="wan"
+			uci set wireless.@wifi-iface[3].mode="ap"
+			uci set wireless.@wifi-iface[3].device="radio0"
+		else
+			uci delete wireless.@wifi-iface[3]
+		fi
 	elif [ "$one" = "network.ssid3.hide" ]; then
 		uci set wireless.@wifi-iface[3].hidden="$two"
 	elif [ "$one" = "network.ssid3.ssid" ]; then
@@ -291,7 +312,14 @@ cat $response_file | while read line ; do
 	
 	# SSID #4
 	elif [ "$one" = "network.ssid4.enabled" ]; then
-		uci set wireless.@wifi-iface[4].enabled="$two"
+		if [ "$two" == "1" ]; then
+			if [ -z "$(uci get wireless.@wifi-iface[4])" ]; then uci add wireless wifi-iface; fi
+			uci set wireless.@wifi-iface[4].network="wan"
+			uci set wireless.@wifi-iface[4].mode="ap"
+			uci set wireless.@wifi-iface[4].device="radio0"
+		else
+			uci delete wireless.@wifi-iface[4]
+		fi
 	elif [ "$one" = "network.ssid4.hide" ]; then
 		uci set wireless.@wifi-iface[4].hidden="$two"
 	elif [ "$one" = "network.ssid4.ssid" ]; then
@@ -375,7 +403,7 @@ uci commit
 # Restart all of the services
 /etc/init.d/network restart
 /etc/init.d/openvpn restart
-sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 0
+sleep 1 && iw ${if_mesh} set mesh_param mesh_rssi_threshold 0
 
 if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 	echo "restarting coovachilli"

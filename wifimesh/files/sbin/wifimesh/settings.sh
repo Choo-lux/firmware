@@ -24,11 +24,13 @@ radio_mesh="radio0"
 channel_client=$(uci get wireless.${radio_client}.channel)
 channel_mesh=$(uci get wireless.${radio_mesh}.channel)
 
+if_mesh=$(ifconfig | grep 'wlan0' | sort -r | awk '{ print $1 }' | head -1)
+
 # Define some networking-related variables
 mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
-mac_mesh=$(ifconfig wlan0-4 | grep 'HWaddr' | awk '{ print $5 }')
+mac_mesh=$(ifconfig ${if_mesh} | grep 'HWaddr' | awk '{ print $5 }')
 ip_lan="10.$(hex_ip 13-14).$(hex_ip 16-17).1"
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 ip_gateway=$(route -n | grep 'UG' | grep 'br-wan' | awk '{ print $2 }')

@@ -66,11 +66,8 @@ uci set wireless.${radio_client}.distance="2000"
 uci set wireless.${radio_mesh}.country="US"
 uci set wireless.${radio_client}.country="US"
 
-# Create the wifi interfaces (if they don't already exist)
+# Create the SSID #1/Public wifi interface (if it doesn't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
-if [ -z "$(uci get wireless.@wifi-iface[2])" ]; then uci add wireless wifi-iface; fi
-if [ -z "$(uci get wireless.@wifi-iface[3])" ]; then uci add wireless wifi-iface; fi
-if [ -z "$(uci get wireless.@wifi-iface[4])" ]; then uci add wireless wifi-iface; fi
 
 # Set the defaults on those interfaces
 uci set wireless.@wifi-iface[0].device="radio0"
@@ -86,30 +83,6 @@ uci set wireless.@wifi-iface[1].ssid="${ssid}"
 uci set wireless.@wifi-iface[1].encryption="none"
 uci set wireless.@wifi-iface[1].key=""
 uci set wireless.@wifi-iface[1].hidden="0"
-
-uci set wireless.@wifi-iface[2].device="radio0"
-uci set wireless.@wifi-iface[2].network="wan"
-uci set wireless.@wifi-iface[2].mode="ap"
-uci set wireless.@wifi-iface[2].ssid="${ssid}_2"
-uci set wireless.@wifi-iface[2].encryption="psk2"
-uci set wireless.@wifi-iface[2].key="w1f1m35h"
-uci set wireless.@wifi-iface[2].hidden="1"
-
-uci set wireless.@wifi-iface[3].device="radio0"
-uci set wireless.@wifi-iface[3].network="wan"
-uci set wireless.@wifi-iface[3].mode="ap"
-uci set wireless.@wifi-iface[3].ssid="${ssid}_3"
-uci set wireless.@wifi-iface[3].encryption="psk2"
-uci set wireless.@wifi-iface[3].key="w1f1m35h"
-uci set wireless.@wifi-iface[3].hidden="1"
-
-uci set wireless.@wifi-iface[4].device="radio0"
-uci set wireless.@wifi-iface[4].network="wan"
-uci set wireless.@wifi-iface[4].mode="ap"
-uci set wireless.@wifi-iface[4].ssid="${ssid}_4"
-uci set wireless.@wifi-iface[4].encryption="psk2"
-uci set wireless.@wifi-iface[4].key="w1f1m35h"
-uci set wireless.@wifi-iface[4].hidden="1"
 uci commit wireless
 /etc/init.d/network restart
 
@@ -204,7 +177,7 @@ log_message "boot: enable stp on the wan bridge"
 sleep 1 && brctl stp br-wan on
 
 log_message "boot: enable mesh constraints (80 dBm)"
-sleep 1 && iw wlan0-4 set mesh_param mesh_rssi_threshold 0
+sleep 1 && iw ${if_mesh} set mesh_param mesh_rssi_threshold 0
 
 log_message "boot: loading in cronjobs"
 crontab /sbin/wifimesh/cron.txt
