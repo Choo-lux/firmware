@@ -366,6 +366,7 @@ cat $response_file | while read line ; do
 		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.crt" $two
 	elif [ "$one" = "network.vpn.ca" ]; then
 		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/ca.crt" $two
+	fi
 done
 
 # Save all of that
