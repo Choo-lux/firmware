@@ -83,6 +83,7 @@ banner_end
 else
 	log_message "upgrade: v${old_package_version} is the latest package version available."
 fi
+exit
 
 
 old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt | grep $device | awk '{ print $2 }')
