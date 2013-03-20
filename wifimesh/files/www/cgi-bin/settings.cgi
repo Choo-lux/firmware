@@ -58,7 +58,7 @@ EOF_96
 uci set wireless.radio0.channel="$(get_parameter channel)"
 uci set wireless.@wifi-iface[0].mesh_id="$(get_parameter mesh_id)"
 uci commit wireless
-wifi
+reboot
 
 exit
 fi
