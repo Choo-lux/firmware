@@ -113,9 +113,10 @@ speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
 echo "Doing a ping test"
 if [ "${role}" == "G" ]; then
-	rtt=$(ping -c 3 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
+	rtt=$(ping -c 3 "google.com" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 else
-	rtt=$(ping -c 3 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
+	# rtt=$(ping -c 3 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
+	rtt=$(ping -c 3 "google.com" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 fi
 
 echo "Getting the model information"
