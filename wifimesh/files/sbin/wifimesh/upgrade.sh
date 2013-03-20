@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
+# Copyright Â© 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
 
 # Load in the settings
