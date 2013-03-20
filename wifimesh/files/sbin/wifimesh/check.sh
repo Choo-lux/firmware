@@ -16,7 +16,7 @@ echo "WiFi Mesh Connection Checker"
 echo "----------------------------------------------------------------"
 
 # Checks mesh connectivity if the node is a repeater (to make sure it hasn't been orphaned)
-if [ "${role}" == "R" ]; then
+if [ "${role}" == "DISABLED" ]; then
 	if [ -z "$(iw ${if_mesh} mpath dump | grep '0x' | grep -v '00:00:00:00:00')" ]; then
 		log_message "check: we have no routes, sleeping..."
 		sleep 10
