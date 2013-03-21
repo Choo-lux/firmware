@@ -58,7 +58,13 @@ EOF_96
 uci set wireless.radio0.channel="$(get_parameter channel)"
 uci set wireless.@wifi-iface[0].mesh_id="$(get_parameter mesh_id)"
 uci commit wireless
-reboot
+
+/etc/init.d/network restart
+/etc/init.d/openvpn restart
+
+/etc/init.d/chilli stop
+sleep 5
+/etc/init.d/chilli start
 
 exit
 fi
