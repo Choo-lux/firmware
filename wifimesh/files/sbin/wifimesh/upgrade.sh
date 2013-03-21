@@ -9,73 +9,46 @@
 . /etc/openwrt_release
 architecture=$(echo $DISTRIB_TARGET | cut -d = -f 2 | cut -d / -f 1)
 device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | sed 's/ /_/g')
-# Read kernel_version.txt before a potential package upgrade overwrites it.
-old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt | grep $device | awk '{ print $2 }')
-
-# set rebootPending off
-rebootPending=0
 
 echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
-old_package_version=$(cat /sbin/wifimesh/package_version.txt)
 if [ "${firmware_branch}" = "fixed" ]; then
 	log_message "upgrade: We are locked on v${old_package_version}. Enable upgrades at the dashboard."
 	exit
 fi
-new_package_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+
+log_message "upgrade: Checking for new upgrade package..."
+old_package_version=$(cat /sbin/wifimesh/package_version.txt)
+new_package_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/full_package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
 if [ "${new_package_version+x}" = x ] && [ -z "$new_package_version" ]; then
-	log_message "upgrade: Could not connect to the upgrade server, aborting..."
+	log_message "upgrade: Could not connect to the upgrade server, aborting!"
 elif [ "$old_package_version" != "$new_package_version" ]; then
 	# Make sure the directory exists
 	if [ ! -d "/sbin/wifimesh" ]; then mkdir /sbin/wifimesh > /dev/null; fi
 	
 	# Make sure no old upgrade exists
-	if [ -e "/tmp/scripts.zip" ]; then rm "/tmp/scripts.zip"; fi
-	if [ -e "/tmp/www.zip" ]; then rm "/tmp/www.zip"; fi
+	if [ -e "/tmp/full_scripts.zip" ]; then rm "/tmp/full_scripts.zip"; fi
 	
 	echo "Downloading package upgrade"
-	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/scripts.zip "http://${firmware_server}firmware/${firmware_branch}/scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
-	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/www.zip "http://${firmware_server}firmware/${firmware_branch}/www.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
+	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/full_scripts.zip "http://${firmware_server}firmware/${firmware_branch}/full_scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
 	
-###### NEW www upgrade package support - BEGIN
-	echo "Checking validity of the www archive"
-	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/whash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
-	local_hash=$(md5sum /tmp/www.zip | awk '{ print $1 }')
-	
-	if [ ! -e "/tmp/www.zip" ]; then
-		log_message "upgrade: The www package upgrade download was not successful, upgrade cancelled."
-	elif [ "${actual_hash}" = "${local_hash}" ]; then
-		echo "Installing www upgrade"
-		unzip -o /tmp/www.zip -d /www > /dev/null
-		
-		# Say about it
-		log_message "upgrade: Upgraded www package from ${old_package_version} to ${new_package_version} successfully"
-	else
-		log_message "upgrade: The downloaded www package upgrade was not valid, www package upgrade cancelled."
-	fi
-###### NEW www upgrade package support - END	
-
 	echo "Checking validity of the scripts archive"
-	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
-	local_hash=$(md5sum /tmp/scripts.zip | awk '{ print $1 }')
+	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/full_hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+	local_hash=$(md5sum /tmp/full_scripts.zip | awk '{ print $1 }')
 	
-	if [ ! -e "/tmp/scripts.zip" ]; then
+	if [ ! -e "/tmp/full_scripts.zip" ]; then
 		log_message "upgrade: The scripts package upgrade download was not successful, upgrade cancelled."
 	elif [ "${actual_hash}" = "${local_hash}" ]; then
 		echo "Installing scripts upgrade"
-		unzip -o /tmp/scripts.zip -d /sbin/wifimesh > /dev/null
+		unzip -o /tmp/full_scripts.zip -d / > /dev/null
 		
 		# Move the startup file
 		mv /sbin/wifimesh/startup.sh /etc/init.d/wifimesh > /dev/null
 		
-		# Fix permissions
+		# Fix the permissions
 		chmod +x /etc/init.d/wifimesh > /dev/null
-		chmod +x /sbin/wifimesh/check.sh > /dev/null
-		chmod +x /sbin/wifimesh/settings.sh > /dev/null
-		chmod +x /sbin/wifimesh/update.sh > /dev/null
-		chmod +x /sbin/wifimesh/upgrade.sh > /dev/null
 		
 		# Make sure we are enabled
 		/etc/init.d/wifimesh enable > /dev/null
@@ -93,81 +66,17 @@ cat > /etc/banner << banner_end
   v${new_package_version}       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
-  http://www.wifi-mesh.co.nz/    http://www.openwrt.org
-  http://coova.org/              http://www.wifirush.com
+  http://www.wifi-mesh.co.nz     http://www.openwrt.org
+  http://coova.org               http://www.wifirush.com
   ------------------------------------------------------
 banner_end
 		
 		# Say about it
-		# log_message "upgrade: Upgraded the scripts package from ${old_package_version} to ${new_package_version} successfully, rebooting..."
-		
-		# reboot
-		rebootPending=1
+		log_message "upgrade: Upgraded the scripts package from ${old_package_version} to ${new_package_version} successfully, rebooting..."
+		reboot
 	else
 		log_message "upgrade: The downloaded scripts package upgrade was not valid, upgrade cancelled."
 	fi	
 else
 	log_message "upgrade: v${old_package_version} is the latest package version available."
-fi
-
-# old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt | grep $device | awk '{ print $2 }')
-# new_kernel_file=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/${architecture}/kernel_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/kernel_version.txt "http://${firmware_server}firmware/${firmware_branch}/${architecture}/kernel_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
-new_kernel_version=$(cat /tmp/kernel_version.txt | grep $device | awk '{ print $2 }')
-new_kernel_hash=$(cat /tmp/kernel_version.txt | grep $device | awk '{ print $3 }')
-new_kernel_bin=$(cat /tmp/kernel_version.txt | grep $device | awk '{ print $4 }')
-
-if [ "${new_kernel_version+x}" = x ] && [ -z "$new_kernel_version" ]; then
-	log_message "upgrade: Could not connect to the upgrade server, aborting..."
-elif [ "$new_kernel_version" == "" ]; then
-	log_message "upgrade: Kernel upgrade not supported for this device (${device}/${architecture})"
-elif [ "$old_kernel_version" != "$new_kernel_version" ]; then
-	# Make sure the directory exists
-	if [ ! -d "/sbin/wifimesh" ]; then mkdir /sbin/wifimesh > /dev/null; fi
-	
-	# Make sure no old upgrade exists
-	if [ -e "/tmp/scripts.zip" ]; then rm "/tmp/scripts.zip"; fi
-	
-	if [ "$(cat /sbin/wifimesh/dashboard_server.txt)" == "mesh.wifirush.com/" ] && [ "$device" == "TP-LINK_TL-WR741ND_v4" ]; then
-		new_kernel_hash=$(cat /tmp/kernel_version.txt | grep $device-WFR | awk '{ print $3 }')	
-		new_kernel_bin=$(cat /tmp/kernel_version.txt | grep $device-WFR | awk '{ print $4 }')
-		echo "BIN FILE is: $new_kernel_bin with a HASH: $new_kernel_hash"
-		
-		echo "Downloading kernel upgrade (WR740 Special FLASH)"
-		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/sysupgrade.bin "http://${firmware_server}firmware/${firmware_branch}/${architecture}/${new_kernel_bin}?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
-		
-		echo "Checking validity (WR740 Special FLASH)"
-		local_hash=$(md5sum /tmp/sysupgrade.bin | awk '{ print $1 }')
-		echo "Installing special FLASH for TP-WR740N-WiFiRUSH"
-			if [ "${new_kernel_hash}" = "${local_hash}" ]; then
-				mtd write /tmp/sysupgrade.bin firmware && mtd -r erase rootfs_data
-			else
-				log_message "upgrade: The (WR740 Special FLASH) downloaded kernel upgrade was not valid, upgrade cancelled."
-			fi
-	else 
-		echo "Downloading kernel upgrade"
-		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/sysupgrade.bin "http://${firmware_server}firmware/${firmware_branch}/${architecture}/${new_kernel_bin}?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
-		
-		echo "Checking validity"
-		local_hash=$(md5sum /tmp/sysupgrade.bin | awk '{ print $1 }')
-	
-		if [ "${new_kernel_hash}" = "${local_hash}" ]; then
-			# Say about it
-			log_message "upgrade: Upgrading kernel from ${old_kernel_version} to ${new_kernel_version} successfully, rebooting..."
-			echo "Installing upgrade"
-			sysupgrade -n /tmp/sysupgrade.bin
-		else
-			log_message "upgrade: The downloaded kernel upgrade was not valid, upgrade cancelled."
-			if [ $rebootPending == 1 ]; then
-				log_message "upgrade: Upgraded the scripts package from ${old_package_version} to ${new_package_version} successfully, rebooting..."
-				reboot
-			fi
-		fi
-	fi
-else
-	log_message "upgrade: v${old_kernel_version} is the latest kernel version available."
-	if [ $rebootPending == 1 ]; then
-		log_message "upgrade: Upgraded the scripts package from ${old_package_version} to ${new_package_version} successfully, rebooting..."
-		reboot
-	fi
 fi
