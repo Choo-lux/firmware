@@ -112,7 +112,6 @@ rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
 speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
 echo "Doing a ping test"
-if [ "${role}" == "G" ]; then
 rtt_internal=$(ping -c 2 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 rtt_external=$(ping -c 2 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 
