@@ -12,6 +12,9 @@ device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | sed
 # Read kernel_version.txt before a potential package upgrade overwrites it.
 old_kernel_version=$(cat /sbin/wifimesh/kernel_version.txt | grep $device | awk '{ print $2 }')
 
+# set rebootPending off
+rebootPending=0
+
 echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
