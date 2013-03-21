@@ -113,17 +113,15 @@ speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
 echo "Doing a ping test"
 if [ "${role}" == "G" ]; then
-	rtt=$(ping -c 3 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
-else
-	rtt=$(ping -c 3 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
-fi
+rtt_internal=$(ping -c 2 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
+rtt_external=$(ping -c 2 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 
 echo "Getting the model information"
 model_cpu=$(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
 model_device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | tr ' ' '+')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&RTT=${rtt}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&role=${role}&channel_client=${channel_client}&channel_mesh=${channel_mesh}&RR=${RR}"
+request_data="ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&role=${role}&channel_client=${channel_client}&channel_mesh=${channel_mesh}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
@@ -389,11 +387,11 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.vpn.server" ]; then
 		uci set openvpn.sample_client.remote=$two
 	elif [ "$one" = "network.vpn.key" ]; then
-		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.key" $two
+		curl -s -k -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.key
 	elif [ "$one" = "network.vpn.certificate" ]; then
-		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/client.crt" $two
+		curl -s -k -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.crt
 	elif [ "$one" = "network.vpn.ca" ]; then
-		curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/openvpn/ca.crt" $two
+		curl -s -k -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/ca.crt
 	fi
 done
 
