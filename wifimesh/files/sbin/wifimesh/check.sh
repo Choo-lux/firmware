@@ -43,6 +43,11 @@ if [ "${role}" == "DISABLED" ]; then
 	fi
 fi
 
+# Deletes any bad mesh paths that may occur from time to time
+iw ${if_mesh} mpath dump | grep '00:00:00:00:00:00' | while read line; do
+	iw ${if_mesh} mpath del $(echo $line | awk '{ print $1 }')
+done
+
 # Tests LAN Connectivity
 if [ "$(ping -c 2 ${ip_gateway})" ]; then
 	lan_status=1
