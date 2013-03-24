@@ -5,13 +5,6 @@
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
-# Check if there is currently a check_lock in progress
-if [ -e "/tmp/lock_check.tmp" ]; then
-    log_message "check: already in progress (lock)"
-    exit
-fi
-echo "locked" > /tmp/lock_check.tmp
-
 echo "WiFi Mesh Connection Checker"
 echo "----------------------------------------------------------------"
 
@@ -71,8 +64,3 @@ fi
 
 # Log that result
 log_message "check: LAN: ${lan_status} | WAN: ${wan_status} | DNS: ${dns_status}"
-
-# Check if there is currently a check_lock in progress
-if [ -e "/tmp/lock_check.tmp" ]; then
-    rm "/tmp/lock_check.tmp"
-fi
