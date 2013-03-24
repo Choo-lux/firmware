@@ -102,6 +102,53 @@ EOF_97
 exit
 fi
 
+# Find the number of interfaces
+let number=$(ifconfig | grep -c 'wlan0')-1
+
+if [ ${number} == 1 ]; then
+	mesh_name=$(uci get wireless.@wifi-iface[0].mesh_id)
+	mesh_mac=$(ifconfig wlan0-1 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid1_name=$(uci get wireless.@wifi-iface[1].ssid)
+	ssid1_mac=$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')
+elif [ ${number} == 2 ]; then
+	mesh_name=$(uci get wireless.@wifi-iface[0].mesh_id)
+	mesh_mac=$(ifconfig wlan0-2 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid1_name=$(uci get wireless.@wifi-iface[1].ssid)
+	ssid1_mac=$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid2_name=$(uci get wireless.@wifi-iface[2].ssid)
+	ssid2_mac=$(ifconfig wlan0-1 | grep 'HWaddr' | awk '{ print $5 }')
+elif [ ${number} == 3 ]; then
+	mesh_name=$(uci get wireless.@wifi-iface[0].mesh_id)
+	mesh_mac=$(ifconfig wlan0-3 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid1_name=$(uci get wireless.@wifi-iface[1].ssid)
+	ssid1_mac=$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid2_name=$(uci get wireless.@wifi-iface[2].ssid)
+	ssid2_mac=$(ifconfig wlan0-1 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid3_name=$(uci get wireless.@wifi-iface[3].ssid)
+	ssid3_mac=$(ifconfig wlan0-2 | grep 'HWaddr' | awk '{ print $5 }')
+elif [ ${number} == 4 ]; then
+	mesh_name=$(uci get wireless.@wifi-iface[0].mesh_id)
+	mesh_mac=$(ifconfig wlan0-4 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid1_name=$(uci get wireless.@wifi-iface[1].ssid)
+	ssid1_mac=$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid2_name=$(uci get wireless.@wifi-iface[2].ssid)
+	ssid2_mac=$(ifconfig wlan0-1 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid3_name=$(uci get wireless.@wifi-iface[3].ssid)
+	ssid3_mac=$(ifconfig wlan0-2 | grep 'HWaddr' | awk '{ print $5 }')
+	
+	ssid4_name=$(uci get wireless.@wifi-iface[4].ssid)
+	ssid4_mac=$(ifconfig wlan0-3 | grep 'HWaddr' | awk '{ print $5 }')
+fi
+
 # Start showing the page
 cat <<EOF_01
 Content-Type: text/html
@@ -203,29 +250,29 @@ Pragma: no-cache
 								<td>n/a</td>
 							</tr>
 							<tr>
-								<td>wlan0&nbsp;&nbsp;&nbsp;(SSID #1)</td>
-								<td>$(uci get wireless.@wifi-iface[1].ssid)</td>
-								<td>$(ifconfig wlan0 | grep 'HWaddr' | awk '{ print $5 }')</td>
+								<td>SSID #1 (Public)</td>
+								<td>${ssid1_name}</td>
+								<td>${ssid1_mac}</td>
 							</tr>
 							<tr>
-								<td>wlan0-1 (SSID #2)</td>
-								<td>$(uci get wireless.@wifi-iface[2].ssid)</td>
-								<td>$(ifconfig wlan0-1 | grep 'HWaddr' | awk '{ print $5 }')</td>
+								<td>SSID #2 (Private)</td>
+								<td>${ssid2_name}</td>
+								<td>${ssid2_mac}</td>
 							</tr>
 							<tr>
-								<td>wlan0-2 (SSID #3)</td>
-								<td>$(uci get wireless.@wifi-iface[3].ssid)</td>
-								<td>$(ifconfig wlan0-2 | grep 'HWaddr' | awk '{ print $5 }')</td>
+								<td>SSID #3</td>
+								<td>${ssid3_name}</td>
+								<td>${ssid3_mac}</td>
 							</tr>
 							<tr>
-								<td>wlan0-3 (SSID #4)</td>
-								<td>$(uci get wireless.@wifi-iface[4].ssid)</td>
-								<td>$(ifconfig wlan0-3 | grep 'HWaddr' | awk '{ print $5 }')</td>
+								<td>SSID #4</td>
+								<td>${ssid4_name}</td>
+								<td>${ssid4_mac}</td>
 							</tr>
 							<tr>
-								<td>wlan0-4 (802.11s)</td>
-								<td>$(uci get wireless.@wifi-iface[0].mesh_id)</td>
-								<td>$(ifconfig wlan0-4 | grep 'HWaddr' | awk '{ print $5 }')</td>
+								<td>802.11s (Mesh)</td>
+								<td>${mesh_name}</td>
+								<td>${mesh_mac}</td>
 							</tr>
 						</table>
 					</fieldset>
@@ -282,7 +329,7 @@ cat <<EOF_02
 								<th>Data Rate</th>
 							</tr>
 EOF_02
-iw wlan0-4 mpath dump | grep '0x' | while read device; do
+iw ${if_mesh} mpath dump | grep '0x' | while read device; do
 	if [ $(echo $device | awk '{ print $10 }') == "0x14" ]; then
 		role="Online"
 	elif [ $(echo $device | awk '{ print $10 }') == "0x15" ]; then
