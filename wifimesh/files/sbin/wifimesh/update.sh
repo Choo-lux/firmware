@@ -115,12 +115,23 @@ echo "Doing a ping test"
 rtt_internal=$(ping -c 2 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 rtt_external=$(ping -c 2 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 
+echo "Checking the noise levels"
+echo "" > /tmp/noise.tmp
+iw wlan0 survey dump | while read line; do
+	if [ "$(echo $line | grep 'frequency')" ]; then
+		echo ";$(echo $line | awk '{ print $2 }')," >> /tmp/noise.tmp
+	elif [ "$(echo $line | grep 'noise')" ]; then
+		echo $(echo $line | awk '{ print $2 }') >> /tmp/noise.tmp
+	fi
+done
+noise=$(cat /tmp/noise.tmp | tr '\n' ' ' | sed 's/ //g')
+
 echo "Getting the model information"
 model_cpu=$(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
 model_device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | tr ' ' '+')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&top_users=${top_users}&role=${role}&channel_client=${channel_client}&channel_mesh=${channel_mesh}&RR=${RR}"
+request_data="ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${channel_client}&channel_mesh=${channel_mesh}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
