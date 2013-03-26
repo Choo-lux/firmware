@@ -24,10 +24,19 @@ radio_mesh="radio0"
 channel_client=$(uci get wireless.${radio_client}.channel)
 channel_mesh=$(uci get wireless.${radio_mesh}.channel)
 
+# Define some networking-related variables
 if_mesh=$(ifconfig | grep 'wlan0' | sort -r | awk '{ print $1 }' | head -1)
 
-# Define some networking-related variables
-mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
+	if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
+		mac_lan=$(ifconfig eth1 | grep 'HWaddr' | awk '{ print $5 }')
+	else
+		mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+	fi
+else
+	mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+fi
+
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
 mac_mesh=$(ifconfig ${if_mesh} | grep 'HWaddr' | awk '{ print $5 }')
