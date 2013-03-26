@@ -29,12 +29,20 @@ if_mesh=$(ifconfig | grep 'wlan0' | sort -r | awk '{ print $1 }' | head -1)
 
 if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
 	if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
-		mac_lan=$(ifconfig eth1 | grep 'HWaddr' | awk '{ print $5 }')
+		mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+	else
+		if [ "$(ifconfig -a | grep 'br-lan' | awk '{ print $1 }')" == "br-lan" ]; then
+			mac_lan=$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }')
+		else
+			mac_lan=$(ifconfig eth1 | grep 'HWaddr' | awk '{ print $5 }')
+		fi
+	fi
+else
+	if [ "$(ifconfig -a | grep 'br-lan' | awk '{ print $1 }')" == "br-lan" ]; then
+		mac_lan=$(ifconfig br-lan | grep 'HWaddr' | awk '{ print $5 }')
 	else
 		mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 	fi
-else
-	mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
 fi
 
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
