@@ -20,7 +20,7 @@ fi
 
 log_message "upgrade: Checking for new upgrade package..."
 old_package_version=$(cat /sbin/wifimesh/package_version.txt)
-new_package_version=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/full_package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+new_package_version=$(curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/full_package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 
 if [ "${new_package_version+x}" = x ] && [ -z "$new_package_version" ]; then
 	log_message "upgrade: Could not connect to the upgrade server, aborting!"
@@ -32,10 +32,10 @@ elif [ "$old_package_version" != "$new_package_version" ]; then
 	if [ -e "/tmp/full_scripts.zip" ]; then rm "/tmp/full_scripts.zip"; fi
 	
 	echo "Downloading package upgrade"
-	curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/full_scripts.zip "http://${firmware_server}firmware/${firmware_branch}/full_scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
+	curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/full_scripts.zip "http://${firmware_server}firmware/${firmware_branch}/full_scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
 	
 	echo "Checking validity of the scripts archive"
-	actual_hash=$(curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/full_hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
+	actual_hash=$(curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/full_hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
 	local_hash=$(md5sum /tmp/full_scripts.zip | awk '{ print $1 }')
 	
 	if [ ! -e "/tmp/full_scripts.zip" ]; then

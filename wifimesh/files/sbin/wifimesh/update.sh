@@ -141,7 +141,7 @@ echo "----------------------------------------------------------------"
 echo "Sending data:"
 echo "$url"
 
-curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s "${url}" > $response_file
+curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s "${url}" > $response_file
 curl_result=$?
 curl_data=$(cat $response_file)
 
@@ -179,7 +179,7 @@ cat $response_file | while read line ; do
 	echo "$one=$two"
 	
 	if [ "$one" = "system.ssh.key" ]; then
-		curl -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -k -s -o /etc/dropbear/authorized_keys "$two"
+		curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s -o /etc/dropbear/authorized_keys "$two"
 	elif [ "$one" = "system.ssh.password" ]; then
 		echo -e "$two\n$two" | passwd root
 		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
@@ -243,13 +243,13 @@ cat $response_file | while read line ; do
 					dns2=1
 				fi
 			done
-			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
+			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
 			
 			# get the page to use as the splash page
-			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
+			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
 			
 			# get the logo to use on the splash page
-			curl -s -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
+			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
 			# restarts coovachilli
 			/etc/init.d/chilli enable
@@ -397,11 +397,11 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.vpn.server" ]; then
 		uci set openvpn.sample_client.remote=$two
 	elif [ "$one" = "network.vpn.key" ]; then
-		curl -s -k -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.key
+		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.key
 	elif [ "$one" = "network.vpn.certificate" ]; then
-		curl -s -k -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.crt
+		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.crt
 	elif [ "$one" = "network.vpn.ca" ]; then
-		curl -s -k -A "WMF/v${fw_ver} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/ca.crt
+		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/ca.crt
 	fi
 done
 
