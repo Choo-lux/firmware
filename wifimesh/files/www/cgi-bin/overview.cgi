@@ -346,14 +346,14 @@ iw ${if_mesh} mpath dump | grep '0x' | while read device; do
 		role="Unknown ($(echo $device | awk '{ print $10 }'))"
 	fi
 	
-	dbm_rate="$(iw wlan0-4 station get $(echo $device | awk '{ print $1 }') | grep 'signal:' | awk '{ print $2 }')"
+	dbm_rate="$(iw ${if_mesh} station get $(echo $device | awk '{ print $1 }') | grep 'signal:' | awk '{ print $2 }')"
 	if [ "${dbm_rate}" == "" ]; then
 		dbm_rate="n/a"
 	else
 		dbm_rate="${dbm_rate} dBm"
 	fi
 	
-	data_rate=$(iw wlan0-4 station get $(echo $device | awk '{ print $1 }') | grep 'rx bitrate:' | awk '{ print $3 }')
+	data_rate=$(iw ${if_mesh} station get $(echo $device | awk '{ print $1 }') | grep 'rx bitrate:' | awk '{ print $3 }')
 	if [ "${data_rate}" == "" ]; then
 		data_rate="n/a"
 	else
