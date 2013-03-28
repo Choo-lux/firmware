@@ -171,6 +171,7 @@ echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chill
 
 # define the coova flag
 echo "0" > /tmp/coova_flag
+echo "0" > /tmp/reboot_flag
 
 cat $response_file | while read line ; do
 	one=$(echo $line | awk '{print $1}')
@@ -185,6 +186,8 @@ cat $response_file | while read line ; do
 		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
+	elif [ "$one" = "system.reboot" ]; then
+		echo $two > /tmp/reboot_flag
 	elif [ "$one" = "system.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "servers.ntp.server" ]; then
@@ -358,36 +361,6 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.country" ]; then
 		uci set wireless.${radio_client}.country=$two
 		uci set wireless.${radio_mesh}.country=$two
-
-	# WAN configuration
-	elif [ "$one" = "network.wan.enabled" ]; then
-		if [ "$two" = "0" ]; then
-			uci set network.wan.ifname=""
-		else
-			if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
-				uci set network.wan.ifname="eth1"
-			else
-				uci set network.wan.ifname="eth0"
-			fi
-		fi
-	elif [ "$one" = "network.wan.type" ]; then
-		if [ "$two" = "dhcp" ]; then
-			uci set network.wan.proto="dhcp"
-			uci set network.wan.ipaddr=""
-			uci set network.wan.netmask=""
-			uci set network.wan.dns=""
-			uci set network.wan.gateway=""
-		else
-			uci set network.wan.proto="static"
-		fi
-	elif [ "$one" = "network.wan.ip" ]; then
-		uci set network.wan.ipaddr=$two
-	elif [ "$one" = "network.wan.subnet" ]; then
-		uci set network.wan.netmask=$two
-	elif [ "$one" = "network.wan.gateway" ]; then
-		uci set network.wan.gateway=$two
-	elif [ "$one" = "network.wan.dns" ]; then
-		uci set network.wan.dns=$two
 	
 	elif [ "$one" = "network.channel.client" ]; then
 		uci set wireless.radio0.channel=$two
@@ -420,6 +393,11 @@ if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
 	echo "stopping coovachilli"
 	/etc/init.d/chilli stop
+fi
+
+if [ $(cat /tmp/reboot_flag) -eq 1 ]; then
+	echo "restarting the node"
+	reboot
 fi
 
 # Clear out the old files
