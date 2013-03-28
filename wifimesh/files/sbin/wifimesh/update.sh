@@ -361,36 +361,6 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.country" ]; then
 		uci set wireless.${radio_client}.country=$two
 		uci set wireless.${radio_mesh}.country=$two
-
-	# WAN configuration
-	elif [ "$one" = "network.wan.enabled" ]; then
-		if [ "$two" = "0" ]; then
-			uci set network.wan.ifname=""
-		else
-			if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
-				uci set network.wan.ifname="eth1"
-			else
-				uci set network.wan.ifname="eth0"
-			fi
-		fi
-	elif [ "$one" = "network.wan.type" ]; then
-		if [ "$two" = "dhcp" ]; then
-			uci set network.wan.proto="dhcp"
-			uci set network.wan.ipaddr=""
-			uci set network.wan.netmask=""
-			uci set network.wan.dns=""
-			uci set network.wan.gateway=""
-		else
-			uci set network.wan.proto="static"
-		fi
-	elif [ "$one" = "network.wan.ip" ]; then
-		uci set network.wan.ipaddr=$two
-	elif [ "$one" = "network.wan.subnet" ]; then
-		uci set network.wan.netmask=$two
-	elif [ "$one" = "network.wan.gateway" ]; then
-		uci set network.wan.gateway=$two
-	elif [ "$one" = "network.wan.dns" ]; then
-		uci set network.wan.dns=$two
 	
 	elif [ "$one" = "network.channel.client" ]; then
 		uci set wireless.radio0.channel=$two
