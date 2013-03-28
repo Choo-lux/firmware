@@ -171,6 +171,7 @@ echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chill
 
 # define the coova flag
 echo "0" > /tmp/coova_flag
+echo "0" > /tmp/reboot_flag
 
 cat $response_file | while read line ; do
 	one=$(echo $line | awk '{print $1}')
@@ -185,6 +186,8 @@ cat $response_file | while read line ; do
 		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
+	elif [ "$one" = "system.reboot" ]; then
+		echo $two > /tmp/reboot_flag
 	elif [ "$one" = "system.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "servers.ntp.server" ]; then
@@ -420,6 +423,11 @@ if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
 	echo "stopping coovachilli"
 	/etc/init.d/chilli stop
+fi
+
+if [ $(cat /tmp/reboot_flag) -eq 1 ]; then
+	echo "restarting the node"
+	reboot
 fi
 
 # Clear out the old files
