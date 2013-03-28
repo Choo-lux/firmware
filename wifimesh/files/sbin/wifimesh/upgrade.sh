@@ -73,6 +73,8 @@ banner_end
 		
 		# Say about it
 		log_message "upgrade: Upgraded the scripts package from ${old_package_version} to ${new_package_version} successfully, rebooting..."
+		# After a successful upgrade it might be a good idea to perform a full update & checkin before reboot.
+		/sbin/wifimesh/update.sh 1
 		reboot
 	else
 		log_message "upgrade: The downloaded scripts package upgrade was not valid, upgrade cancelled."
