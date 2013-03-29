@@ -395,6 +395,12 @@ elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
 	/etc/init.d/chilli stop
 fi
 
+if [ "$(brctl show | grep br-wan | awk '{print $3}')" = "no" ]; then
+	echo "stp is is disabled on the WAN, enable stp"
+	# Enable stp on the wan bridge
+	sleep 1 && brctl stp br-wan on
+fi
+
 if [ $(cat /tmp/reboot_flag) -eq 1 ]; then
 	echo "restarting the node"
 	reboot
