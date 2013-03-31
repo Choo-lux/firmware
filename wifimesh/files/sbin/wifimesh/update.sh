@@ -375,6 +375,39 @@ cat $response_file | while read line ; do
 		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.crt
 	elif [ "$one" = "network.vpn.ca" ]; then
 		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/ca.crt
+	
+	elif [ "$one" = "network.lan.block" ]; then
+		if [ "$two" == "1" ]; then
+			iptables -I FORWARD -s ${ip_lan_block}/24 -d 172.16.0.0/12 -j DROP
+			iptables -I FORWARD -s ${ip_lan_block}/24 -d 192.168.0.0/16 -j DROP
+			iptables -I FORWARD -s ${ip_lan_block}/24 -d ${ip_gateway} -j DROP
+			
+			iptables -I FORWARD -p tcp --source-port 22 -j ACCEPT
+			iptables -I FORWARD -p udp --destination-port 67:68 --source-port 67:68 -j ACCEPT
+			iptables -I FORWARD -p udp --destination-port 53 -j ACCEPT
+			iptables -I FORWARD -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables -I FORWARD -i br-wan -d ${ip_dhcp} -j ACCEPT
+			iptables -I FORWARD -i br-wan -p udp --destination-port 53 -j ACCEPT
+			iptables -I FORWARD -i br-wan -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables-save
+		else
+			iptables -D FORWARD -s ${ip_lan_block}/24 -d 172.16.0.0/12 -j DROP
+			iptables -D FORWARD -s ${ip_lan_block}/24 -d 192.168.0.0/16 -j DROP
+			iptables -D FORWARD -s ${ip_lan_block}/24 -d ${ip_gateway} -j DROP
+			
+			iptables -D FORWARD -p tcp --source-port 22 -j ACCEPT
+			iptables -D FORWARD -p udp --destination-port 67:68 --source-port 67:68 -j ACCEPT
+			iptables -D FORWARD -p udp --destination-port 53 -j ACCEPT
+			iptables -D FORWARD -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables -D FORWARD -i br-wan -d ${ip_dhcp} -j ACCEPT
+			iptables -D FORWARD -i br-wan -p udp --destination-port 53 -j ACCEPT
+			iptables -D FORWARD -i br-wan -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables-save
+		fi
 	fi
 done
 
