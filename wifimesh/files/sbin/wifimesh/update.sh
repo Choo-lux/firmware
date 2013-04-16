@@ -246,7 +246,7 @@ cat $response_file | while read line ; do
 					dns2=1
 				fi
 			done
-			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
+			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)&dnsname=$(cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'search' | awk '{ print $2 }')"
 			
 			# get the page to use as the splash page
 			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
