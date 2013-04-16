@@ -235,7 +235,7 @@ cat $response_file | while read line ; do
 			
 			# get the config to use for chilli
 			echo "" > /tmp/dns.tmp
-			cat /tmp/resolv.conf.auto | grep 'nameserver' | while read line; do
+			cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'nameserver' | while read line; do
 				line=$(echo $line | awk '{ print $2 }')
 				
 				if [ -z $dns1 ] ; then
