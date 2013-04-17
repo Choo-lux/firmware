@@ -197,8 +197,8 @@ cat $response_file | while read line ; do
 		uci set system.@system[0].timezone="$two"
 	elif [ "$one" = "servers.dns.domain" ]; then
 		uci set dhcp.@dnsmasq[0].domain="$two"
-	elif [ "$one" = "servers.firmware.url" ]; then
-		echo "$two" > /sbin/wifimesh/firmware_server.txt
+	# elif [ "$one" = "servers.firmware.url" ]; then
+		# echo "$two" > /sbin/wifimesh/firmware_server.txt
 	elif [ "$one" = "servers.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "servers.dashboard.url" ]; then
