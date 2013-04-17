@@ -202,7 +202,8 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "servers.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "servers.dashboard.url" ]; then
-		echo "$two" > /sbin/wifimesh/dashboard_server.txt
+		# echo "$two" > /sbin/wifimesh/dashboard_server.txt
+		echo "$two" > /tmp/dashboard_server.txt
 	
 	# SSID #1 (formerly Public SSID)
 	elif [ "$one" = "network.ssid1.enabled" ]; then
