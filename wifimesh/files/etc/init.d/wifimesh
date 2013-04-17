@@ -54,6 +54,8 @@ if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then # Add
 		uci set network.lan.ifname="eth0"
 		uci set network.wan.ifname="eth1"
 	fi
+	# If there are more that one adapter, move any LAN bridged adpter to the WAN.
+	brctl delif br-lan $(uci get network.lan.ifname) && brctl addif br-wan $(uci get network.lan.ifname)
 fi
 uci commit network
 

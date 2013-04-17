@@ -233,6 +233,11 @@ cat $response_file | while read line ; do
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="lan"
 			
+			# If there are more that one adapter, move the intended LAN adpter to the LAN bridge.
+			if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
+				brctl delif br-wan $(uci get network.lan.ifname) && brctl addif br-lan $(uci get network.lan.ifname)
+			fi
+			
 			# get the config to use for chilli
 			echo "" > /tmp/dns.tmp
 			cat /tmp/resolv.conf.auto | grep 'nameserver' | while read line; do
@@ -267,6 +272,14 @@ cat $response_file | while read line ; do
 			# stops coovachilli
 			/etc/init.d/chilli disable
 			echo "2" > /tmp/coova_flag
+			
+			# If there are more that one adapter, move any LAN bridged adpter to the WAN.
+			if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
+				brctl delif br-lan $(uci get network.lan.ifname) && brctl addif br-wan $(uci get network.lan.ifname)
+			fi
+			# Always enable stp on the wan bridge
+			sleep 1 && brctl stp br-wan on
+
 		fi
 	
 	# SSID #2 (formerly Private SSID)
