@@ -172,6 +172,7 @@ echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chill
 # define the coova flag
 echo "0" > /tmp/coova_flag
 echo "0" > /tmp/reboot_flag
+echo "0" > /tmp/lanifbr_flag
 
 cat $response_file | while read line ; do
 	one=$(echo $line | awk '{print $1}')
@@ -232,12 +233,7 @@ cat $response_file | while read line ; do
 		if [ "$two" = "1" ]; then
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="lan"
-			
-			# If there are more that one adapter, move the intended LAN adpter to the LAN bridge.
-			if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
-				brctl delif br-wan $(uci get network.lan.ifname) && brctl addif br-lan $(uci get network.lan.ifname)
-			fi
-			
+
 			# get the config to use for chilli
 			echo "" > /tmp/dns.tmp
 			cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'nameserver' | while read line; do
@@ -275,11 +271,8 @@ cat $response_file | while read line ; do
 			
 			# If there are more that one adapter, move any LAN bridged adpter to the WAN.
 			if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
-				brctl delif br-lan $(uci get network.lan.ifname) && brctl addif br-wan $(uci get network.lan.ifname)
+				echo "2" > /tmp/lanifbr_flag
 			fi
-			# Always enable stp on the wan bridge
-			sleep 1 && brctl stp br-wan on
-
 		fi
 	
 	# SSID #2 (formerly Private SSID)
@@ -439,6 +432,11 @@ if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
 	echo "stopping coovachilli"
 	/etc/init.d/chilli stop
+fi
+
+if [ $(cat /tmp/lanifbr_flag) -eq 2 ]; then
+	echo "moving interface: $(uci get network.lan.ifname) to the WAN"
+	brctl delif br-lan $(uci get network.lan.ifname) && brctl addif br-wan $(uci get network.lan.ifname)	
 fi
 
 if [ "$(brctl show | grep br-wan | awk '{print $3}')" = "no" ]; then
