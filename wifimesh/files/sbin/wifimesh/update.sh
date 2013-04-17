@@ -240,7 +240,7 @@ cat $response_file | while read line ; do
 			
 			# get the config to use for chilli
 			echo "" > /tmp/dns.tmp
-			cat /tmp/resolv.conf.auto | grep 'nameserver' | while read line; do
+			cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'nameserver' | while read line; do
 				line=$(echo $line | awk '{ print $2 }')
 				
 				if [ -z $dns1 ] ; then
@@ -251,7 +251,7 @@ cat $response_file | while read line ; do
 					dns2=1
 				fi
 			done
-			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)"
+			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)&dnsname=$(cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'search' | awk '{ print $2 }')"
 			
 			# get the page to use as the splash page
 			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
@@ -388,6 +388,39 @@ cat $response_file | while read line ; do
 		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.crt
 	elif [ "$one" = "network.vpn.ca" ]; then
 		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/ca.crt
+	
+	elif [ "$one" = "network.lan.block" ]; then
+		if [ "$two" == "1" ]; then
+			iptables -I FORWARD -s ${ip_lan_block}/24 -d 172.16.0.0/12 -j DROP
+			iptables -I FORWARD -s ${ip_lan_block}/24 -d 192.168.0.0/16 -j DROP
+			iptables -I FORWARD -s ${ip_lan_block}/24 -d ${ip_gateway} -j DROP
+			
+			iptables -I FORWARD -p tcp --source-port 22 -j ACCEPT
+			iptables -I FORWARD -p udp --destination-port 67:68 --source-port 67:68 -j ACCEPT
+			iptables -I FORWARD -p udp --destination-port 53 -j ACCEPT
+			iptables -I FORWARD -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables -I FORWARD -i br-wan -d ${ip_dhcp} -j ACCEPT
+			iptables -I FORWARD -i br-wan -p udp --destination-port 53 -j ACCEPT
+			iptables -I FORWARD -i br-wan -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables-save
+		else
+			iptables -D FORWARD -s ${ip_lan_block}/24 -d 172.16.0.0/12 -j DROP
+			iptables -D FORWARD -s ${ip_lan_block}/24 -d 192.168.0.0/16 -j DROP
+			iptables -D FORWARD -s ${ip_lan_block}/24 -d ${ip_gateway} -j DROP
+			
+			iptables -D FORWARD -p tcp --source-port 22 -j ACCEPT
+			iptables -D FORWARD -p udp --destination-port 67:68 --source-port 67:68 -j ACCEPT
+			iptables -D FORWARD -p udp --destination-port 53 -j ACCEPT
+			iptables -D FORWARD -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables -D FORWARD -i br-wan -d ${ip_dhcp} -j ACCEPT
+			iptables -D FORWARD -i br-wan -p udp --destination-port 53 -j ACCEPT
+			iptables -D FORWARD -i br-wan -p tcp --destination-port 53 -j ACCEPT
+			
+			iptables-save
+		fi
 	fi
 done
 
