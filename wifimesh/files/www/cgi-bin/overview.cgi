@@ -201,31 +201,9 @@ Pragma: no-cache
 						<li><a id="tab3" href="/cgi-bin/help.cgi" onmouseover="our_onmouseover('tab3');" onmouseout="our_onmouseout('tab3');"><span id="tab3span" onclick="our_onclick('tab3');">Help</span></a></li>
 					</ul>
 					<fieldset>
-						<legend>Network Connectivity</legend>
-						<table>
-							<tr>
-								<th>Kind</th>
-								<th>Status</th>
-								<th>IP Address</th>
-							</tr>
-							<tr>
-								<td>LAN</td>
-								<td id="lan_status">n/a</td>
-								<td id="lan_ip">n/a</td>
-							</tr>
-							<tr>
-								<td>WAN</td>
-								<td id="wan_status">n/a</td>
-								<td id="wan_ip">n/a</td>
-							</tr>
-							<tr>
-								<td>DNS</td>
-								<td id="dns_status">n/a</td>
-								<td id="dns_ip">n/a</td>
-							</tr>
-						</table>
+						<legend>System Uptime</legend>
+						<p>$(uptime | awk '{ print $3 " " $4 }' | sed '$s/.$//')</p>
 					</fieldset>
-					<br />
 					<fieldset>
 						<legend>Network Connections</legend>
 						<table>
