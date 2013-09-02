@@ -33,10 +33,10 @@ if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
 		if_wan="eth0"
 	else
 		if_lan="eth0"
-		if_wan="eth0"
+		if_wan="eth1"
 	fi
 else
-	if_lan="eth1"
+	if_lan="eth0"
 	if_wan="eth0"
 fi
 
