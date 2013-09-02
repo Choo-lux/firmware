@@ -48,7 +48,7 @@ ip_lan="10.$(hex_ip 13-14).$(hex_ip 16-17).1"
 ip_lan_block="10.$(hex_ip 13-14).$(hex_ip 16-17).0"
 ip_vpn=$(ifconfig | grep 'inet addr:172.16.' | cut -d: -f2 | awk '{ print $1 }')
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
-ip_gateway=$(route -n | grep 'UG' | grep 'br-wan' | awk '{ print $2 }')
+ip_gateway=$(route -n | grep 'UG' | grep 'br-wan' | awk '{ print $2 }' | head -1)
 ssid="wifimesh_$(hex_ip 16-17)"
 
 if [ "$(cat /sys/class/net/${if_wan}/carrier)" -eq "1" ]; then
