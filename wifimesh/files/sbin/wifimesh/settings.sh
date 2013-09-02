@@ -29,14 +29,18 @@ if_mesh=$(ifconfig | grep 'wlan0' | sort -r | awk '{ print $1 }' | head -1)
 
 if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then
 	if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
-		mac_lan=$(ifconfig eth1 | grep 'HWaddr' | awk '{ print $5 }')
+		if_lan="eth1"
+		if_wan="eth0"
 	else
-		mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+		if_lan="eth0"
+		if_wan="eth0"
 	fi
 else
-	mac_lan=$(ifconfig eth0 | grep 'HWaddr' | awk '{ print $5 }')
+	if_lan="eth1"
+	if_wan="eth0"
 fi
 
+mac_lan=$(ifconfig ${if_lan} | grep 'HWaddr' | awk '{ print $5 }')
 mac_wan=$(ifconfig br-wan | grep 'HWaddr' | awk '{ print $5 }')
 mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
 mac_mesh=$(ifconfig ${if_mesh} | grep 'HWaddr' | awk '{ print $5 }')
@@ -47,7 +51,7 @@ ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }'
 ip_gateway=$(route -n | grep 'UG' | grep 'br-wan' | awk '{ print $2 }')
 ssid="wifimesh_$(hex_ip 16-17)"
 
-if [ "$(cat /sys/class/net/$(uci get network.wan.ifname)/carrier)" -eq "1" ]; then
+if [ "$(cat /sys/class/net/${if_wan}/carrier)" -eq "1" ]; then
 	role="G"
 else
 	role="R"
