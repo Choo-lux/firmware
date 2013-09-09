@@ -16,7 +16,7 @@ else
 fi
 
 # Tests WAN Connectivity
-wan=$(wget -qO- http://maintenance.wifi-mesh.co.nz/check-ip.php?mac=${mac_lan})
+wan=$(curl "http://${dashboard_server}checkin-wm.php?ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&action=remote-addr")
 if [ "${wan}" ]; then
 	wan_status=1
 	wan_ip="${wan}"
