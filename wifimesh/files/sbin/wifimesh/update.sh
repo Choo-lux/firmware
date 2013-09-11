@@ -99,7 +99,7 @@ echo "" > /tmp/checkin/nbs
 echo "" > /tmp/checkin/rssi
 echo "" > /tmp/checkin/speed
 
-iw ${if_mesh} mpath dump | tail -n +2 | while read line; do
+iw ${if_mesh} mpath dump | grep -v '00:00:00:00:00:00' | tail -n +2 | while read line; do
 	echo $(echo $line | awk '{ print $5 }' | sed 's/ /,/g')";" >> /tmp/checkin/rank
 	echo $(echo $line | awk '{ print $1,$2 }' | sed 's/ /,/g')";" >> /tmp/checkin/nbs
 	echo $(iw ${if_mesh} station get $(echo $line | awk '{ print $2 }') | grep 'signal:' | awk '{ print $2 }')";" >> /tmp/checkin/rssi
