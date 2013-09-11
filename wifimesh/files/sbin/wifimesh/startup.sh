@@ -144,9 +144,6 @@ log_message "first_boot: enabling cron at boot"
 crontab /sbin/wifimesh/cron.txt
 /etc/init.d/cron enable
 
-# Move the firmware default coova.html file into the actual directory, if necessary
-if [ -e "/sbin/wifimesh/coova.html" ]; then mv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html; fi
-
 log_message "first_boot: saving ssh banner"
 cat > /etc/banner << banner_end
   ________ __ _______ __   _______               __     
