@@ -234,8 +234,6 @@ cat $response_file | while read line ; do
 		if [ "$two" = "1" ]; then
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="lan"
-			brctl delif br-wan eth1
-			brctl addif br-lan eth1
 			
 			# get the config to use for chilli
 			echo "" > /tmp/dns.tmp
@@ -267,8 +265,6 @@ cat $response_file | while read line ; do
 		else
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="wan"
-			brctl delif br-lan eth1
-			brctl addif br-wan eth1
 			
 			# stops coovachilli
 			/etc/init.d/chilli disable
