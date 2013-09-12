@@ -111,6 +111,8 @@ nbs=$(cat /tmp/checkin/nbs | tr '\n' ' ' | sed 's/ //g')
 rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
 speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
 
+radio_channel=$(uci get wireless.radio0.channel)
+
 echo "Doing a ping test"
 rtt_internal=$(ping -c 2 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 rtt_external=$(ping -c 2 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
@@ -131,7 +133,7 @@ model_cpu=$(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-5
 model_device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | tr ' ' '+')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${channel_client}&channel_mesh=${channel_mesh}&RR=${RR}"
+request_data="ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${radio_channel}&channel_mesh=${radio_channel}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
@@ -353,19 +355,13 @@ cat $response_file | while read line ; do
 	
 	# Radios
 	elif [ "$one" = "network.client.channel" ]; then
-		uci set wireless.${radio_client}.channel=$two
-	elif [ "$one" = "network.mesh.channel" ]; then
-		uci set wireless.${radio_mesh}.channel=$two
+		uci set wireless.radio0.channel=$two
 	elif [ "$one" = "network.client.txpower" ]; then
-		uci set wireless.${radio_client}.txpower=$two
-	elif [ "$one" = "network.mesh.txpower" ]; then
-		uci set wireless.${radio_mesh}.txpower=$two
+		uci set wireless.radio0.txpower=$two
 	elif [ "$one" = "network.distance" ]; then
-		uci set wireless.${radio_mesh}.distance=$two
+		uci set wireless.radio0.distance=$two
 	elif [ "$one" = "network.country" ]; then
-		uci set wireless.${radio_client}.country=$two
-		uci set wireless.${radio_mesh}.country=$two
-	
+		uci set wireless.radio0.country=$two
 	elif [ "$one" = "network.channel.client" ]; then
 		uci set wireless.radio0.channel=$two
 	

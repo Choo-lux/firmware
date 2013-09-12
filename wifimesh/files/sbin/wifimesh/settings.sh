@@ -17,13 +17,6 @@ log_message() {
 	echo $1
 }
 
-# Radio Detection
-radio_client="radio0"
-radio_mesh="radio0"
-
-channel_client=$(uci get wireless.${radio_client}.channel)
-channel_mesh=$(uci get wireless.${radio_mesh}.channel)
-
 # Define some networking-related variables
 if_mesh=$(ifconfig | grep 'wlan0' | sort -r | awk '{ print $1 }' | head -1)
 

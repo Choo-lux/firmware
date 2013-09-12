@@ -59,12 +59,9 @@ uci commit network
 
 # Enable the wifi radios
 log_message "first_boot: configuring the wifi"
-uci set wireless.${radio_mesh}.disabled="0"
-uci set wireless.${radio_client}.disabled="0"
-uci set wireless.${radio_mesh}.distance="2000"
-uci set wireless.${radio_client}.distance="2000"
-uci set wireless.${radio_mesh}.country="US"
-uci set wireless.${radio_client}.country="US"
+uci set wireless.radio0.disabled="0"
+uci set wireless.radio0.distance="2000"
+uci set wireless.radio0.country="US"
 
 # Create the SSID #1/Public wifi interface (if it doesn't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
