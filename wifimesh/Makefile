@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wifimesh
-PKG_VERSION:2.0.0
+PKG_VERSION:3.0.0
 PKG_RELEASE:=1
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
@@ -20,7 +20,7 @@ define Package/wifimesh
 	SUBMENU:=WiFi Mesh
 	SECTION:=net
 	CATEGORY:=Network
-	DEPENDS:=+om-watchdog +curl +uhttpd +unzip +coova-chilli +openvpn
+	DEPENDS:=+om-watchdog +curl +unzip +coova-chilli
 	TITLE:=WiFi Mesh (base)
 	URL:=http://www.wifi-mesh.co.nz/
 endef
