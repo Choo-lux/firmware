@@ -21,14 +21,14 @@ else
 fi
 
 # Tests WAN Connectivity
-if [ "$(ping -c 2 www.google.com)" ]; then
+if [ "$(ping -c 2 cdn.wifi-mesh.co.nz)" ]; then
 	wan_status=1
 else
 	wan_status=0
 fi
 
 # Tests DNS Connectivity
-if [ "$(nslookup www.google.com)" ]; then
+if [ "$(nslookup cdn.wifi-mesh.co.nz)" ]; then
 	dns_status=1
 else
 	dns_status=0
