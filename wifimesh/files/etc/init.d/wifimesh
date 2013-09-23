@@ -7,10 +7,9 @@ STOP=15
 
 boot() {
 # Fix the permissions
-chmod 0777 /etc/init.d/chilli > /dev/null
-chmod 0777 /etc/init.d/wifimesh > /dev/null
-chmod 0777 /sbin/wifimesh/*.sh > /dev/null
-chmod 0777 /www/cgi-bin/*.cgi > /dev/null
+chmod +x /etc/init.d/chilli > /dev/null
+chmod +x /etc/init.d/wifimesh > /dev/null
+chmod +x /sbin/wifimesh/*.sh > /dev/null
 
 # Start wifimesh at boot
 /etc/init.d/wifimesh enable
@@ -32,10 +31,6 @@ log_message "first_boot: configuring the firewall"
 uci set firewall.@zone[1].input="ACCEPT"
 uci commit firewall
 /etc/init.d/firewall restart
-
-log_message "first_boot: disable dnsmasq"
-/etc/init.d/dnsmasq disable
-/etc/init.d/dnsmasq stop
 
 log_message "first_boot: configuring the bridges"
 brctl addbr br-wan
@@ -92,16 +87,6 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Y
 log_message "first_boot: setting the ssh default password"
 echo -e "w1f1m35h\nw1f1m35h" | passwd root
 
-log_message "first_boot: configuring uhttpd"
-uci set uhttpd.main.realm="my.wifi-mesh.co.nz"
-uci set uhttpd.px5g.commonname="my.wifi-mesh.co.nz"
-uci set uhttpd.px5g.country="NZ"
-uci set uhttpd.px5g.state="Auckland"
-uci set uhttpd.px5g.location="Auckland"
-uci commit uhttpd
-/etc/init.d/uhttpd enable
-/etc/init.d/uhttpd restart
-
 log_message "first_boot: configuring coova-chilli"
 echo "HS_LANIF='br-lan'
 HS_WANIF='br-wan'
@@ -123,7 +108,7 @@ HS_UAMALIASNAME='chilli'
 HS_AAA='http'
 HS_UAMAAAURL='http://localhost/aaa.txt'
 HS_UAMSERVER='${ip_lan}'
-HS_UAMFORMAT='http://${ip_lan}/first_boot.html'
+HS_UAMFORMAT='http://dashboard.wifi-mesh.co.nz/aaa.php'
 HS_UAMHOMEPAGE='http://${ip_lan}:3990/www/coova.html'
 HS_TCP_PORTS='22 23 80 443'
 HS_MODE='hotspot'
@@ -134,18 +119,9 @@ HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
 /etc/init.d/chilli start
 
-log_message "first_boot: configuring the VPN"
-uci delete openvpn.custom_config
-uci delete openvpn.sample_server
-uci commit openvpn
-/etc/init.d/openvpn enable
-
 log_message "first_boot: enabling cron at boot"
 crontab /sbin/wifimesh/cron.txt
 /etc/init.d/cron enable
-
-# Move the firmware default coova.html file into the actual directory, if necessary
-if [ -e "/sbin/wifimesh/coova.html" ]; then mv /sbin/wifimesh/coova.html /etc/chilli/www/coova.html; fi
 
 log_message "first_boot: saving ssh banner"
 cat > /etc/banner << banner_end
@@ -166,7 +142,7 @@ log_message "first_boot: removing first_boot marker file"
 rm /sbin/wifimesh/first_boot
 
 log_message "first_boot: done, rebooting..."
-sleep 10
+sleep 1
 reboot
 
 # mark it as a new boot

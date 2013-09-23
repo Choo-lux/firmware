@@ -53,7 +53,6 @@ if [ -z "${IPKG_INSTROOT}" ]; then
 	chmod +x /etc/rc.d/chilli
 	chmod +x /etc/rc.d/wifimesh
 	chmod +x /sbin/wifimesh/*.sh
-	chmod +x /www/cgi-bin/*.cgi
 	
 	echo "Enabling rc.d symlink for wifimesh"
 	/etc/init.d/wifimesh enable

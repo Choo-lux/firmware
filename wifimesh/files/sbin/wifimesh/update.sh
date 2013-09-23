@@ -133,7 +133,7 @@ model_cpu=$(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-5
 model_device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | tr ' ' '+')
 
 # Saving Request Data
-request_data="ip=${ip_lan}&ip_vpn=${ip_vpn}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${radio_channel}&channel_mesh=${radio_channel}&RR=${RR}"
+request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${radio_channel}&channel_mesh=${radio_channel}&RR=${RR}"
 
 dashboard_protocol="http"
 dashboard_url="checkin-wm.php"
@@ -173,7 +173,6 @@ echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chill
 
 # define the coova flag
 echo "0" > /tmp/coova_flag
-echo "0" > /tmp/reboot_flag
 
 cat $response_file | while read line ; do
 	one=$(echo $line | awk '{print $1}')
@@ -188,16 +187,12 @@ cat $response_file | while read line ; do
 		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
-	elif [ "$one" = "system.reboot" ]; then
-		echo $two > /tmp/reboot_flag
 	elif [ "$one" = "system.firmware.branch" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "servers.ntp.server" ]; then
 		uci set system.ntp.server="$two"
 	elif [ "$one" = "servers.ntp.timezone" ]; then
 		uci set system.@system[0].timezone="$two"
-	elif [ "$one" = "servers.dns.domain" ]; then
-		uci set dhcp.@dnsmasq[0].domain="$two"
 	elif [ "$one" = "servers.firmware.url" ]; then
 		echo "$two" > /sbin/wifimesh/firmware_server.txt
 	elif [ "$one" = "servers.firmware.branch" ]; then
@@ -361,17 +356,6 @@ cat $response_file | while read line ; do
 	elif [ "$one" = "network.channel.client" ]; then
 		uci set wireless.radio0.channel=$two
 	
-	elif [ "$one" = "network.vpn.enabled" ]; then
-		uci set openvpn.sample_client.enabled=$two
-	elif [ "$one" = "network.vpn.server" ]; then
-		uci set openvpn.sample_client.remote=$two
-	elif [ "$one" = "network.vpn.key" ]; then
-		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.key
-	elif [ "$one" = "network.vpn.certificate" ]; then
-		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/client.crt
-	elif [ "$one" = "network.vpn.ca" ]; then
-		curl -s -k -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" $two > /etc/openvpn/ca.crt
-	
 	elif [ "$one" = "network.lan.block" ]; then
 		if [ "$two" == "1" ]; then
 			iptables -I FORWARD -s ${ip_lan_block}/24 -d 172.16.0.0/12 -j DROP
@@ -412,7 +396,6 @@ uci commit
 
 # Restart all of the services
 /etc/init.d/network restart
-/etc/init.d/openvpn restart
 
 if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 	echo "restarting coovachilli"
@@ -422,11 +405,6 @@ if [ $(cat /tmp/coova_flag) -eq 1 ]; then
 elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
 	echo "stopping coovachilli"
 	/etc/init.d/chilli stop
-fi
-
-if [ $(cat /tmp/reboot_flag) -eq 1 ]; then
-	echo "restarting the node"
-	reboot
 fi
 
 # Clear out the old files

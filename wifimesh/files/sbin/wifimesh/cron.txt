@@ -4,3 +4,4 @@
 * * * * * /sbin/wifimesh/check.sh
 * * * * * /sbin/wifimesh/update.sh
 0 * * * * /sbin/wifimesh/upgrade.sh
+0 * * * * /sbin/wifimesh/monitor.sh

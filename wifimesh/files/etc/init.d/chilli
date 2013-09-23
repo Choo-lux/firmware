@@ -25,7 +25,7 @@ start() {
 	ifconfig br-lan 0.0.0.0
 	brctl stp br-wan on
 	sleep 1
-	/usr/sbin/chilli -c /etc/chilli.conf --acctupdate --dnsparanoia --uamhostname my.wifi-mesh.co.nz
+	/usr/sbin/chilli -c /etc/chilli.conf --uamhostname my.wifi-mesh.co.nz --dhcpradius
 	touch /var/lock/subsys/chilli
 }
 

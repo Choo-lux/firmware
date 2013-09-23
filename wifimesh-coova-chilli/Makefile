@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=coova-chilli
-PKG_VERSION:=1.3.0
+PKG_VERSION:=1.2.9
 PKG_RELEASE:=1
 
-PKG_SOURCE:=coova-chilli-1.3.0.tar.gz
+PKG_SOURCE:=coova-chilli-1.2.9.tar.gz
 PKG_SOURCE_URL:=http://ap.coova.org/chilli
-PKG_MD5SUM:=dc0037e3cdebcb60508081b4e42e984a
+PKG_MD5SUM:=a493d0562fc3b05fe86d8ad65f7f2dc0
 
 PKG_FIXUP:=libtool
 PKG_INSTALL:=1
@@ -75,13 +75,7 @@ define Build/Configure
 			--enable-chilliproxy \
 			--enable-chilliredir \
 			--enable-layer3 \
-			--disable-json \
-			--disable-chillixml \
-			--disable-ieee8021q \
-			--with-curl \
-			--disable-chilliproxy \
-			--enable-useragent \
-			--enable-sessionstate \
+			--enable-dhcpradius \
 	);
 endef
 
@@ -101,4 +95,3 @@ define Package/coova-chilli/install
 endef
 
 $(eval $(call BuildPackage,coova-chilli))
-

@@ -13,7 +13,7 @@ hex_ip() {
 }
 
 log_message() {
-	#echo "$(date) $1" >> /etc/perma.log
+	logger "$1"
 	echo $1
 }
 
@@ -39,7 +39,6 @@ mac_wlan=$(cat /sys/class/ieee80211/phy0/macaddress)
 mac_mesh=$(ifconfig ${if_mesh} | grep 'HWaddr' | awk '{ print $5 }')
 ip_lan="10.$(hex_ip 13-14).$(hex_ip 16-17).1"
 ip_lan_block="10.$(hex_ip 13-14).$(hex_ip 16-17).0"
-ip_vpn=$(ifconfig | grep 'inet addr:172.16.' | cut -d: -f2 | awk '{ print $1 }')
 ip_dhcp=$(ifconfig br-wan | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }')
 ip_gateway=$(route -n | grep 'UG' | grep 'br-wan' | awk '{ print $2 }' | head -1)
 ssid="wifimesh_$(hex_ip 16-17)"
@@ -62,5 +61,4 @@ if [ -z "${firmware_branch}" ]; then firmware_branch="stable"; fi
 
 # Define version information
 package_version=$(cat /sbin/wifimesh/package_version.txt)
-kernel_version=$(cat /sbin/wifimesh/kernel_version.txt)
 mesh_version=$(opkg list_installed | grep 'ath9k - ' | awk '{ print $3 }' |cut -d + -f 2)
