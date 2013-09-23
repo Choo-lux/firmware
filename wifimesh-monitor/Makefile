@@ -48,6 +48,7 @@ define Package/wifimesh-monitor/postinst
 # check if we are on real system
 if [ -z "${IPKG_INSTROOT}" ]; then
 	logger "Fix the permissions for wifimesh-monitor"
+	chmod +x /sbin/wifimesh/monitor.sh
 	chmod +x /usr/sbin/airodump-ng
 fi
 exit 0
