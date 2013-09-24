@@ -14,7 +14,7 @@ echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
 log_message "Waiting a bit..."
-sleep $[ ( $RANDOM % 10 )  + 1 ]s
+sleep $(head -30 /dev/urandom | tr -dc "0123456789" | head -c1)
 
 if [ "${firmware_branch}" = "fixed" ]; then
 	log_message "upgrade: We are locked on v${old_package_version}. Enable upgrades at the dashboard."

@@ -19,6 +19,9 @@ if [ ! -d "$temp_dir" ]; then mkdir $temp_dir; fi
 echo "WiFi Mesh Dashboard Checker"
 echo "----------------------------------------------------------------"
 
+log_message "Waiting a bit..."
+sleep $(head -30 /dev/urandom | tr -dc "0123456789" | head -c1)
+
 # If the node has no configuration, say that we need it
 if [ "$(uci get wireless.@wifi-iface[1].ssid)" = "${ssid}" ]; then
 	RR=1
@@ -26,9 +29,6 @@ if [ "$(uci get wireless.@wifi-iface[1].ssid)" = "${ssid}" ]; then
 # If we have not passed in a variable then it is 0
 elif [ "$1" = "" ]; then
 	RR=0
-	
-	log_message "Waiting a bit..."
-	sleep $[ ( $RANDOM % 10 )  + 1 ]s
 
 # Otherwise, work with what we have on hand
 else
