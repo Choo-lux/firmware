@@ -397,19 +397,6 @@ done
 # Save all of that
 uci commit
 
-# Restart all of the services
-/etc/init.d/network restart
-
-if [ $(cat /tmp/coova_flag) -eq 1 ]; then
-	echo "restarting coovachilli"
-	/etc/init.d/chilli stop
-	sleep 5
-	/etc/init.d/chilli start
-elif [ $(cat /tmp/coova_flag) -eq 2 ]; then
-	echo "stopping coovachilli"
-	/etc/init.d/chilli stop
-fi
-
 # Clear out the old files
 if [ -e $status_file ]; then rm $status_file; fi
 if [ -e $response_file ]; then rm $response_file; fi
@@ -418,4 +405,6 @@ if [ -e $temp_file ]; then rm $temp_file; fi
 echo "----------------------------------------------------------------"
 echo "Successfully applied new settings"
 
-log_message "update: Successfully applied new settings"
+log_message "update: Successfully applied new settings, rebooting..."
+sleep 1
+reboot
