@@ -26,6 +26,9 @@ if [ "$(uci get wireless.@wifi-iface[1].ssid)" = "${ssid}" ]; then
 # If we have not passed in a variable then it is 0
 elif [ "$1" = "" ]; then
 	RR=0
+	
+	log_message "Waiting a bit..."
+	sleep $[ ( $RANDOM % 10 )  + 1 ]s
 
 # Otherwise, work with what we have on hand
 else
