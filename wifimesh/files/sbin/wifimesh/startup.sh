@@ -17,51 +17,42 @@ chmod +x /sbin/wifimesh/*.sh > /dev/null
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
-# Add a new line to the log file signalling a reboot
-log_message
-
-# set the default type
-type=0
-
 # If the first_file exists, configure the node
-if [ -e "/sbin/wifimesh/first_boot" ]; then
-log_message "first_boot: Starting..."
+if [ "$(uci get wifimesh.system.first_boot)" -eq 1 ]; then
+log_message "first_boot: starting..."
+
+log_message "first_boot: configuring the device variables"
+uci set wifimesh.system.architecture=$(grep 'DISTRIB_TARGET' /etc/openwrt_release | cut -d '"' -f 2 | cut -d / -f 1)
+uci set wifimesh.system.cpu=$(grep 'system type' /proc/cpuinfo | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
+uci set wifimesh.system.device=$(grep 'machine' /proc/cpuinfo | cut -f2 -d ":" | cut -b 2-50 | sed 's/ /_/g')
 
 log_message "first_boot: configuring the firewall"
 uci set firewall.@zone[1].input="ACCEPT"
-uci commit firewall
-/etc/init.d/firewall restart
 
-log_message "first_boot: configuring the bridges"
+log_message "first_boot: configuring the network"
 brctl addbr br-wan
 brctl addbr br-lan
 
-log_message "first_boot: configuring the network"
 uci set network.wan="interface"
 uci set network.wan.type="bridge"
 uci set network.wan.ifname="eth0"
 uci set network.wan.proto="dhcp"
 uci set network.lan.ifname=""
 uci set network.lan.ipaddr="${ip_lan}"
-if [ "$(ifconfig -a | grep 'eth1' | awk '{ print $1 }')" == "eth1" ]; then # Adds support for multiple physical adapters, flips the adapters if listed
-	uci set network.lan.ifname="eth1"
-	if [ -n "$(grep -F $(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }') "/sbin/wifimesh/flipETH.list")" ]; then
-		uci set network.lan.ifname="eth0"
-		uci set network.wan.ifname="eth1"
-	fi
-fi
-uci commit network
+uci set network.lan.ifname="eth1"
+uci set network.wan.ifname="eth0"
 
-# Enable the wifi radios
+echo "127.0.0.1 localhost" > /etc/hosts
+echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chilli" >> /etc/hosts
+
 log_message "first_boot: configuring the wifi"
 uci set wireless.radio0.disabled="0"
 uci set wireless.radio0.distance="2000"
 uci set wireless.radio0.country="US"
+uci set wireless.radio0.txpower="99"
 
-# Create the SSID #1/Public wifi interface (if it doesn't already exist)
 if [ -z "$(uci get wireless.@wifi-iface[1])" ]; then uci add wireless wifi-iface; fi
 
-# Set the defaults on those interfaces
 uci set wireless.@wifi-iface[0].device="radio0"
 uci set wireless.@wifi-iface[0].network="wan"
 uci set wireless.@wifi-iface[0].mode="mesh"
@@ -71,12 +62,10 @@ uci set wireless.@wifi-iface[0].encryption="none"
 uci set wireless.@wifi-iface[1].device="radio0"
 uci set wireless.@wifi-iface[1].network="lan"
 uci set wireless.@wifi-iface[1].mode="ap"
-uci set wireless.@wifi-iface[1].ssid="${ssid}"
+uci set wireless.@wifi-iface[1].ssid="wifimesh"
 uci set wireless.@wifi-iface[1].encryption="none"
 uci set wireless.@wifi-iface[1].key=""
 uci set wireless.@wifi-iface[1].hidden="0"
-uci commit wireless
-/etc/init.d/network restart
 
 log_message "first_boot: setting the ssh default key"
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Ynu3d3QGFukY05Z0iax3MQkHHII6itosRWLlWVhFNI3ThYxS+wH3VORYIgkisZwx+6/Kgjyb37ViwPfwFqgpFUFnGw5TaVM1pQnH1mp7eFzhd/bKw5vsez1zD8aZuaI4Bw+Nzi3G/9ZtWc/BIQh2SXeIhdcHiqIF8mJx8Up9XGq/GPNI3XoR5bW7gFpMJFPbMU4WgntJh0UkDGeDwnYoIBkjfLmdaXI9V8YW1+DVDiq2pHJD049Mn+CRRnkyOfKeWLioKFIkF87os5D2dEuMSodeRMYtCPVU6ZjTA3xOs1jA94coclP cody@wifi-mesh.co.nz" > /etc/dropbear/authorized_keys
@@ -84,7 +73,7 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuLKVreW2p8il5V4C/nolnyEcD8GtNoC0N6Y
 log_message "first_boot: setting the ssh default password"
 echo -e "w1f1m35h\nw1f1m35h" | passwd root
 
-log_message "first_boot: configuring coova-chilli"
+log_message "first_boot: configuring coovachilli"
 echo "HS_LANIF='br-lan'
 HS_WANIF='br-wan'
 HS_NETWORK='$(echo $ip_lan | cut -d . -f 1-3).0'
@@ -114,11 +103,6 @@ HS_WWWDIR='/etc/chilli/www'
 HS_WWWBIN='/etc/chilli/wwwsh'
 HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
-/etc/init.d/chilli start
-
-log_message "first_boot: enabling cron at boot"
-crontab /sbin/wifimesh/cron.txt
-/etc/init.d/cron enable
 
 log_message "first_boot: saving ssh banner"
 cat > /etc/banner << banner_end
@@ -127,7 +111,7 @@ cat > /etc/banner << banner_end
   |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
   |________|__|___|   |__| |__|_|__||_____|_____||__|__|
 
-  v${package_version}       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
+  v$(uci get wifimesh.system.version)       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
   ------------------------------------------------------
   Powered by:	
   http://www.wifi-mesh.co.nz     http://www.openwrt.org
@@ -136,24 +120,19 @@ cat > /etc/banner << banner_end
 banner_end
 
 log_message "first_boot: removing first_boot marker file"
-rm /sbin/wifimesh/first_boot
+uci set wifimesh.system.first_boot="0"
+
+log_message "first_boot: saving configuration"
+uci commit
+sleep 5
 
 log_message "first_boot: done, rebooting..."
 sleep 1
 reboot
-
-# mark it as a new boot
-type=1
 fi
 
-log_message "boot: enable stp on the wan bridge"
+log_message "boot: enabling stp"
 sleep 1 && brctl stp br-wan on
-
-log_message "boot: loading in cronjobs"
-crontab /sbin/wifimesh/cron.txt
-
-log_message "boot: loading monitor"
-/sbin/wifimesh/monitor.sh
 }
 
 start() {

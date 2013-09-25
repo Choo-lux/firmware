@@ -1,0 +1,31 @@
+config wifimesh 'system'
+	option	'first_boot'	'1'
+	option	'version'		'3.1.0'
+	option	'architecture'	'Unknown'
+	option	'cpu'			'Unknown'
+	option	'device'		'Unknown'
+
+config wifimesh 'dashboard'
+	option	'enabled'		'1'
+	option	'https'			'1'
+	option	'server'		'dashboard.wifi-mesh.co.nz'
+	
+config wifimesh 'firmware'
+	option	'enabled'		'1'
+	option	'https'			'0'
+	option	'server'		'cdn.wifi-mesh.co.nz'
+	option	'branch'		'stable'
+
+config wifimesh 'check'
+	option	'enabled'		'1'
+	option	'server'		'cdn.wifi-mesh.co.nz'
+
+config wifimesh 'monitor'
+	option	'enabled'		'0'
+
+config wifimesh 'captive_portal'
+	option	'enabled_lan'	'1'
+	option	'enabled_wlan'	'1'
+
+config wifimesh 'ssh'
+	option	'enabled'		'1'

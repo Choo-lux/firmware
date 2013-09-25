@@ -5,25 +5,20 @@
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
-temp_dir="/tmp/checkin"
-status_file="$temp_dir/request.txt"
-response_file="$temp_dir/response.txt"
-temp_file="$temp_dir/tmp"
-
-if [ -e $status_file ]; then rm $status_file; fi
-if [ -e $response_file ]; then rm $response_file; fi
-if [ -e $temp_file ]; then rm $temp_file; fi
-if [ ! -d "$temp_dir" ]; then mkdir $temp_dir; fi
-
-
 echo "WiFi Mesh Dashboard Checker"
 echo "----------------------------------------------------------------"
+
+# Check that we are allowed to use this
+if [ "$(uci get wifimesh.dashboard.enabled)" -eq 0 ]; then
+	echo "This script is disabled, exiting..."
+	exit
+fi
 
 log_message "Waiting a bit..."
 sleep $(head -30 /dev/urandom | tr -dc "0123456789" | head -c1)
 
 # If the node has no configuration, say that we need it
-if [ "$(uci get wireless.@wifi-iface[1].ssid)" = "${ssid}" ]; then
+if [ "$(uci get wireless.@wifi-iface[1].ssid)" = "wifimesh" ]; then
 	RR=1
 
 # If we have not passed in a variable then it is 0
@@ -61,7 +56,7 @@ if [ $(grep 'wificpa_enterprise' /etc/chilli/defaults) ]; then
 	cpmac_wan=${mac_wan}
 	cpip_wan=${ip_dhcp}
 	machine=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
-	cpfw_ver=${package_version}
+	cpfw_ver=$(uci get wifimesh.system.version)
 	nasid=$(grep HS_RADIUSNASID /etc/chilli/defaults | awk -F'HS_RADIUSNASID=' '/HS_RADIUSNASID/ {print $2}' | sed s/\"//g)
 	uamserver=$(grep HS_UAMSERVER= /etc/chilli/defaults | awk -F'HS_UAMSERVER=' '/HS_UAMSERVER/ {print $2}' | sed s/\"//g | sed '1!d')
 
@@ -100,25 +95,25 @@ echo "Acquiring routing information"
 echo "" > /tmp/checkin/rank
 echo "" > /tmp/checkin/nbs
 echo "" > /tmp/checkin/rssi
-echo "" > /tmp/checkin/speed
+echo "" > /tmp/checkin/ntr
 
 iw ${if_mesh} mpath dump | grep -v '00:00:00:00:00:00' | tail -n +2 | while read line; do
 	echo $(echo $line | awk '{ print $5 }' | sed 's/ /,/g')";" >> /tmp/checkin/rank
 	echo $(echo $line | awk '{ print $1,$2 }' | sed 's/ /,/g')";" >> /tmp/checkin/nbs
 	echo $(iw ${if_mesh} station get $(echo $line | awk '{ print $2 }') | grep 'signal:' | awk '{ print $2 }')";" >> /tmp/checkin/rssi
-	echo $(iw ${if_mesh} station get $(echo $line | awk '{ print $2 }') | grep 'tx bitrate:' | awk '{ print $3 }')";" >> /tmp/checkin/speed
+	echo $(iw ${if_mesh} station get $(echo $line | awk '{ print $2 }') | grep 'tx bitrate:' | awk '{ print $3 }')";" >> /tmp/checkin/ntr
 done
 
 rank=$(cat /tmp/checkin/rank | tr '\n' ' ' | sed 's/ //g')
 nbs=$(cat /tmp/checkin/nbs | tr '\n' ' ' | sed 's/ //g')
 rssi=$(cat /tmp/checkin/rssi | tr '\n' ' ' | sed 's/ //g')
-speed=$(cat /tmp/checkin/speed | tr '\n' ' ' | sed 's/ //g')
+ntr=$(cat /tmp/checkin/ntr | tr '\n' ' ' | sed 's/ //g')
 
 radio_channel=$(uci get wireless.radio0.channel)
 
 echo "Doing a ping test"
 rtt_internal=$(ping -c 2 ${ip_gateway} | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
-rtt_external=$(ping -c 2 "cdn.wifi-mesh.co.nz" | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
+rtt_external=$(ping -c 2 $(uci get wifimesh.ping.server) | tail -1 | awk '{print $4}' | cut -d '/' -f 2)
 
 echo "Checking the noise levels"
 echo "" > /tmp/noise.tmp
@@ -132,37 +127,36 @@ done
 noise=$(cat /tmp/noise.tmp | tr '\n' ' ' | sed 's/ //g')
 
 echo "Getting the model information"
-model_cpu=$(cat /proc/cpuinfo | grep 'system type' | cut -f2 -d ":" | cut -b 2-50 | awk '{ print $2 }')
-model_device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | tr ' ' '+')
+model_cpu=$(uci get wifimesh.system.cpu)
+model_device=$(uci get wifimesh.system.device)
 
 # Saving Request Data
-request_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=${package_version}&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&NTR=${speed}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${radio_channel}&channel_mesh=${radio_channel}&RR=${RR}"
+url_data="ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&mac_mesh=${mac_mesh}&fw_ver=$(uci get wifimesh.system.version)&model_cpu=${model_cpu}&model_device=${model_device}&gateway=${ip_gateway}&ip_internal=${ip_dhcp}&memfree=${memfree}&memtotal=${memtotal}&load=${load}&uptime=${uptime}&rtt_internal=${rtt_internal}&rtt_external=${rtt_external}&rank=${rank}&nbs=${nbs}&rssi=${rssi}&ntr=${ntr}&noise=${noise}&top_users=${top_users}&role=${role}&channel_client=${radio_channel}&RR=${RR}"
 
-dashboard_protocol="http"
-dashboard_url="checkin-wm.php"
-url="${dashboard_protocol}://${dashboard_server}${dashboard_url}?${request_data}"
+if [ "$(uci get wifimesh.dashboard.https)" -eq 1 ]; then
+	url="https://$(uci get wifimesh.dashboard.server)/checkin-wm.php?${url_data}"
+else
+	url="http://$(uci get wifimesh.dashboard.server)/checkin-wm.php?${url_data}"
+fi
 
 echo "----------------------------------------------------------------"
 echo "Sending data:"
 echo "$url"
 
-curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s "${url}" > $response_file
+curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/checkin_request.txt "${url}" > /dev/null
 curl_result=$?
-curl_data=$(cat $response_file)
 
-if [ "$curl_result" -eq "0" ]; then
+if [ "${curl_result}" -eq 0 ]; then
 	echo "Checked in to the dashboard successfully,"
 	
-	if grep -q "." $response_file; then
+	if [ "$(grep -q "." /tmp/checkin_request.txt)" ]; then
 		echo "we have new settings to apply!"
 	else
 		echo "we will maintain the existing settings."
 		exit
 	fi
 else
-	logger "WARNING: Could not checkin to the dashboard."
-	echo "WARNING: Could not checkin to the dashboard."
-	
+	log_message "WARNING: Could not checkin to the dashboard."
 	exit
 fi
 
@@ -170,38 +164,30 @@ fi
 echo "----------------------------------------------------------------"
 echo "Applying settings"
 
-# define the hosts file
-echo "127.0.0.1 localhost" > /etc/hosts
-echo "${ip_lan} my.wifi-mesh.co.nz my.robin-mesh.com my.open-mesh.com node chilli" >> /etc/hosts
-
-# define the coova flag
-echo "0" > /tmp/coova_flag
-
-cat $response_file | while read line ; do
+cat /tmp/checkin_request.txt | while read line ; do
 	one=$(echo $line | awk '{print $1}')
 	two=$(echo $line | awk '{print $2}')
 	
 	echo "$one=$two"
 	
 	if [ "$one" = "system.ssh.key" ]; then
-		curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s -o /etc/dropbear/authorized_keys "$two"
+		curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -k -s -o /etc/dropbear/authorized_keys "$two"
 	elif [ "$one" = "system.ssh.password" ]; then
 		echo -e "$two\n$two" | passwd root
-		echo "/cgi-bin/:admin:$two" > /etc/httpd.conf
 	elif [ "$one" = "system.hostname" ]; then
 		uci set system.@system[0].hostname="$two"
-	elif [ "$one" = "system.firmware.branch" ]; then
-		echo "$two" > /sbin/wifimesh/firmware_branch.txt
 	elif [ "$one" = "servers.ntp.server" ]; then
 		uci set system.ntp.server="$two"
 	elif [ "$one" = "servers.ntp.timezone" ]; then
 		uci set system.@system[0].timezone="$two"
 	elif [ "$one" = "servers.firmware.url" ]; then
-		echo "$two" > /sbin/wifimesh/firmware_server.txt
+		uci set wifimesh.firmware.server="$two"
 	elif [ "$one" = "servers.firmware.branch" ]; then
-		echo "$two" > /sbin/wifimesh/firmware_branch.txt
+		uci set wifimesh.firmware.branch="$two"
 	elif [ "$one" = "servers.dashboard.url" ]; then
-		echo "$two" > /sbin/wifimesh/dashboard_server.txt
+		uci set wifimesh.dashboard.server="$two"
+	elif [ "$one" = "servers.ping.url" ]; then
+		uci set wifimesh.ping.server="$two"
 	
 	# SSID #1 (formerly Public SSID)
 	elif [ "$one" = "network.ssid1.enabled" ]; then
@@ -230,6 +216,9 @@ cat $response_file | while read line ; do
 		uci set wireless.@wifi-iface[1].isolate="$two"
 	elif [ "$one" = "network.ssid1.captive_portal" ]; then
 		if [ "$two" = "1" ]; then
+			uci set wifimesh.captive_portal.enabled_lan="1"
+			uci set wifimesh.captive_portal.enabled_wlan="1"
+			
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="lan"
 			
@@ -246,27 +235,28 @@ cat $response_file | while read line ; do
 					dns2=1
 				fi
 			done
-			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)&dnsname=$(cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'search' | awk '{ print $2 }')"
+			curl -s -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/defaults" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-config&$(sed ':a;N;$!ba;s/\n//g' /tmp/dns.tmp)&dnsname=$(cat /tmp/resolv.conf.auto | awk '/wan/ {seen = 1} seen {print}' | grep 'search' | awk '{ print $2 }')"
 			
 			# get the page to use as the splash page
-			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
+			curl -s -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.html" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-html"
 			
 			# get the logo to use on the splash page
-			curl -s -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
+			curl -s -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -o "/etc/chilli/www/coova.jpg" "${url}?ip=${ip_lan}&mac_lan=${mac_lan}&mac_wan=${mac_wan}&mac_wlan=${mac_wlan}&action=coova-logo"
 			
-			# restarts coovachilli
+			# start coovachilli at boot
 			/etc/init.d/chilli enable
-			echo "1" > /tmp/coova_flag
 			
 			# forces DNS for coova clients
 			uci set network.lan.dns="$(grep 'DNS1' /etc/chilli/defaults | cut -d = -f 2) $(grep 'DNS2' /etc/chilli/defaults | cut -d = -f 2)"
 		else
+			uci set wifimesh.captive_portal.enabled_lan="0"
+			uci set wifimesh.captive_portal.enabled_wlan="0"
+			
 			# change to use the LAN
 			uci set wireless.@wifi-iface[1].network="wan"
 			
-			# stops coovachilli
+			# stop coovachilli at boot
 			/etc/init.d/chilli disable
-			echo "2" > /tmp/coova_flag
 		fi
 	
 	# SSID #2 (formerly Private SSID)
@@ -356,9 +346,8 @@ cat $response_file | while read line ; do
 		uci set wireless.radio0.distance=$two
 	elif [ "$one" = "network.country" ]; then
 		uci set wireless.radio0.country=$two
-	elif [ "$one" = "network.channel.client" ]; then
-		uci set wireless.radio0.channel=$two
 	
+	# LAN Block
 	elif [ "$one" = "network.lan.block" ]; then
 		if [ "$two" == "1" ]; then
 			iptables -I FORWARD -s ${ip_lan_block}/24 -d 172.16.0.0/12 -j DROP
@@ -396,11 +385,6 @@ done
 
 # Save all of that
 uci commit
-
-# Clear out the old files
-if [ -e $status_file ]; then rm $status_file; fi
-if [ -e $response_file ]; then rm $response_file; fi
-if [ -e $temp_file ]; then rm $temp_file; fi
 
 echo "----------------------------------------------------------------"
 echo "Successfully applied new settings"

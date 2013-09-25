@@ -5,21 +5,17 @@
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
-# Load in the OpenWrt release information
-. /etc/openwrt_release
-architecture=$(echo $DISTRIB_TARGET | cut -d = -f 2 | cut -d / -f 1)
-device=$(cat /proc/cpuinfo | grep 'machine' | cut -f2 -d ":" | cut -b 2-50 | sed 's/ /_/g')
-
 echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
-log_message "Waiting a bit..."
-sleep $(head -30 /dev/urandom | tr -dc "0123456789" | head -c1)
-
-if [ "${firmware_branch}" = "fixed" ]; then
-	log_message "upgrade: We are locked on v${old_package_version}. Enable upgrades at the dashboard."
+# Check that we are allowed to use this
+if [ "$(uci get wifimesh.firmware.enabled)" -eq 0 ]; then
+	echo "This script is disabled, exiting..."
 	exit
 fi
+
+log_message "Waiting a bit..."
+sleep $(head -30 /dev/urandom | tr -dc "0123456789" | head -c1)
 
 log_message "upgrade: Checking for new upgrade package..."
 old_package_version=$(cat /sbin/wifimesh/package_version.txt)
