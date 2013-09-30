@@ -131,6 +131,17 @@ sleep 1
 reboot
 fi
 
+log_message "boot: loading in cronjobs"
+echo "# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
+# All rights reserved.
+
+* * * * * /sbin/wifimesh/check.sh
+* * * * * /sbin/wifimesh/update.sh
+0 * * * * /sbin/wifimesh/upgrade.sh
+*/5 * * * * /sbin/wifimesh/monitor.sh
+" > /tmp/cron.tmp
+crontab /tmp/cron.tmp
+
 log_message "boot: enabling stp"
 sleep 1 && brctl stp br-wan on
 }
