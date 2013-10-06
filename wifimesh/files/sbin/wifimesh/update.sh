@@ -5,6 +5,12 @@
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
+# Creates temporary directory if it doesn't already exist
+if [ ! -d "/tmp/checkin" ]; then mkdir /tmp/checkin; fi
+
+# Wipes out previous configuration updates from dashboard
+echo "" > /tmp/checkin_request.txt
+
 echo "WiFi Mesh Dashboard Checker"
 echo "----------------------------------------------------------------"
 
