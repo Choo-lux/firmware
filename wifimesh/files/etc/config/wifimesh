@@ -16,7 +16,7 @@ config wifimesh 'firmware'
 	option	'server'		'cdn.wifi-mesh.co.nz'
 	option	'branch'		'stable'
 
-config wifimesh 'check'
+config wifimesh 'ping'
 	option	'enabled'		'1'
 	option	'server'		'cdn.wifi-mesh.co.nz'
 
