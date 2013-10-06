@@ -149,7 +149,7 @@ curl_result=$?
 if [ "${curl_result}" -eq 0 ]; then
 	echo "Checked in to the dashboard successfully,"
 	
-	if [ "$(grep -q "." /tmp/checkin_request.txt)" ]; then
+	if grep -q "." /tmp/checkin_request.txt; then
 		echo "we have new settings to apply!"
 	else
 		echo "we will maintain the existing settings."
