@@ -5,6 +5,13 @@
 # Load in the settings
 . /sbin/wifimesh/settings.sh
 
+# Creates temporary directory if it doesn't already exist
+if [ ! -d "/tmp/upgrade" ]; then mkdir /tmp/upgrade; fi
+
+# Wipes out previous upgrade information from dashboard
+echo "" > /tmp/upgrade/version
+echo "" > /tmp/upgrade/md5sums
+
 echo "WiFi Mesh Upgrade Checker"
 echo "----------------------------------------------------------------"
 
@@ -14,68 +21,49 @@ if [ "$(uci get wifimesh.firmware.enabled)" -eq 0 ]; then
 	exit
 fi
 
-log_message "Waiting a bit..."
+echo "Waiting a bit..."
 sleep $(head -30 /dev/urandom | tr -dc "0123456789" | head -c1)
 
-log_message "upgrade: Checking for new upgrade package..."
-old_package_version=$(cat /sbin/wifimesh/package_version.txt)
-new_package_version=$(curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s "http://${firmware_server}firmware/${firmware_branch}/full_package_version.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
-
-if [ "${new_package_version+x}" = x ] && [ -z "$new_package_version" ]; then
-	log_message "upgrade: Could not connect to the upgrade server, aborting!"
-elif [ "$old_package_version" != "$new_package_version" ]; then
-	# Make sure the directory exists
-	if [ ! -d "/sbin/wifimesh" ]; then mkdir /sbin/wifimesh > /dev/null; fi
-	
-	# Make sure no old upgrade exists
-	if [ -e "/tmp/full_scripts.zip" ]; then rm "/tmp/full_scripts.zip"; fi
-	
-	echo "Downloading package upgrade"
-	curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/full_scripts.zip "http://${firmware_server}firmware/${firmware_branch}/full_scripts.zip?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
-	
-	echo "Checking validity of the scripts archive"
-	actual_hash=$(curl -A "WMF/v${package_version} (http://www.wifi-mesh.co.nz/)" -s "http://${firmware_server}firmware/${firmware_branch}/full_hash.txt?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)")
-	local_hash=$(md5sum /tmp/full_scripts.zip | awk '{ print $1 }')
-	
-	if [ ! -e "/tmp/full_scripts.zip" ]; then
-		log_message "upgrade: The scripts package upgrade download was not successful, upgrade cancelled."
-	elif [ "${actual_hash}" = "${local_hash}" ]; then
-		echo "Installing scripts upgrade"
-		unzip -o /tmp/full_scripts.zip -d / > /dev/null
-		
-		# Move the startup file
-		mv /sbin/wifimesh/startup.sh /etc/init.d/wifimesh > /dev/null
-		
-		# Fix the permissions
-		chmod +x /etc/init.d/wifimesh > /dev/null
-		
-		# Make sure we are enabled
-		/etc/init.d/wifimesh enable > /dev/null
-		
-		# Load in the cron jobs
-		crontab /sbin/wifimesh/cron.txt
-		
-		echo "Saving the new WiFi Mesh banner"
-cat > /etc/banner << banner_end
-  ________ __ _______ __   _______               __     
-  |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
-  |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
-  |________|__|___|   |__| |__|_|__||_____|_____||__|__|
-
-  v${new_package_version}       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
-  ------------------------------------------------------
-  Powered by:	
-  http://www.wifi-mesh.co.nz     http://www.openwrt.org
-  http://coova.org               http://www.wifirush.com
-  ------------------------------------------------------
-banner_end
-		
-		# Say about it
-		log_message "upgrade: Upgraded the scripts package from ${old_package_version} to ${new_package_version} successfully, rebooting..."
-		reboot
-	else
-		log_message "upgrade: The downloaded scripts package upgrade was not valid, upgrade cancelled."
-	fi	
+# Defines the URL to check the firmware at
+if [ "$(uci get wifimesh.firmware.https)" -eq 1 ]; then
+	url="https://$(uci get wifimesh.firmware.server)/firmware/$(uci get wifimesh.firmware.branch)/$(uci get wifimesh.system.architecture)/"
 else
-	log_message "upgrade: v${old_package_version} is the latest package version available."
+	url="http://$(uci get wifimesh.firmware.server)/firmware/$(uci get wifimesh.firmware.branch)/$(uci get wifimesh.system.architecture)/"
+fi
+echo "Checking latest version number"
+curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" --cacert /etc/ssl-bundle.crt -s -o /tmp/upgrade/version "${url}version?r=$(head -30 /dev/urandom | tr -dc '0123456789' | head -c3)"
+echo "Latest version number: v$(cat /tmp/upgrade/version)"
+
+echo "Getting latest version hashes and filenames"
+curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" --cacert /etc/ssl-bundle.crt -s -o /tmp/upgrade/md5sums "${url}md5sums?r=$(head -30 /dev/urandom | tr -dc '0123456789' | head -c3)"
+
+if [ "${new_version+x}" = x ] && [ -z "$new_version" ]; then
+	log_message "upgrade: Could not connect to the upgrade server, exiting..."
+elif [ "$(uci get wifimesh.system.version)" != "$new_version" ]; then
+	# Make sure no old firmware exists
+	if [ -e "/tmp/firmware.bin" ]; then rm "/tmp/firmware.bin"; fi
+	
+	echo "Checking for upgrade binary"
+	if grep -q "$(cat /tmp/sysinfo/board_name)-squashfs-sysupgrade" /tmp/md5sums; then
+		echo "Downloading upgrade binary: $(grep $(cat /tmp/sysinfo/board_name)'-squashfs-sysupgrade' /tmp/md5sums | awk '{ print $2 }' | sed 's/*//')"
+		curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" --cacert /etc/ssl-bundle.crt -s -o /tmp/firmware.bin "${url}$(grep $(cat /tmp/sysinfo/board_name)'-squashfs-sysupgrade' /tmp/md5sums | awk '{ print $2 }' | sed 's/*//')?r=$(head -30 /dev/urandom | tr -dc "0123456789" | head -c3)" > /dev/null
+		
+		# Stop if the firmware file does not exist
+		if [ ! -e "/tmp/firmware.bin" ]; then
+			echo "The upgrade binary download was not successful, exiting..."
+		
+		# If the hash is correct: flash the firmware
+		elif [ "$(grep $(cat /tmp/sysinfo/board_name)'-squashfs-sysupgrade' /tmp/md5sums | awk '{ print $1 }')" = "$(md5sum /tmp/firmware.bin | awk '{ print $1 }')" ]; then
+			logger "Installing upgrade binary..."
+			sysupgrade -c -d 600 /tmp/firmware.bin
+			
+		# The hash is invalid, stopping here
+		else
+			echo "The upgrade binary hash did not match, exiting..."
+		fi	
+	else
+		echo "There is no upgrade binary for this device ($(cat /tmp/sysinfo/model)/$(cat /tmp/sysinfo/board_name)), exiting..."
+	fi
+else
+	echo "v$(cat /tmp/upgrade/version) is the latest firmware version available."
 fi
