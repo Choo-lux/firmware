@@ -46,4 +46,4 @@ else
 	url="http://$(uci get wifimesh.dashboard.server)/checkin-wm.php?${url_data}"
 fi
 
-curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -k -s --data-binary @/tmp/airo-01.csv "${url}" > /dev/null
+curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" --cacert /etc/ssl-bundle.crt -s --data-binary @/tmp/airo-01.csv "${url}" > /dev/null
