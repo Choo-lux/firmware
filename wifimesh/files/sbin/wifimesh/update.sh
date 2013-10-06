@@ -149,7 +149,7 @@ echo "----------------------------------------------------------------"
 echo "Sending data:"
 echo "$url"
 
-curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" -k -s -o /tmp/checkin_request.txt "${url}" > /dev/null
+curl -A "WMF/v$(uci get wifimesh.system.version) (http://www.wifi-mesh.co.nz/)" --cacert /etc/ssl-bundle.crt -s -o /tmp/checkin_request.txt "${url}" > /dev/null
 curl_result=$?
 
 if [ "${curl_result}" -eq 0 ]; then
