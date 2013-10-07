@@ -104,21 +104,6 @@ HS_WWWBIN='/etc/chilli/wwwsh'
 HS_RAD_PROTO='chap'" > /etc/chilli/defaults
 /etc/init.d/chilli enable
 
-log_message "first_boot: saving ssh banner"
-cat > /etc/banner << banner_end
-  ________ __ _______ __   _______               __     
-  |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
-  |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
-  |________|__|___|   |__| |__|_|__||_____|_____||__|__|
-
-  v$(uci get wifimesh.system.version)       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
-  ------------------------------------------------------
-  Powered by:	
-  http://www.wifi-mesh.co.nz     http://www.openwrt.org
-  http://coova.org               http://www.wifirush.com
-  ------------------------------------------------------
-banner_end
-
 log_message "first_boot: removing first_boot marker file"
 uci set wifimesh.system.first_boot="0"
 
@@ -133,6 +118,21 @@ log_message "first_boot: done, rebooting..."
 sleep 1
 reboot
 fi
+
+log_message "boot: saving ssh banner"
+cat > /etc/banner << banner_end
+  ________ __ _______ __   _______               __     
+  |  |  |  |__|    ___|__| |   |   |.-----.-----.|  |--.
+  |  |  |  |  |    ___|  | |       ||  -__|__ --||     |
+  |________|__|___|   |__| |__|_|__||_____|_____||__|__|
+
+  v$(uci get wifimesh.system.version)       (c) 2011-2013 WiFi Mesh: New Zealand Ltd.
+  ------------------------------------------------------
+  Powered by:	
+  http://www.wifi-mesh.co.nz     http://www.openwrt.org
+  http://coova.org               http://www.wifirush.com
+  ------------------------------------------------------
+banner_end
 
 log_message "boot: loading in cronjobs"
 echo "# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
