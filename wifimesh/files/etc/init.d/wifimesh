@@ -126,6 +126,9 @@ log_message "first_boot: saving configuration"
 uci commit
 sleep 5
 
+log_message "first_boot: getting dashboard configuration"
+/sbin/wifimesh/update.sh 1
+
 log_message "first_boot: done, rebooting..."
 sleep 1
 reboot
