@@ -55,6 +55,11 @@ elif [ "$(uci get wifimesh.system.version)" != "$new_version" ]; then
 		# If the hash is correct: flash the firmware
 		elif [ "$(grep $(cat /tmp/sysinfo/board_name)'-squashfs-sysupgrade' /tmp/md5sums | awk '{ print $1 }')" = "$(md5sum /tmp/firmware.bin | awk '{ print $1 }')" ]; then
 			logger "Installing upgrade binary..."
+			
+			uci set wifimesh.system.version=${new_version}
+			uci set wifimesh.system.first_boot=1
+			uci commit wifimesh
+			
 			sysupgrade -c -d 600 /tmp/firmware.bin
 			
 		# The hash is invalid, stopping here
