@@ -134,6 +134,9 @@ cat > /etc/banner << banner_end
   ------------------------------------------------------
 banner_end
 
+log_message "boot: acquire dhcp lease using system hostname"
+udhcpc --i br-wan --hostname $(uci get system.@system[0].hostname) --fqdn $(uci get system.@system[0].hostname)
+
 log_message "boot: loading in cronjobs"
 echo "# Copyright © 2011-2013 WiFi Mesh: New Zealand Ltd.
 # All rights reserved.
